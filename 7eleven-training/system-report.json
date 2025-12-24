@@ -1,0 +1,11 @@
+{
+  "timestamp": "9/12/2568 14:46:08",
+  "sqlite": {
+    "found": true,
+    "studentCount": 3230
+  },
+  "supabase": {
+    "configured": false
+  },
+  "status": "unknown"
+}

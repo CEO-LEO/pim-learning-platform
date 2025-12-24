@@ -1,0 +1,194 @@
+// This is your Prisma schema file for Supabase PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  student_id      String   @id @db.VarChar(20)
+  password_hash   String?  @db.VarChar(255)
+  birthdate       DateTime? @db.Date
+  otp_code        String?  @db.VarChar(6)
+  otp_expires_at  DateTime?
+  role            String   @default("student") @db.VarChar(20) // student, admin, instructor
+  name            String   @db.VarChar(255)
+  email           String?  @db.VarChar(255)
+  phone           String?  @db.VarChar(20)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  enrollments     Enrollment[]
+  quiz_attempts   QuizAttempt[]
+  bookings        Booking[]
+  station_logs    StationLog[]
+  evaluations     Evaluation[]
+
+  @@index([role])
+  @@map("users")
+}
+
+model Course {
+  course_id       String   @id @default(uuid())
+  title           String   @db.VarChar(255)
+  description     String?  @db.Text
+  video_url       String?  @db.VarChar(500)
+  duration        Int?     // in minutes
+  order_index     Int      @default(0)
+  is_active       Boolean  @default(true)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  enrollments     Enrollment[]
+  quizzes         Quiz[]
+  stations        Station[]
+
+  @@index([is_active, order_index])
+  @@map("courses")
+}
+
+model Enrollment {
+  enrollment_id   String   @id @default(uuid())
+  student_id      String   @db.VarChar(20)
+  course_id       String
+  status          String   @default("registered") @db.VarChar(20) // registered, in-progress, completed
+  progress_percent Int      @default(0)
+  enrolled_at     DateTime @default(now())
+  started_at      DateTime?
+  completed_at    DateTime?
+  updated_at      DateTime @updatedAt
+
+  student         User     @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+  course          Course   @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+
+  @@unique([student_id, course_id])
+  @@index([student_id, status])
+  @@index([course_id])
+  @@map("enrollments")
+}
+
+model Quiz {
+  quiz_id         String   @id @default(uuid())
+  course_id       String
+  type            String   @db.VarChar(20) // pre-test, post-test
+  title           String   @db.VarChar(255)
+  description     String?  @db.Text
+  time_limit      Int?     // in minutes
+  passing_score   Int      @default(70) // percentage
+  is_active       Boolean  @default(true)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  course          Course   @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+  questions       QuizQuestion[]
+  attempts        QuizAttempt[]
+
+  @@index([course_id, type])
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  question_id     String   @id @default(uuid())
+  quiz_id         String
+  question_text   String   @db.Text
+  question_type   String   @default("multiple_choice") @db.VarChar(50)
+  options         Json?    // Array of options for multiple choice
+  correct_answer  String   @db.Text
+  points          Int      @default(1)
+  order_index     Int      @default(0)
+  created_at      DateTime @default(now())
+
+  quiz            Quiz     @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+
+  @@index([quiz_id, order_index])
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  attempt_id      String   @id @default(uuid())
+  student_id      String   @db.VarChar(20)
+  quiz_id         String
+  score           Int      // percentage
+  status          String   @db.VarChar(20) // pass, fail
+  answers         Json?    // Student's answers
+  started_at      DateTime @default(now())
+  completed_at    DateTime?
+  time_taken      Int?     // in seconds
+
+  student         User     @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+  quiz            Quiz     @relation(fields: [quiz_id], references: [quiz_id], onDelete: Cascade)
+
+  @@index([student_id, quiz_id])
+  @@index([quiz_id])
+  @@map("quiz_attempts")
+}
+
+model Booking {
+  booking_id      String   @id @default(uuid())
+  student_id      String   @db.VarChar(20)
+  slot_datetime   DateTime
+  status          String   @default("confirmed") @db.VarChar(20) // confirmed, cancelled, completed
+  qr_code         String?  @db.VarChar(255)
+  check_in_time   DateTime?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  student         User     @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+
+  @@unique([slot_datetime, student_id])
+  @@index([slot_datetime, status])
+  @@index([student_id])
+  @@map("bookings")
+}
+
+model Station {
+  station_id      String   @id @default(uuid())
+  course_id       String
+  station_name    String   @db.VarChar(100) // Service, Warming, etc.
+  description     String?  @db.Text
+  order_index     Int      @default(0)
+  is_active       Boolean  @default(true)
+  created_at      DateTime @default(now())
+
+  course          Course   @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
+  logs            StationLog[]
+
+  @@index([course_id, order_index])
+  @@map("stations")
+}
+
+model StationLog {
+  log_id          String   @id @default(uuid())
+  student_id      String   @db.VarChar(20)
+  station_id      String
+  stamp_status    String   @db.VarChar(20) // passed, failed
+  timestamp       DateTime @default(now())
+  approver_id     String?  @db.VarChar(20) // Staff/Instructor ID
+  notes           String?  @db.Text
+
+  student         User     @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+  station         Station  @relation(fields: [station_id], references: [station_id], onDelete: Cascade)
+
+  @@unique([student_id, station_id])
+  @@index([student_id])
+  @@index([station_id])
+  @@map("station_logs")
+}
+
+model Evaluation {
+  evaluation_id   String   @id @default(uuid())
+  student_id      String   @db.VarChar(20)
+  rating          Int      // 1-5 scale
+  comment         String?  @db.Text
+  submitted_at    DateTime @default(now())
+
+  student         User     @relation(fields: [student_id], references: [student_id], onDelete: Cascade)
+
+  @@index([student_id])
+  @@index([rating])
+  @@map("evaluations")
+}
