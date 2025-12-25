@@ -82,6 +82,15 @@ app.use('/api/rooms', roomRoutes);
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'ok', 
+    message: 'PIM Learning Platform API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Root route
 app.get('/', (req, res) => {
   const html = `
