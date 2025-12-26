@@ -1,8 +1,8 @@
 {
-  "buildCommand": "cd client && npm install && npm run build",
+  "buildCommand": "npm run vercel-build",
   "outputDirectory": "client/build",
-  "installCommand": "cd client && npm install",
-  "framework": "create-react-app",
+  "installCommand": "cd client && npm ci",
+  "framework": null,
   "rewrites": [
     {
       "source": "/(.*)",
