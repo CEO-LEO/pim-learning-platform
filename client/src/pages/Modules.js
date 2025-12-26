@@ -7,7 +7,7 @@ import Toast from '../components/Toast';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-const QuizSection = ({ moduleId, videos = [] }) => {
+const QuizSection = ({ moduleId, videos = [], videosLoading = false }) => {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -467,7 +467,7 @@ const Modules = () => {
             <p className="text-sm sm:text-base md:text-lg text-blue-50">{selectedModule.description}</p>
           </div>
 
-          <QuizSection moduleId={moduleId} videos={videos} />
+          <QuizSection moduleId={moduleId} videos={videos} videosLoading={videosLoading} />
 
           {toast && (
             <Toast
