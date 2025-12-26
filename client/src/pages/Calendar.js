@@ -117,6 +117,7 @@ const Calendar = () => {
 
   const todayEvents = useMemo(() => {
     return getEventsForDate(selectedDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [events, selectedDate]);
 
   const getEventTypeConfig = (type) => {
