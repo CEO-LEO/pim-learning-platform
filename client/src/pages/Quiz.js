@@ -302,10 +302,10 @@ const Quiz = () => {
     
     return (
       <div className="space-y-6" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <FiAlertCircle className="mx-auto text-red-500 mb-4" size={48} />
-          <h2 className="text-xl font-bold text-red-800 mb-2">เกิดข้อผิดพลาด</h2>
-          <p className="text-red-600 mb-4">{error}</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+          <FiAlertCircle className="mx-auto text-red-500 mb-3" size={32} />
+          <h2 className="text-lg font-bold text-red-800 mb-2">เกิดข้อผิดพลาด</h2>
+          <p className="text-sm text-red-600 mb-4">{error}</p>
           <div className="flex items-center justify-center space-x-4">
             <button
               onClick={fetchQuiz}
@@ -349,10 +349,10 @@ const Quiz = () => {
   if (!quiz.questions || quiz.questions.length === 0) {
     return (
       <div className="space-y-6" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-          <FiAlertCircle className="mx-auto text-yellow-500 mb-4" size={48} />
-          <h2 className="text-xl font-bold text-yellow-800 mb-2">ไม่พบคำถาม</h2>
-          <p className="text-yellow-600 mb-4">แบบทดสอบนี้ยังไม่มีคำถาม กรุณาติดต่อผู้ดูแลระบบ</p>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+          <FiAlertCircle className="mx-auto text-yellow-500 mb-3" size={32} />
+          <h2 className="text-lg font-bold text-yellow-800 mb-2">ไม่พบคำถาม</h2>
+          <p className="text-sm text-yellow-600 mb-4">แบบทดสอบนี้ยังไม่มีคำถาม กรุณาติดต่อผู้ดูแลระบบ</p>
           <div className="flex items-center justify-center space-x-4">
             {quiz.module_id ? (
               <Link
@@ -386,20 +386,20 @@ const Quiz = () => {
           <span>กลับไปหน้าหลักสูตร</span>
         </Link>
 
-        <div className="bg-white rounded-xl shadow-md p-8 text-center">
-          <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${
+        <div className="bg-white rounded-lg shadow-md p-4 text-center">
+          <div className={`w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center ${
             result.passed ? 'bg-green-100' : 'bg-red-100'
           }`}>
             {result.passed ? (
-              <FiCheckCircle className="text-green-600" size={48} />
+              <FiCheckCircle className="text-green-600" size={32} />
             ) : (
-              <FiXCircle className="text-red-600" size={48} />
+              <FiXCircle className="text-red-600" size={32} />
             )}
           </div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">
+          <h2 className="text-xl font-bold text-gray-800 mb-2">
             {result.passed ? 'ผ่าน!' : 'ไม่ผ่าน'}
           </h2>
-          <p className="text-2xl font-semibold text-blue-600 mb-4">
+          <p className="text-lg font-semibold text-blue-600 mb-3">
             คะแนน: {result.score}%
           </p>
           <p className="text-gray-600 mb-4">
@@ -455,18 +455,18 @@ const Quiz = () => {
       </Link>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-4 text-white shadow-md">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold mb-2">{quiz.title}</h1>
-            <p className="text-purple-100">
+            <h1 className="text-lg font-bold mb-1">{quiz.title}</h1>
+            <p className="text-sm text-purple-100">
               {quiz.questions?.length || 0} คำถาม
             </p>
           </div>
           {timeLeft !== null && (
-            <div className="flex items-center space-x-2 bg-white bg-opacity-20 rounded-lg px-4 py-2">
-              <FiClock size={20} />
-              <span className="text-xl font-bold">{formatTime(timeLeft)}</span>
+            <div className="flex items-center space-x-2 bg-white bg-opacity-20 rounded-lg px-3 py-1.5">
+              <FiClock size={16} />
+              <span className="text-base font-bold">{formatTime(timeLeft)}</span>
             </div>
           )}
         </div>
@@ -477,14 +477,14 @@ const Quiz = () => {
         {quiz.questions?.map((question, index) => (
           <div 
             key={question.question_id} 
-            className={`bg-white rounded-xl shadow-md p-6 transition-all ${
+            className={`bg-white rounded-lg shadow-md p-4 transition-all ${
               answers[question.question_id] 
                 ? 'border-2 border-purple-200' 
                 : 'border-2 border-transparent'
             }`}
           >
-            <div className="flex items-start space-x-4">
-              <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+            <div className="flex items-start space-x-3">
+              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-sm ${
                 answers[question.question_id]
                   ? 'bg-purple-600'
                   : 'bg-gray-300'
@@ -492,7 +492,7 @@ const Quiz = () => {
                 {index + 1}
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                <h3 className="text-base font-semibold text-gray-800 mb-3">
                   {question.question}
                 </h3>
                 <div className="space-y-2">

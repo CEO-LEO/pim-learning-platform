@@ -1,66 +1,72 @@
-const db = require('./init');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+
+const dbPath = path.join(__dirname, 'pim_learning.db');
+const db = new sqlite3.Database(dbPath);
 
 const moduleId = 'module_3';
-const videoUrl = '/uploads/videos/store-model-101-video4.mp4';
-const duration = 299; // 4 minutes 59 seconds
-const mainVideoId = '6e108d67-f847-4e1b-9458-399040500e77';
+const orderIndex = 1;
+const videoTitle = 'การจัดการอุปกรณ์และความสะอาด - วิดีโอที่ 1';
+const videoUrl = '/uploads/videos/video-module_3-1.mp4';
 
-console.log(`🔧 Updating video for Module 3 (Video ID: ${mainVideoId})...`);
+console.log('📹 Updating module_3 video...\n');
 
 db.serialize(() => {
-  // 1. Update the main video
-  db.run(
-    'UPDATE videos SET url = ?, duration = ? WHERE video_id = ?',
-    [videoUrl, duration, mainVideoId],
-    function(err) {
+  // Check if video exists
+  db.get(
+    'SELECT video_id FROM videos WHERE module_id = ? AND order_index = ?',
+    [moduleId, orderIndex],
+    (err, existingVideo) => {
       if (err) {
-        console.error('❌ Error updating video:', err.message);
+        console.error('❌ Database error:', err.message);
         db.close();
         process.exit(1);
       }
-      console.log(`✅ Updated main video with URL: ${videoUrl} and Duration: ${duration}s`);
 
-      // 2. Get all other videos in module_3 to delete
-      db.all(
-        'SELECT video_id FROM videos WHERE module_id = ? AND video_id != ?',
-        [moduleId, mainVideoId],
-        (err, rows) => {
-          if (err) {
-            console.error('❌ Error fetching duplicate videos:', err.message);
+      if (existingVideo) {
+        // Update existing video
+        db.run(
+          'UPDATE videos SET title = ?, url = ? WHERE video_id = ?',
+          [videoTitle, videoUrl, existingVideo.video_id],
+          function(updateErr) {
+            if (updateErr) {
+              console.error('❌ Error updating video:', updateErr.message);
+              db.close();
+              process.exit(1);
+            }
+
+            console.log('✅ Video updated successfully!');
+            console.log(`   Title: ${videoTitle}`);
+            console.log(`   URL: ${videoUrl}`);
+            console.log(`   Rows affected: ${this.changes}`);
             db.close();
-            process.exit(1);
+            process.exit(0);
           }
+        );
+      } else {
+        // Create new video
+        const uuid = require('uuid');
+        const videoId = uuid.v4();
+        
+        db.run(
+          'INSERT INTO videos (video_id, module_id, title, url, duration, order_index) VALUES (?, ?, ?, ?, ?, ?)',
+          [videoId, moduleId, videoTitle, videoUrl, 0, orderIndex],
+          function(insertErr) {
+            if (insertErr) {
+              console.error('❌ Error creating video:', insertErr.message);
+              db.close();
+              process.exit(1);
+            }
 
-          const idsToDelete = rows.map(r => r.video_id);
-          console.log(`📋 Found ${idsToDelete.length} duplicate videos to delete.`);
-
-          if (idsToDelete.length > 0) {
-            const placeholders = idsToDelete.map(() => '?').join(',');
-            
-            // Delete progress first
-            db.run(`DELETE FROM video_progress WHERE video_id IN (${placeholders})`, idsToDelete, (err) => {
-              if (err) console.error('❌ Error deleting progress:', err.message);
-              
-              // Delete videos
-              db.run(`DELETE FROM videos WHERE video_id IN (${placeholders})`, idsToDelete, function(err) {
-                if (err) console.error('❌ Error deleting videos:', err.message);
-                else console.log(`✅ Deleted ${this.changes} duplicate videos`);
-                
-                finish();
-              });
-            });
-          } else {
-            finish();
+            console.log('✅ Video created successfully!');
+            console.log(`   Video ID: ${videoId}`);
+            console.log(`   Title: ${videoTitle}`);
+            console.log(`   URL: ${videoUrl}`);
+            db.close();
+            process.exit(0);
           }
-        }
-      );
+        );
+      }
     }
   );
 });
-
-function finish() {
-  console.log('\n🎉 Finished updating Module 3!');
-  db.close();
-  process.exit(0);
-}
-

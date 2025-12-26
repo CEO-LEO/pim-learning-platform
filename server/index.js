@@ -1,3 +1,14 @@
+// Suppress deprecation warnings from dependencies
+process.removeAllListeners('warning');
+process.on('warning', (warning) => {
+  // Only suppress fs.F_OK deprecation warnings
+  if (warning.name === 'DeprecationWarning' && warning.message.includes('fs.F_OK')) {
+    return; // Suppress this specific warning
+  }
+  // Show other warnings
+  console.warn(warning.name, warning.message);
+});
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');

@@ -88,14 +88,19 @@ router.get('/student', authenticateToken, (req, res) => {
 router.get('/dashboard', authenticateToken, (req, res) => {
   const { userId } = req.user;
 
-  // Total learning hours
+  // Calculate total watch time from actual video_progress (in seconds)
   db.get(
-    'SELECT SUM(hours) as total_hours FROM learning_hours WHERE user_id = ?',
+    `SELECT COALESCE(SUM(vp.watch_time), 0) as total_seconds 
+     FROM video_progress vp 
+     WHERE vp.user_id = ?`,
     [userId],
-    (err, hoursResult) => {
+    (err, watchTimeResult) => {
       if (err) {
         return res.status(500).json({ error: 'Database error' });
       }
+      
+      // Convert seconds to hours (with decimal precision)
+      const totalHours = (watchTimeResult.total_seconds || 0) / 3600;
 
       // Completed modules
       db.all(
@@ -157,7 +162,8 @@ router.get('/dashboard', authenticateToken, (req, res) => {
                       }
 
                       res.json({
-                        total_hours: hoursResult.total_hours || 0,
+                        total_hours: totalHours,
+                        total_seconds: watchTimeResult.total_seconds || 0,
                         modules: modules.map(m => ({
                           ...m,
                           completion_rate: m.total_videos > 0 ? (m.completed_videos / m.total_videos) * 100 : 0

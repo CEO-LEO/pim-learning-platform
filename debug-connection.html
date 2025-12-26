@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug API Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1d4ed8;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug API Connection</h1>
+        
+        <div class="test-section">
+            <h2>1. ตรวจสอบ Environment Variable</h2>
+            <p>REACT_APP_API_URL ที่ Frontend ใช้:</p>
+            <div id="env-url" class="result info">กำลังตรวจสอบ...</div>
+            <button onclick="checkEnv()">ตรวจสอบอีกครั้ง</button>
+        </div>
+
+        <div class="test-section">
+            <h2>2. ทดสอบ Backend Connection</h2>
+            <p>ทดสอบเชื่อมต่อกับ Backend:</p>
+            <button onclick="testBackend()">ทดสอบ Backend</button>
+            <div id="backend-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. ทดสอบ Login API</h2>
+            <p>ทดสอบ API endpoint `/api/auth/login`:</p>
+            <button onclick="testLoginAPI()">ทดสอบ Login API</button>
+            <div id="login-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. ข้อมูลสำหรับ Debug</h2>
+            <button onclick="showDebugInfo()">แสดงข้อมูล Debug</button>
+            <div id="debug-info" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // ตรวจสอบ Environment Variable
+        function checkEnv() {
+            const apiUrl = 'REACT_APP_API_URL' in process?.env 
+                ? process.env.REACT_APP_API_URL 
+                : (window.REACT_APP_API_URL || 'ไม่พบ');
+            
+            const displayUrl = apiUrl === 'ไม่พบ' 
+                ? '❌ ไม่พบ REACT_APP_API_URL\n\nต้องตั้งค่าใน Vercel:\nSettings → Environment Variables → REACT_APP_API_URL\nValue = https://pim-learning-platform-production.up.railway.app/api'
+                : `✅ พบ REACT_APP_API_URL:\n${apiUrl}\n\n${apiUrl.includes('/api') ? '✅ มี /api ต่อท้าย' : '❌ ไม่มี /api ต่อท้าย'}`;
+            
+            document.getElementById('env-url').textContent = displayUrl;
+            document.getElementById('env-url').className = apiUrl === 'ไม่พบ' ? 'result error' : 'result success';
+        }
+
+        // ทดสอบ Backend Connection
+        async function testBackend() {
+            const resultDiv = document.getElementById('backend-result');
+            resultDiv.textContent = 'กำลังทดสอบ...';
+            resultDiv.className = 'result info';
+
+            const backendUrl = 'https://pim-learning-platform-production.up.railway.app';
+            
+            try {
+                const response = await fetch(backendUrl, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                
+                resultDiv.textContent = `✅ Backend ตอบสนอง\nStatus: ${response.status}\nURL: ${backendUrl}`;
+                resultDiv.className = 'result success';
+            } catch (error) {
+                resultDiv.textContent = `❌ ไม่สามารถเชื่อมต่อ Backend ได้\nError: ${error.message}\n\nตรวจสอบ:\n1. Backend status = Online (Railway)\n2. URL ถูกต้อง: ${backendUrl}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        // ทดสอบ Login API
+        async function testLoginAPI() {
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.textContent = 'กำลังทดสอบ...';
+            resultDiv.className = 'result info';
+
+            const apiUrl = 'https://pim-learning-platform-production.up.railway.app/api/auth/login';
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        studentId: 'STU001',
+                        password: 'student123'
+                    }),
+                    mode: 'cors'
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.textContent = `✅ Login API ทำงานได้\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.textContent = `⚠️ Login API ตอบสนอง แต่มี error\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ ไม่สามารถเรียก Login API ได้\nError: ${error.message}\n\nตรวจสอบ:\n1. CORS configuration ใน Backend\n2. ALLOWED_ORIGINS ใน Railway\n3. URL ถูกต้อง: ${apiUrl}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        // แสดงข้อมูล Debug
+        function showDebugInfo() {
+            const infoDiv = document.getElementById('debug-info');
+            const info = {
+                'Current URL': window.location.href,
+                'User Agent': navigator.userAgent,
+                'Backend URL': 'https://pim-learning-platform-production.up.railway.app',
+                'API URL': 'https://pim-learning-platform-production.up.railway.app/api',
+                'Timestamp': new Date().toISOString()
+            };
+
+            infoDiv.textContent = JSON.stringify(info, null, 2);
+            infoDiv.className = 'result info';
+        }
+
+        // รันอัตโนมัติเมื่อโหลดหน้า
+        window.onload = function() {
+            checkEnv();
+        };
+    </script>
+</body>
+</html>
+

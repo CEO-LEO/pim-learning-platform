@@ -124,16 +124,16 @@ const QuizSection = ({ moduleId, videos = [] }) => {
     <div className="space-y-6 sm:space-y-8">
       {/* Pre-test Section */}
       {pretest && (
-        <div className={`bg-gradient-to-br ${pretestDone ? 'from-green-50 to-green-100 border-green-200' : 'from-orange-50 to-orange-100 border-orange-200'} rounded-xl md:rounded-2xl shadow-lg p-6 sm:p-8 md:p-10 border-2`}>
-          <div className="flex items-center space-x-4 mb-4">
-            <div className={`p-3 rounded-full ${pretestDone ? 'bg-green-500' : 'bg-orange-500'} text-white`}>
-              <FiClipboard size={32} />
+        <div className={`bg-gradient-to-br ${pretestDone ? 'from-green-50 to-green-100 border-green-200' : 'from-orange-50 to-orange-100 border-orange-200'} rounded-lg shadow-md p-4 sm:p-5 border-2`}>
+          <div className="flex items-center space-x-3 mb-3">
+            <div className={`p-2 rounded-full ${pretestDone ? 'bg-green-500' : 'bg-orange-500'} text-white`}>
+              <FiClipboard size={20} />
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-800">
               แบบทดสอบก่อนเรียน (Pre-test)
             </h2>
           </div>
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-6">
+          <p className="text-sm sm:text-base text-gray-600 mb-4">
             {pretestDone 
               ? normalizedLastPassed === 1
                 ? 'คุณทำแบบทดสอบก่อนเรียนเรียบร้อยแล้ว สามารถเริ่มเรียนเนื้อหาวิดีโอได้'
@@ -150,15 +150,15 @@ const QuizSection = ({ moduleId, videos = [] }) => {
                   pretestDone: pretestDone
                 });
               }}
-              className="inline-flex items-center space-x-4 bg-orange-600 text-white px-10 sm:px-12 py-5 sm:py-6 rounded-xl md:rounded-2xl hover:bg-orange-700 transition-colors font-bold text-lg sm:text-xl md:text-2xl shadow-lg cursor-pointer"
+              className="inline-flex items-center space-x-2 bg-orange-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-orange-700 transition-colors font-semibold text-sm sm:text-base shadow-md cursor-pointer"
               style={{ textDecoration: 'none' }}
             >
               <span>เริ่มทำแบบทดสอบก่อนเรียน</span>
-              <FiArrowRight size={28} />
+              <FiArrowRight size={18} />
             </a>
           ) : (
-            <div className="flex items-center space-x-3 text-green-600 font-bold text-2xl">
-              <FiCheckCircle size={32} />
+            <div className="flex items-center space-x-2 text-green-600 font-semibold text-base">
+              <FiCheckCircle size={20} />
               <span>ทำแบบทดสอบก่อนเรียนแล้ว {pretest.last_score >= 0 && `(คะแนน: ${pretest.last_score}%)`}</span>
             </div>
           )}
@@ -168,21 +168,31 @@ const QuizSection = ({ moduleId, videos = [] }) => {
       {/* Main Content (Videos and Other Quizzes) */}
       <div className={!pretestDone ? 'opacity-50 pointer-events-none' : ''}>
         {!pretestDone && (
-          <div className="bg-red-100 text-red-700 p-4 rounded-xl mb-6 flex items-center space-x-3 font-bold text-xl">
-            <FiAlertCircle size={28} />
+          <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 flex items-center space-x-2 font-semibold text-sm">
+            <FiAlertCircle size={18} />
             <span>กรุณาทำแบบทดสอบก่อนเรียนด้านบนให้เสร็จก่อน จึงจะสามารถเข้าถึงเนื้อหาได้</span>
           </div>
         )}
         
         {/* Videos List Wrapper */}
-        <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-6 sm:p-8 md:p-10 mb-8">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-6 sm:mb-8 md:mb-10">วิดีโอในหมวดนี้</h2>
-          <div className="space-y-4 sm:space-y-5 md:space-y-6">
-            {videos
-              .filter(v => v.url && v.url.trim() !== '')
-              .filter((v, index, arr) => arr.findIndex(v2 => v2.order_index === v.order_index) === index)
-              .sort((a, b) => (a.order_index || 0) - (b.order_index || 0))
-              .map((video, index, sortedVideos) => {
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-5 mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">วิดีโอในหมวดนี้</h2>
+          {videosLoading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3"></div>
+              <p className="text-gray-600 text-sm">กำลังโหลดวิดีโอ...</p>
+            </div>
+          ) : videos.length === 0 ? (
+            <div className="text-center py-8">
+              <FiPlay className="mx-auto text-gray-400 mb-3" size={40} />
+              <p className="text-gray-600 text-sm">ยังไม่มีวิดีโอในหมวดนี้</p>
+            </div>
+          ) : (
+            <div className="space-y-4 sm:space-y-5 md:space-y-6">
+              {videos
+                .filter((v, index, arr) => arr.findIndex(v2 => v2.order_index === v.order_index) === index)
+                .sort((a, b) => (a.order_index || 0) - (b.order_index || 0))
+                .map((video, index, sortedVideos) => {
                 // Check if previous video is completed
                 const prevVideo = index > 0 ? sortedVideos[index - 1] : null;
                 const isPrevVideoCompleted = !prevVideo || prevVideo.is_complete === 1;
@@ -191,76 +201,77 @@ const QuizSection = ({ moduleId, videos = [] }) => {
                 return (
                   <div
                     key={video.video_id}
-                    className={`block border-2 rounded-xl md:rounded-2xl p-6 sm:p-7 md:p-8 lg:p-10 transition-all ${
+                    className={`block border-2 rounded-lg p-3 sm:p-4 transition-all ${
                       isLocked
                         ? 'border-gray-300 bg-gray-50 opacity-60 cursor-not-allowed'
-                        : 'border-gray-200 hover:border-blue-500 hover:shadow-xl transform hover:scale-[1.01] md:hover:scale-[1.02]'
+                        : 'border-gray-200 hover:border-blue-500 hover:shadow-md'
                     }`}
                   >
                     {isLocked ? (
-                      <div className="flex items-center justify-between gap-5 sm:gap-6">
-                        <div className="flex items-center space-x-4 sm:space-x-5 md:space-x-6 flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
                           <div className="flex-shrink-0">
-                            <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full bg-gray-200 flex items-center justify-center shadow-lg">
-                              <FiAlertCircle className="text-gray-500" size={32} />
+                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                              <FiAlertCircle className="text-gray-500" size={18} />
                             </div>
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-500 mb-3 sm:mb-4 line-clamp-2">{video.title}</h3>
-                            <div className="flex flex-wrap items-center gap-4 sm:gap-5 text-base sm:text-lg md:text-xl lg:text-2xl text-gray-500">
-                              <span className="flex items-center space-x-2 sm:space-x-3">
-                                <FiClock size={22} />
-                                <span className="font-semibold">{Math.floor((video.duration || 0) / 60)} นาที</span>
+                            <h3 className="text-base sm:text-lg font-semibold text-gray-500 mb-2 line-clamp-2">{video.title}</h3>
+                            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
+                              <span className="flex items-center space-x-1">
+                                <FiClock size={14} />
+                                <span className="font-medium">{Math.floor((video.duration || 0) / 60)} นาที</span>
                               </span>
-                              <span className="text-red-600 font-bold text-lg sm:text-xl md:text-2xl">
+                              <span className="text-red-600 font-semibold text-sm">
                                 🔒 กรุณาดูวิดีโอที่ {prevVideo?.order_index || index} ให้ครบ 100% ก่อน
                               </span>
                             </div>
                           </div>
                         </div>
-                        <FiAlertCircle className="text-gray-400 flex-shrink-0" size={28} />
+                        <FiAlertCircle className="text-gray-400 flex-shrink-0" size={18} />
                       </div>
                     ) : (
                       <Link
                         to={`/video/${video.video_id}`}
                         className="block"
                       >
-                        <div className="flex items-center justify-between gap-5 sm:gap-6">
-                          <div className="flex items-center space-x-4 sm:space-x-5 md:space-x-6 flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center space-x-3 flex-1 min-w-0">
                             <div className="flex-shrink-0">
                               {video.is_complete === 1 ? (
-                                <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full bg-green-100 flex items-center justify-center shadow-lg">
-                                  <FiCheckCircle className="text-green-600" size={32} />
+                                <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                                  <FiCheckCircle className="text-green-600" size={18} />
                                 </div>
                               ) : (
-                                <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-24 lg:h-24 rounded-full bg-blue-100 flex items-center justify-center shadow-lg">
-                                  <FiPlay className="text-blue-600" size={32} />
+                                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                  <FiPlay className="text-blue-600" size={18} />
                                 </div>
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-800 mb-3 sm:mb-4 line-clamp-2">{video.title}</h3>
-                              <div className="flex flex-wrap items-center gap-4 sm:gap-5 text-base sm:text-lg md:text-xl lg:text-2xl text-gray-600">
-                                <span className="flex items-center space-x-2 sm:space-x-3">
-                                  <FiClock size={22} />
-                                  <span className="font-semibold">{Math.floor((video.duration || 0) / 60)} นาที</span>
+                              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 line-clamp-2">{video.title}</h3>
+                              <div className="flex flex-wrap items-center gap-2 text-sm text-gray-600">
+                                <span className="flex items-center space-x-1">
+                                  <FiClock size={14} />
+                                  <span className="font-medium">{Math.floor((video.duration || 0) / 60)} นาที</span>
                                 </span>
                                 {video.duration > 0 && (
-                                  <span className="text-blue-600 font-bold text-lg sm:text-xl md:text-2xl">
+                                  <span className="text-blue-600 font-semibold text-sm">
                                     ดูแล้ว: {video.is_complete === 1 ? 100 : Math.floor(((video.watch_time || 0) / video.duration) * 100)}%
                                   </span>
                                 )}
                               </div>
                             </div>
                           </div>
-                          <FiArrowRight className="text-gray-400 flex-shrink-0" size={28} />
+                          <FiArrowRight className="text-gray-400 flex-shrink-0" size={18} />
                         </div>
                       </Link>
                     )}
                   </div>
                 );
               })}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Subsequent Quizzes */}
@@ -272,11 +283,11 @@ const QuizSection = ({ moduleId, videos = [] }) => {
             const isLastQuiz = index === otherQuizzes.length - 1;
             
             return (
-              <div key={quiz.quiz_id} className="bg-white rounded-xl md:rounded-2xl shadow-lg p-6 sm:p-8 md:p-10">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-5 sm:mb-6">
+              <div key={quiz.quiz_id} className="bg-white rounded-lg shadow-md p-4 sm:p-5">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3">
                   {otherQuizzes.length === 1 ? 'แบบทดสอบท้ายหลักสูตร' : (isLastQuiz ? `${quiz.title} (แบบทดสอบสุดท้าย)` : quiz.title)}
                 </h2>
-                <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 mb-6 sm:mb-8">
+                <p className="text-sm sm:text-base text-gray-600 mb-4">
                   {!isVideoCompleted 
                     ? `กรุณาดูวิดีโอที่ ${videoOrder} ให้ครบ 100% ก่อนทำแบบทดสอบ`
                     : `คุณดูวิดีโอที่ ${videoOrder} ครบแล้ว สามารถทำแบบทดสอบได้`}
@@ -284,25 +295,25 @@ const QuizSection = ({ moduleId, videos = [] }) => {
                 {isVideoCompleted ? (
                   <Link
                     to={`/quiz/${quiz.quiz_id}`}
-                    className="inline-flex items-center space-x-4 bg-purple-600 text-white px-10 sm:px-12 py-5 sm:py-6 md:py-7 lg:py-8 rounded-xl md:rounded-2xl hover:bg-purple-700 transition-colors font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl shadow-lg hover:shadow-xl"
+                    className="inline-flex items-center space-x-2 bg-purple-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-purple-700 transition-colors font-semibold text-sm sm:text-base shadow-md"
                   >
-                    <FiClipboard size={28} />
+                    <FiClipboard size={18} />
                     <span>ทำแบบทดสอบ</span>
                   </Link>
                 ) : (
-                  <div className="inline-flex items-center space-x-4 bg-gray-400 text-white px-10 sm:px-12 py-5 sm:py-6 md:py-7 lg:py-8 rounded-xl md:rounded-2xl cursor-not-allowed font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl shadow-lg opacity-60">
-                    <FiClipboard size={28} />
+                  <div className="inline-flex items-center space-x-2 bg-gray-400 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg cursor-not-allowed font-semibold text-sm sm:text-base shadow-md opacity-60">
+                    <FiClipboard size={18} />
                     <span>ทำแบบทดสอบ (ต้องดูวิดีโอที่ ${videoOrder} ครบ 100%)</span>
                   </div>
                 )}
                 {quiz.last_score >= 0 && (
-                  <div className="mt-6 sm:mt-8 p-6 sm:p-8 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl md:rounded-2xl border-2 border-purple-200">
-                    <p className="text-lg sm:text-xl md:text-2xl text-gray-700">
-                      คะแนนล่าสุด: <span className="font-bold text-2xl sm:text-3xl md:text-4xl text-purple-700">{quiz.last_score}%</span>
+                  <div className="mt-4 p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border-2 border-purple-200">
+                    <p className="text-sm text-gray-700">
+                      คะแนนล่าสุด: <span className="font-bold text-base text-purple-700">{quiz.last_score}%</span>
                       {quiz.last_passed === 1 ? (
-                        <span className="ml-4 text-green-600 font-bold text-xl sm:text-2xl md:text-3xl">✓ ผ่าน</span>
+                        <span className="ml-3 text-green-600 font-semibold text-sm">✓ ผ่าน</span>
                       ) : (
-                        <span className="ml-4 text-red-600 font-bold text-xl sm:text-2xl md:text-3xl">✗ ไม่ผ่าน</span>
+                        <span className="ml-3 text-red-600 font-semibold text-sm">✗ ไม่ผ่าน</span>
                       )}
                     </p>
                   </div>
@@ -323,16 +334,16 @@ const QuizSection = ({ moduleId, videos = [] }) => {
 
 const EvaluationSection = ({ moduleId }) => {
   return (
-    <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-6 sm:p-8 md:p-10">
-      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 mb-5 sm:mb-6">แบบประเมินความพึงพอใจ</h2>
-      <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-600 mb-6 sm:mb-8">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-5">
+      <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-3">แบบประเมินความพึงพอใจ</h2>
+      <p className="text-sm sm:text-base text-gray-600 mb-4">
         หลังจากเรียนและฝึกปฏิบัติเสร็จแล้ว กรุณาประเมินความพึงพอใจต่อการเข้าอบรมในครั้งนี้
       </p>
       <Link
         to={`/evaluation/${moduleId}`}
-        className="inline-flex items-center space-x-4 bg-green-600 text-white px-10 sm:px-12 py-5 sm:py-6 md:py-7 lg:py-8 rounded-xl md:rounded-2xl hover:bg-green-700 transition-colors font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl shadow-lg hover:shadow-xl"
+        className="inline-flex items-center space-x-2 bg-green-600 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm sm:text-base shadow-md"
       >
-        <FiStar size={28} />
+        <FiStar size={18} />
         <span>ทำแบบประเมิน</span>
       </Link>
     </div>
@@ -395,22 +406,29 @@ const Modules = () => {
 
   const fetchVideos = async (id) => {
     try {
+      setVideosLoading(true);
       const response = await axios.get(`${API_URL}/videos/module/${id}`);
       if (response && response.data) {
         const newVideos = Array.isArray(response.data) ? response.data : [];
+        console.log('📹 Fetched videos:', { count: newVideos.length, videos: newVideos });
         // Only update state if data actually changed to prevent unnecessary re-renders
         setVideos(prevVideos => {
           const dataChanged = JSON.stringify(prevVideos) !== JSON.stringify(newVideos);
           return dataChanged ? newVideos : prevVideos;
         });
       } else {
+        console.warn('⚠️ No videos data in response');
         setVideos([]);
       }
     } catch (error) {
-      console.error('Failed to fetch videos:', error);
+      console.error('❌ Failed to fetch videos:', error);
       // Don't update state on error if we already have videos to prevent flickering
       const errorMessage = error.response?.data?.error || 'ไม่สามารถโหลดวิดีโอได้';
       showToast(errorMessage, 'error');
+      // Only clear videos if we don't have any yet
+      setVideos(prevVideos => prevVideos.length === 0 ? [] : prevVideos);
+    } finally {
+      setVideosLoading(false);
     }
   };
 
@@ -433,12 +451,20 @@ const Modules = () => {
   }
 
   if (moduleId && selectedModule) {
+    // Debug: Log videos state
+    console.log('📹 Module videos state:', { 
+      moduleId, 
+      videosCount: videos.length, 
+      videos: videos,
+      videosLoading 
+    });
+    
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50" style={{ marginTop: 0, paddingTop: '2rem', paddingBottom: '3rem' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 rounded-3xl p-12 md:p-16 text-white shadow-2xl">
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-6">{selectedModule.title}</h1>
-            <p className="text-2xl sm:text-3xl md:text-4xl text-blue-50">{selectedModule.description}</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50" style={{ marginTop: 0, paddingTop: '1rem', paddingBottom: '2rem' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 rounded-lg p-4 sm:p-6 text-white shadow-md">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3">{selectedModule.title}</h1>
+            <p className="text-sm sm:text-base md:text-lg text-blue-50">{selectedModule.description}</p>
           </div>
 
           <QuizSection moduleId={moduleId} videos={videos} />
@@ -457,67 +483,67 @@ const Modules = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50" style={{ marginTop: 0, paddingTop: '3rem', paddingBottom: '4rem' }}>
-      <div className="w-full max-w-full mx-auto px-8 lg:px-12 xl:px-16">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50" style={{ marginTop: 0, paddingTop: '1rem', paddingBottom: '2rem' }}>
+      <div className="w-full max-w-full mx-auto px-4 lg:px-6">
         {/* Hero Header */}
-        <div className="mb-16">
-          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 rounded-3xl p-16 md:p-20 text-white shadow-2xl transform transition-all hover:scale-[1.01]">
-            <h1 className="text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] font-bold mb-10">เริ่มต้นทำธุรกิจ</h1>
-            <p className="text-4xl lg:text-5xl text-blue-50">หลักสูตรพื้นฐานสำหรับผู้ที่ต้องการเริ่มต้นทำธุรกิจ</p>
+        <div className="mb-6">
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-500 rounded-lg p-4 sm:p-6 text-white shadow-md">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">หลักสูตรทั้งหมด</h1>
+            <p className="text-sm sm:text-base lg:text-lg text-blue-50">หลักสูตรพื้นฐานสำหรับผู้ที่ต้องการเริ่มต้นทำธุรกิจ</p>
           </div>
         </div>
 
         {/* Search Bar */}
-        <div className="mb-12">
+        <div className="mb-6">
           <div className="relative max-w-3xl mx-auto">
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="ค้นหาหลักสูตร..."
-              className="w-full px-12 py-8 pl-20 border-2 border-gray-300 rounded-2xl text-3xl shadow-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-500 focus:outline-none transition-all"
+              className="w-full px-4 py-2 pl-10 border-2 border-gray-300 rounded-lg text-base shadow-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:outline-none transition-all"
             />
-            <FiPlay className="absolute left-6 top-1/2 transform -translate-y-1/2 text-gray-400" size={32} />
+            <FiPlay className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
           </div>
         </div>
 
         {/* Modules Grid */}
         {filteredModules.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-xl p-16 text-center border-2 border-dashed border-gray-300">
-            <FiPlay className="mx-auto text-gray-400 mb-6" size={80} />
-            <h3 className="text-4xl font-bold text-gray-700 mb-4">ไม่พบหลักสูตร</h3>
-            <p className="text-2xl text-gray-500">ลองค้นหาด้วยคำอื่น</p>
+          <div className="bg-white rounded-lg shadow-md p-8 text-center border-2 border-dashed border-gray-300">
+            <FiPlay className="mx-auto text-gray-400 mb-4" size={40} />
+            <h3 className="text-xl font-bold text-gray-700 mb-2">ไม่พบหลักสูตร</h3>
+            <p className="text-base text-gray-500">ลองค้นหาด้วยคำอื่น</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {filteredModules.map((module) => (
               <Link
                 key={module.module_id}
                 to={`/module/${module.module_id}`}
-                className="relative bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all transform hover:scale-105 group border-2 border-transparent hover:border-blue-200"
+                className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all group border-2 border-transparent hover:border-blue-200"
               >
                 {/* Shine effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 z-20"></div>
                 
-                <div className="relative h-80 bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center overflow-hidden">
+                <div className="relative h-32 bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center overflow-hidden">
                   {/* Animated background */}
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-400/50 to-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <div className="absolute top-0 left-0 w-full h-full opacity-20" style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
                   }}></div>
-                  <FiPlay className="relative z-10 text-white opacity-80 group-hover:opacity-100 transition-all transform group-hover:scale-125 group-hover:rotate-12 duration-300 drop-shadow-2xl" size={112} />
+                  <FiPlay className="relative z-10 text-white opacity-80 group-hover:opacity-100 transition-all transform group-hover:scale-110 duration-300" size={32} />
                   {module.category && (
-                    <span className="absolute top-8 right-8 bg-white/95 backdrop-blur-md text-blue-600 px-6 py-3 rounded-full text-lg font-bold shadow-xl border-2 border-blue-200 transform group-hover:scale-110 transition-transform z-10">
+                    <span className="absolute top-2 right-2 bg-white/95 backdrop-blur-md text-blue-600 px-2 py-1 rounded-full text-xs font-semibold shadow-md border border-blue-200 z-10">
                       {module.category}
                     </span>
                   )}
                 </div>
-                <div className="p-12">
-                  <h2 className="text-4xl font-bold text-gray-800 mb-6 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">{module.title}</h2>
-                  <p className="text-gray-600 mb-10 line-clamp-2 text-xl leading-relaxed">{module.description || 'เรียนรู้เนื้อหาที่น่าสนใจ'}</p>
-                  <div className="flex items-center justify-between pt-6 border-t-2 border-gray-200">
-                    <span className="text-blue-600 font-bold text-3xl group-hover:text-blue-700 transition-colors">เข้าสู่บทเรียน</span>
-                    <FiArrowRight className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-2 transition-all" size={40} />
+                <div className="p-4">
+                  <h2 className="text-base font-bold text-gray-800 mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">{module.title}</h2>
+                  <p className="text-gray-600 mb-3 line-clamp-2 text-sm leading-relaxed">{module.description || 'เรียนรู้เนื้อหาที่น่าสนใจ'}</p>
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                    <span className="text-blue-600 font-semibold text-sm group-hover:text-blue-700 transition-colors">เริ่มต้นบทเรียน</span>
+                    <FiArrowRight className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" size={18} />
                   </div>
                 </div>
               </Link>

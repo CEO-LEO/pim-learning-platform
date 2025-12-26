@@ -490,6 +490,8 @@ const VideoPlayer = () => {
               ref={videoRef}
               src={getVideoUrl(video.url)}
               controls
+              autoPlay
+              muted
               controlsList="nodownload noplaybackrate"
               disablePictureInPicture
               onContextMenu={(e) => e.preventDefault()}
@@ -533,6 +535,20 @@ const VideoPlayer = () => {
                     maxTimeWatched.current = video.watch_time || 0;
                   }
                   hasRestoredPosition.current = true;
+                  
+                  // Auto-play video after restoring position
+                  videoRef.current.play().then(() => {
+                    // Unmute after video starts playing
+                    if (videoRef.current) {
+                      videoRef.current.muted = false;
+                    }
+                  }).catch((error) => {
+                    console.error('Failed to auto-play video:', error);
+                    // If autoplay fails, unmute anyway so user can manually play
+                    if (videoRef.current) {
+                      videoRef.current.muted = false;
+                    }
+                  });
                 }
               }}
               onError={(e) => {
