@@ -13,7 +13,7 @@ const Grades = () => {
   const [summary, setSummary] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedModule, setSelectedModule] = useState('all');
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
   const showToast = (message, type = 'info') => {
@@ -23,6 +23,7 @@ const Grades = () => {
   useEffect(() => {
     fetchGrades();
     fetchSummary();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchGrades = async () => {

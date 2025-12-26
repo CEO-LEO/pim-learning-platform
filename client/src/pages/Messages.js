@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { FiMail, FiSend, FiUser, FiSearch } from 'react-icons/fi';
+import { FiMail, FiSend, FiUser } from 'react-icons/fi';
 import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
@@ -16,7 +16,7 @@ const Messages = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showNewMessageModal, setShowNewMessageModal] = useState(false);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const [toast, setToast] = useState(null);
   const [sending, setSending] = useState(false);
 
@@ -27,12 +27,14 @@ const Messages = () => {
   useEffect(() => {
     fetchConversations();
     fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     if (selectedConversation) {
       fetchMessages(selectedConversation.other_user_id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedConversation]);
 
   const fetchConversations = async () => {
@@ -99,6 +101,7 @@ const Messages = () => {
     }
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleReply = async (userId) => {
     setSelectedConversation({ other_user_id: userId });
     setShowNewMessageModal(false);

@@ -16,11 +16,8 @@ import {
   FiHelpCircle,
   FiFileText,
   FiBell,
-  FiMessageSquare,
   FiCalendar,
-  FiFile,
   FiAward,
-  FiUsers,
   FiMail,
   FiSettings,
 } from 'react-icons/fi';
@@ -42,7 +39,7 @@ const Layout = ({ children }) => {
     } catch (error) {
       // Silently fail if not authenticated
     }
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     if (user) {

@@ -8,12 +8,9 @@ import {
   FiVideo,
   FiClipboard,
   FiBarChart2,
-  FiSettings,
   FiPlus,
   FiEdit,
   FiTrash2,
-  FiCheckCircle,
-  FiXCircle,
   FiDownload
 } from 'react-icons/fi';
 
@@ -25,7 +22,7 @@ const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [stats, setStats] = useState({});
   const [modules, setModules] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
 

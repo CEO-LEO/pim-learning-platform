@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { FiClock, FiCheckCircle, FiXCircle, FiArrowLeft, FiAlertCircle } from 'react-icons/fi';
-import { CardSkeleton, LoadingSkeleton } from '../components/LoadingSkeleton';
+import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -31,6 +31,7 @@ const Quiz = () => {
   useEffect(() => {
     fetchQuiz();
     fetchAttemptInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizId]);
 
   useEffect(() => {
@@ -47,6 +48,7 @@ const Quiz = () => {
 
       return () => clearInterval(timer);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quiz, submitted, timeLeft]);
 
   // Navigate logic when quiz is passed
@@ -141,7 +143,6 @@ const Quiz = () => {
         // Server responded with error status
         const status = error.response.status;
         const serverErrorMsg = error.response.data?.error;
-        const clientErrorMsg = error.message;
         
         // Handle authentication errors (401/403 from authenticateToken middleware)
         if (status === 401 || status === 403) {

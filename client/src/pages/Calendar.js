@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { FiCalendar, FiClock, FiPlus, FiEdit, FiTrash2, FiAlertCircle, FiRefreshCw, FiX } from 'react-icons/fi';
+import { FiCalendar, FiClock, FiPlus, FiRefreshCw, FiX } from 'react-icons/fi';
 import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
@@ -13,7 +13,7 @@ const Calendar = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const [toast, setToast] = useState(null);
   const [lastUpdate, setLastUpdate] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -38,6 +38,7 @@ const Calendar = () => {
     }, 15000);
     
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchEvents = async (silent = false) => {

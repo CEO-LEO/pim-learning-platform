@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FiClock, FiCheckCircle, FiBook, FiTrendingUp, FiAlertCircle } from 'react-icons/fi';
+import { FiClock, FiCheckCircle, FiBook, FiTrendingUp } from 'react-icons/fi';
 import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
@@ -9,7 +9,7 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 const Analytics = () => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
   const showToast = (message, type = 'info') => {
@@ -18,6 +18,7 @@ const Analytics = () => {
 
   useEffect(() => {
     fetchAnalytics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAnalytics = async () => {

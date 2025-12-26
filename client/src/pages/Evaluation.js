@@ -30,6 +30,7 @@ const Evaluation = () => {
 
   useEffect(() => {
     fetchModule();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleId]);
 
   const fetchModule = async () => {

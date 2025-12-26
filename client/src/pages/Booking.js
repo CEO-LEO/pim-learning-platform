@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { FiCalendar, FiClock, FiUsers, FiCheckCircle, FiAlertCircle, FiTrash2, FiMapPin, FiRefreshCw, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiCalendar, FiClock, FiCheckCircle, FiAlertCircle, FiTrash2, FiMapPin, FiRefreshCw, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import Toast from '../components/Toast';
 import { CardSkeleton } from '../components/LoadingSkeleton';
 
@@ -45,6 +45,7 @@ const Booking = () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleFocus);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchSlots = async (silent = false) => {

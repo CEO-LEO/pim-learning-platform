@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { FiFile, FiDownload, FiUpload, FiTrash2, FiAlertCircle } from 'react-icons/fi';
+import { FiFile, FiDownload, FiUpload, FiTrash2 } from 'react-icons/fi';
 import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
@@ -15,7 +15,7 @@ const CourseFiles = () => {
   const [loading, setLoading] = useState(true);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadData, setUploadData] = useState({ title: '', file: null });
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const [toast, setToast] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -28,6 +28,7 @@ const CourseFiles = () => {
     if (moduleId) {
       fetchFiles(moduleId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleId]);
 
   const fetchFiles = async (id) => {

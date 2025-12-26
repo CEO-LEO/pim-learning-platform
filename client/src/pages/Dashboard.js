@@ -71,9 +71,6 @@ const Dashboard = () => {
     }
   };
 
-  const showToast = (message, type = 'info') => {
-    setToast({ message, type, id: Date.now() });
-  };
 
   // Calculate total watch time - use total_seconds if available, otherwise fallback to total_hours
   const totalSeconds = dashboardData?.total_seconds || (dashboardData?.total_hours || 0) * 3600;

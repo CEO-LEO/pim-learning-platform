@@ -1,22 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
-import { FiFileText, FiClock, FiCheckCircle, FiUpload, FiDownload, FiEdit, FiAlertCircle } from 'react-icons/fi';
+import { FiClock, FiCheckCircle, FiUpload } from 'react-icons/fi';
 import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const Assignments = () => {
-  const { user } = useAuth();
   const { moduleId } = useParams();
   const [assignments, setAssignments] = useState([]);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [submission, setSubmission] = useState({ content: '', file: null });
   const [loading, setLoading] = useState(true);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -30,6 +27,7 @@ const Assignments = () => {
     } else {
       fetchMySubmissions();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleId]);
 
   const fetchAssignments = async (id) => {

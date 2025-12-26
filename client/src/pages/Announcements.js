@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { FiBell, FiAlertCircle, FiEdit, FiTrash2, FiPlus, FiRefreshCw, FiX } from 'react-icons/fi';
+import { FiBell, FiAlertCircle, FiPlus, FiRefreshCw, FiX } from 'react-icons/fi';
 import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
@@ -37,6 +37,7 @@ const Announcements = () => {
     }, 15000);
     
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAnnouncements = async (silent = false) => {

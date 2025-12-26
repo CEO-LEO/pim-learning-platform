@@ -22,6 +22,7 @@ const QuizSection = ({ moduleId, videos = [], videosLoading = false }) => {
       fetchQuizzes();
     }, 30000);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [moduleId]); // Removed 'videos' dependency to prevent unnecessary re-runs
 
   const fetchQuizzes = async () => {
@@ -360,29 +361,11 @@ const Modules = () => {
   const [loading, setLoading] = useState(true);
   const [videosLoading, setVideosLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
   const showToast = (message, type = 'info') => {
     setToast({ message, type, id: Date.now() });
   };
-
-  useEffect(() => {
-    fetchModules();
-  }, [category]);
-
-  useEffect(() => {
-    if (moduleId) {
-      if (modules.length > 0) {
-        const module = modules.find((m) => m.module_id === moduleId);
-        if (module) setSelectedModule(module);
-      }
-      fetchVideos(moduleId);
-      // Reduced refresh frequency from 5s to 30s to prevent flickering
-      const interval = setInterval(() => fetchVideos(moduleId), 30000);
-      return () => clearInterval(interval);
-    }
-  }, [moduleId]); // Removed 'modules' dependency to prevent unnecessary re-runs
 
   const fetchModules = async () => {
     try {
@@ -403,6 +386,25 @@ const Modules = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchModules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category]);
+
+  useEffect(() => {
+    if (moduleId) {
+      if (modules.length > 0) {
+        const module = modules.find((m) => m.module_id === moduleId);
+        if (module) setSelectedModule(module);
+      }
+      fetchVideos(moduleId);
+      // Reduced refresh frequency from 5s to 30s to prevent flickering
+      const interval = setInterval(() => fetchVideos(moduleId), 30000);
+      return () => clearInterval(interval);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [moduleId]); // Removed 'modules' dependency to prevent unnecessary re-runs
 
   const fetchVideos = async (id) => {
     try {

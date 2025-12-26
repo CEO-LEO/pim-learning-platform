@@ -65,10 +65,12 @@ const VideoPlayer = () => {
     fetchVideo();
     hasRestoredPosition.current = false; // Reset when video changes
     return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
+      const intervalId = progressIntervalRef.current;
+      if (intervalId) {
+        clearInterval(intervalId);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId]);
 
   const fetchVideo = async () => {

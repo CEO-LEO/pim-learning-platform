@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { FiAward, FiDownload, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiAward, FiDownload, FiCheckCircle } from 'react-icons/fi';
 import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
@@ -11,7 +11,7 @@ const Certificates = () => {
   const { user } = useAuth();
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
   const showToast = (message, type = 'info') => {
@@ -20,6 +20,7 @@ const Certificates = () => {
 
   useEffect(() => {
     fetchCertificates();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchCertificates = async () => {
