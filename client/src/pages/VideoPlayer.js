@@ -19,6 +19,14 @@ const getServerUrl = () => {
 };
 const SERVER_URL = getServerUrl();
 
+// Debug logging for environment variables
+console.log('[VideoPlayer] Environment Variables:', {
+  REACT_APP_API_URL: process.env.REACT_APP_API_URL,
+  REACT_APP_SERVER_URL: process.env.REACT_APP_SERVER_URL,
+  API_URL,
+  SERVER_URL
+});
+
 const VideoPlayer = () => {
   const { videoId } = useParams();
   const navigate = useNavigate();
