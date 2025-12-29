@@ -580,26 +580,70 @@ const VideoPlayer = () => {
                   networkState: videoElement?.networkState,
                   readyState: videoElement?.readyState,
                   videoSrc: videoElement?.src,
-                  videoCurrentSrc: videoElement?.currentSrc
+                  videoCurrentSrc: videoElement?.currentSrc,
+                  videoElement: videoElement ? {
+                    src: videoElement.src,
+                    currentSrc: videoElement.currentSrc,
+                    networkState: videoElement.networkState,
+                    readyState: videoElement.readyState,
+                    error: error ? {
+                      code: error.code,
+                      message: error.message
+                    } : null
+                  } : null
                 });
                 
                 // Try to fetch the video URL to check if it exists
                 if (videoUrl) {
-                  fetch(videoUrl, { method: 'HEAD' })
+                  const token = localStorage.getItem('token');
+                  fetch(videoUrl, { 
+                    method: 'HEAD',
+                    headers: token ? {
+                      'Authorization': `Bearer ${token}`
+                    } : {}
+                  })
                     .then(response => {
                       console.log('[VideoPlayer] Video URL check:', {
                         url: videoUrl,
                         status: response.status,
                         statusText: response.statusText,
-                        headers: Object.fromEntries(response.headers.entries())
+                        headers: Object.fromEntries(response.headers.entries()),
+                        contentType: response.headers.get('content-type'),
+                        contentLength: response.headers.get('content-length'),
+                        acceptRanges: response.headers.get('accept-ranges')
                       });
+                      
+                      // If 401 or 403, token might be invalid
+                      if (response.status === 401 || response.status === 403) {
+                        console.error('[VideoPlayer] Authentication failed:', {
+                          status: response.status,
+                          statusText: response.statusText,
+                          hasToken: !!token,
+                          tokenLength: token?.length
+                        });
+                      }
+                      
+                      // If 404, video file might not exist
+                      if (response.status === 404) {
+                        console.error('[VideoPlayer] Video file not found:', {
+                          url: videoUrl,
+                          originalUrl: video.url,
+                          filename: videoUrl.split('/').pop()
+                        });
+                      }
                     })
                     .catch(err => {
                       console.error('[VideoPlayer] Video URL fetch error:', {
                         url: videoUrl,
-                        error: err.message
+                        error: err.message,
+                        stack: err.stack
                       });
                     });
+                } else {
+                  console.error('[VideoPlayer] No video URL generated!', {
+                    originalUrl: video.url,
+                    video: video
+                  });
                 }
                 
                 let errorMessage = 'ไม่สามารถโหลดวิดีโอได้';
