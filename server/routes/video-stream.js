@@ -33,8 +33,11 @@ router.get('/:filename', (req, res, next) => {
   
   // #region agent log
   const fs = require('fs');
+  const path = require('path');
+  const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
   const logData1 = {location:'video-stream.js:31',message:'VideoStream middleware entry',data:{filename:req.params.filename,hasAuthHeader:!!authHeader,hasTokenQuery:!!tokenFromQuery,tokenQueryLength:tokenFromQuery?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
-  try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData1)+'\n');}catch(e){}
+  console.log('[DEBUG]', JSON.stringify(logData1));
+  try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData1)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
   // #endregion
   
   // If token is in query parameter, add it to Authorization header
@@ -43,7 +46,8 @@ router.get('/:filename', (req, res, next) => {
     console.log('[VideoStream] Token from query parameter added to Authorization header');
     // #region agent log
     const logData2 = {location:'video-stream.js:36',message:'Token from query added to header',data:{hasTokenQuery:!!tokenFromQuery},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
-    try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData2)+'\n');}catch(e){}
+    console.log('[DEBUG]', JSON.stringify(logData2));
+    try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData2)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
     // #endregion
   }
   
@@ -61,16 +65,20 @@ router.get('/:filename', (req, res, next) => {
   });
   
   // #region agent log
+  const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
   const logData3 = {location:'video-stream.js:44',message:'VideoStream processing request',data:{filename,videoPath,cwd:process.cwd(),__dirname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'};
-  try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData3)+'\n');}catch(e){}
+  console.log('[DEBUG]', JSON.stringify(logData3));
+  try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData3)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
   // #endregion
   
   // Security: prevent directory traversal
   if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
     console.error('[VideoStream] Invalid filename detected:', filename);
     // #region agent log
+    const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
     const logData4 = {location:'video-stream.js:54',message:'Invalid filename detected',data:{filename},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'};
-    try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData4)+'\n');}catch(e){}
+    console.log('[DEBUG]', JSON.stringify(logData4));
+    try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData4)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
     // #endregion
     return res.status(400).json({ error: 'Invalid filename' });
   }
@@ -78,8 +86,10 @@ router.get('/:filename', (req, res, next) => {
   // Check if file exists
   const fileExists = fs.existsSync(videoPath);
   // #region agent log
+  const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
   const logData5 = {location:'video-stream.js:60',message:'Checking file existence',data:{filename,videoPath,fileExists},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'};
-  try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData5)+'\n');}catch(e){}
+  console.log('[DEBUG]', JSON.stringify(logData5));
+  try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData5)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
   // #endregion
   
   if (!fileExists) {

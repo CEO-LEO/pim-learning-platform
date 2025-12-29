@@ -226,22 +226,31 @@ function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
   // #region agent log
+  const path = require('path');
+  const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
   const logData = {location:'auth.js:224',message:'authenticateToken entry',data:{hasAuthHeader:!!authHeader,hasToken:!!token,tokenLength:token?.length,path:req.path,method:req.method},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B'};
-  try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData)+'\n');}catch(e){}
+  console.log('[DEBUG]', JSON.stringify(logData));
+  try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
   // #endregion
 
   if (!token) {
     // #region agent log
+    const path = require('path');
+    const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
     const logData2 = {location:'auth.js:229',message:'authenticateToken no token',data:{path:req.path},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'};
-    try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData2)+'\n');}catch(e){}
+    console.log('[DEBUG]', JSON.stringify(logData2));
+    try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData2)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
     // #endregion
     return res.status(401).json({ error: 'Access token required' });
   }
 
   jwt.verify(token, JWT_SECRET, (err, user) => {
     // #region agent log
+    const path = require('path');
+    const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
     const logData3 = {location:'auth.js:232',message:'jwt.verify result',data:{hasError:!!err,errorMsg:err?.message,hasUser:!!user,userId:user?.userId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
-    try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData3)+'\n');}catch(e){}
+    console.log('[DEBUG]', JSON.stringify(logData3));
+    try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData3)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
     // #endregion
     if (err) {
       return res.status(403).json({ error: 'Invalid or expired token' });
