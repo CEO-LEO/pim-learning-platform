@@ -563,8 +563,29 @@ const VideoPlayer = () => {
                   serverUrl: SERVER_URL,
                   originalUrl: video.url,
                   networkState: videoElement?.networkState,
-                  readyState: videoElement?.readyState
+                  readyState: videoElement?.readyState,
+                  videoSrc: videoElement?.src,
+                  videoCurrentSrc: videoElement?.currentSrc
                 });
+                
+                // Try to fetch the video URL to check if it exists
+                if (videoUrl) {
+                  fetch(videoUrl, { method: 'HEAD' })
+                    .then(response => {
+                      console.log('[VideoPlayer] Video URL check:', {
+                        url: videoUrl,
+                        status: response.status,
+                        statusText: response.statusText,
+                        headers: Object.fromEntries(response.headers.entries())
+                      });
+                    })
+                    .catch(err => {
+                      console.error('[VideoPlayer] Video URL fetch error:', {
+                        url: videoUrl,
+                        error: err.message
+                      });
+                    });
+                }
                 
                 let errorMessage = 'ไม่สามารถโหลดวิดีโอได้';
                 if (error) {
