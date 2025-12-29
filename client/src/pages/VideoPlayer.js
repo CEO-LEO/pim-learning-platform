@@ -61,14 +61,28 @@ const VideoPlayer = () => {
     }
     // If relative path, prepend server URL
     const fullUrl = `${SERVER_URL}${url.startsWith('/') ? url : '/' + url}`;
-    console.log('[VideoPlayer] Constructed URL:', { 
+    
+    // Enhanced debug logging
+    const debugInfo = { 
       original: url, 
       serverUrl: SERVER_URL, 
       fullUrl,
       hasServerUrl: !!SERVER_URL,
       envApiUrl: process.env.REACT_APP_API_URL,
-      envServerUrl: process.env.REACT_APP_SERVER_URL
-    });
+      envServerUrl: process.env.REACT_APP_SERVER_URL,
+      allEnvVars: Object.keys(process.env).filter(k => k.startsWith('REACT_APP_'))
+    };
+    console.log('[VideoPlayer] Constructed URL:', debugInfo);
+    
+    // Alert if SERVER_URL is missing (for debugging)
+    if (!SERVER_URL || SERVER_URL === 'http://localhost:5000') {
+      console.warn('[VideoPlayer] ⚠️ SERVER_URL is missing or using default!', {
+        SERVER_URL,
+        REACT_APP_SERVER_URL: process.env.REACT_APP_SERVER_URL,
+        REACT_APP_API_URL: process.env.REACT_APP_API_URL
+      });
+    }
+    
     return fullUrl;
   };
 
