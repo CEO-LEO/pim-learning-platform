@@ -1,116 +1,97 @@
 const db = require('./init');
+const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
-const path = require('path');
 
-// Get command line arguments
-const sourcePath = process.argv[2];
-const moduleId = process.argv[3] || 'module_1';
-const orderIndex = parseInt(process.argv[4]) || 1;
+// Get arguments from command line or config file
+let moduleId, orderIndex, title, url;
 
-if (!sourcePath) {
-  console.log('📹 Video File Manager');
-  console.log('\nUsage:');
-  console.log('  node add-video.js <source-file-path> [module_id] [order_index]');
-  console.log('\nExample:');
-  console.log('  node add-video.js "C:\\Users\\66886\\Downloads\\video.mp4" module_1 1');
-  console.log('  node add-video.js "C:\\path\\to\\video.mp4" module_2 2');
-  process.exit(1);
+if (process.argv[2] === '--config' && process.argv[3]) {
+  // Read from config file
+  try {
+    const config = JSON.parse(fs.readFileSync(process.argv[3], 'utf8'));
+    moduleId = config.module_id;
+    orderIndex = config.order_index;
+    title = config.title;
+    url = config.url || `/uploads/videos/video-${moduleId}-${orderIndex}.mp4`;
+  } catch (err) {
+    console.error('❌ Error reading config file:', err.message);
+    process.exit(1);
+  }
+} else {
+  // Get from command line arguments
+  const args = process.argv.slice(2);
+  if (args.length < 3) {
+    console.log('Usage: node add-video.js <module_id> <order_index> <title> [url]');
+    console.log('   OR: node add-video.js --config <config.json>');
+    console.log('Example: node add-video.js module_1 1 "การบริการ - วิดีโอที่ 1" "/uploads/videos/video-module_1-1.mp4"');
+    process.exit(1);
+  }
+  moduleId = args[0];
+  orderIndex = parseInt(args[1]);
+  title = args[2];
+  url = args[3] || `/uploads/videos/video-${moduleId}-${orderIndex}.mp4`;
 }
 
-// Check if source file exists
-if (!fs.existsSync(sourcePath)) {
-  console.error(`❌ File not found: ${sourcePath}`);
-  console.log('\n💡 Please check the file path and try again.');
-  process.exit(1);
-}
+console.log('📹 Adding video to database...\n');
+console.log(`Module: ${moduleId}`);
+console.log(`Order: ${orderIndex}`);
+console.log(`Title: ${title}`);
+console.log(`URL: ${url}\n`);
 
-// Get filename
-const fileName = path.basename(sourcePath);
-const destDir = path.join(__dirname, '..', 'uploads', 'videos');
-const destPath = path.join(destDir, fileName);
+// Check if module exists
+db.get('SELECT module_id FROM modules WHERE module_id = ?', [moduleId], (err, module) => {
+  if (err) {
+    console.error('❌ Error checking module:', err.message);
+    db.close();
+    process.exit(1);
+  }
 
-// Create destination directory if it doesn't exist
-if (!fs.existsSync(destDir)) {
-  fs.mkdirSync(destDir, { recursive: true });
-}
+  if (!module) {
+    console.error(`❌ Module ${moduleId} not found!`);
+    db.close();
+    process.exit(1);
+  }
 
-// Copy file
-try {
-  console.log('📋 Copying video file...');
-  fs.copyFileSync(sourcePath, destPath);
-  console.log(`✅ File copied to: ${destPath}`);
-} catch (error) {
-  console.error('❌ Error copying file:', error.message);
-  db.close();
-  process.exit(1);
-}
+  // Check if order_index already exists for this module
+  db.get(
+    'SELECT video_id, title FROM videos WHERE module_id = ? AND order_index = ?',
+    [moduleId, orderIndex],
+    (err, existing) => {
+      if (err) {
+        console.error('❌ Error checking existing video:', err.message);
+        db.close();
+        process.exit(1);
+      }
 
-// Video URL path (relative to uploads)
-const videoUrl = `/uploads/videos/${fileName}`;
+      if (existing) {
+        console.log(`⚠️  Video with order_index ${orderIndex} already exists:`);
+        console.log(`   ${existing.title}`);
+        console.log('\n❌ Cancelled. Please use a different order_index.\n');
+        db.close();
+        process.exit(1);
+      }
 
-// Find video by module_id and order_index
-db.get(
-  'SELECT video_id, title FROM videos WHERE module_id = ? AND order_index = ?',
-  [moduleId, orderIndex],
-  (err, video) => {
-    if (err) {
-      console.error('❌ Database error:', err.message);
-      db.close();
-      process.exit(1);
-    }
-
-    if (!video) {
-      console.error(`❌ Video not found: module_id=${moduleId}, order_index=${orderIndex}`);
-      console.log('\n💡 Available videos:');
-      db.all(
-        'SELECT video_id, title, order_index, url FROM videos WHERE module_id = ? ORDER BY order_index',
-        [moduleId],
-        (err, videos) => {
+      // Add video
+      const videoId = uuidv4();
+      db.run(
+        'INSERT INTO videos (video_id, module_id, title, url, duration, order_index) VALUES (?, ?, ?, ?, ?, ?)',
+        [videoId, moduleId, title, url, 1800, orderIndex], // Default duration 30 minutes
+        function(err) {
           if (err) {
-            console.error('Error:', err.message);
-          } else {
-            if (videos.length === 0) {
-              console.log('  No videos found for this module.');
-            } else {
-              videos.forEach(v => {
-                console.log(`  ${v.order_index}. ${v.title} (${v.video_id})`);
-              });
-            }
+            console.error('❌ Error adding video:', err.message);
+            db.close();
+            process.exit(1);
           }
+
+          console.log('✅ Video added successfully!');
+          console.log(`   Video ID: ${videoId}`);
+          console.log(`   Module: ${moduleId}`);
+          console.log(`   Order: ${orderIndex}`);
+          console.log(`   Title: ${title}`);
+          console.log(`   URL: ${url}\n`);
           db.close();
-          process.exit(1);
         }
       );
-      return;
     }
-
-    // Update video URL
-    db.run(
-      'UPDATE videos SET url = ? WHERE video_id = ?',
-      [videoUrl, video.video_id],
-      function(updateErr) {
-        if (updateErr) {
-          console.error('❌ Error updating video:', updateErr.message);
-          db.close();
-          process.exit(1);
-        }
-
-        console.log('\n✅ Video added successfully!');
-        console.log(`\n📹 Video Details:`);
-        console.log(`   Title: ${video.title}`);
-        console.log(`   Video ID: ${video.video_id}`);
-        console.log(`   Module: ${moduleId}`);
-        console.log(`   Order: ${order_index}`);
-        console.log(`   File: ${fileName}`);
-        console.log(`   URL: ${videoUrl}`);
-        console.log(`\n🌐 Video will be accessible at:`);
-        console.log(`   http://localhost:5000${videoUrl}`);
-        console.log(`\n💡 Refresh your browser to see the video!`);
-        
-        db.close();
-        process.exit(0);
-      }
-    );
-  }
-);
-
+  );
+});
