@@ -82,6 +82,7 @@ const VideoPlayer = () => {
     fetchVideo();
     hasRestoredPosition.current = false; // Reset when video changes
     return () => {
+      // Copy ref value to avoid stale closure
       const intervalId = progressIntervalRef.current;
       if (intervalId) {
         clearInterval(intervalId);
@@ -576,10 +577,6 @@ const VideoPlayer = () => {
                     }
                   });
                 }
-              }}
-              onError={(e) => {
-                console.error('Video load error:', e);
-                showToast('ไม่สามารถโหลดวิดีโอได้ กรุณาตรวจสอบ URL', 'error');
               }}
               style={{
                 pointerEvents: 'auto'

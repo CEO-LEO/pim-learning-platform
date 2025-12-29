@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { FiBarChart2, FiFileText, FiClipboard, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { FiBarChart2, FiFileText, FiClipboard, FiCheckCircle } from 'react-icons/fi';
 import { CardSkeleton, TableSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
