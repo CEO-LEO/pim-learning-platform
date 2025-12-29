@@ -5,7 +5,24 @@ const fs = require('fs');
 const { authenticateToken } = require('./auth');
 
 // Stream video files with proper headers
-router.get('/:filename', authenticateToken, (req, res) => {
+// Support both authenticated (with token) and query parameter token (for video element)
+router.get('/:filename', (req, res, next) => {
+  // Try to authenticate - check Authorization header first, then query parameter
+  const authHeader = req.headers.authorization;
+  const tokenFromQuery = req.query.token;
+  
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    // Use standard authentication middleware
+    return authenticateToken(req, res, next);
+  } else if (tokenFromQuery) {
+    // Support token in query parameter for video element (can't send custom headers)
+    req.headers.authorization = `Bearer ${tokenFromQuery}`;
+    return authenticateToken(req, res, next);
+  } else {
+    // No token provided
+    return res.status(401).json({ error: 'Access token required' });
+  }
+}, (req, res) => {
   const { filename } = req.params;
   const videoPath = path.join(__dirname, '..', 'uploads', 'videos', filename);
   

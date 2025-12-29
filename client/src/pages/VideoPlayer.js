@@ -59,27 +59,42 @@ const VideoPlayer = () => {
       console.log('[VideoPlayer] Using full URL:', url);
       return url;
     }
-    // If relative path, prepend server URL
-    const fullUrl = `${SERVER_URL}${url.startsWith('/') ? url : '/' + url}`;
+    
+    // Extract filename from path (e.g., /uploads/videos/video-module_1-1.mp4 -> video-module_1-1.mp4)
+    let filename = url;
+    if (url.includes('/')) {
+      filename = url.split('/').pop();
+    }
+    
+    // Use video streaming route with authentication instead of static files
+    // This ensures video files are accessible even if Git LFS files aren't pulled
+    // Add token to query parameter because video element can't send Authorization header
+    const token = localStorage.getItem('token');
+    const fullUrl = token 
+      ? `${API_URL}/videos/stream/${filename}?token=${encodeURIComponent(token)}`
+      : `${API_URL}/videos/stream/${filename}`;
     
     // Enhanced debug logging
     const debugInfo = { 
-      original: url, 
-      serverUrl: SERVER_URL, 
+      original: url,
+      filename: filename,
+      serverUrl: SERVER_URL,
+      apiUrl: API_URL,
       fullUrl,
       hasServerUrl: !!SERVER_URL,
+      hasApiUrl: !!API_URL,
       envApiUrl: process.env.REACT_APP_API_URL,
       envServerUrl: process.env.REACT_APP_SERVER_URL,
       allEnvVars: Object.keys(process.env).filter(k => k.startsWith('REACT_APP_'))
     };
     console.log('[VideoPlayer] Constructed URL:', debugInfo);
     
-    // Alert if SERVER_URL is missing (for debugging)
-    if (!SERVER_URL || SERVER_URL === 'http://localhost:5000') {
-      console.warn('[VideoPlayer] ⚠️ SERVER_URL is missing or using default!', {
-        SERVER_URL,
-        REACT_APP_SERVER_URL: process.env.REACT_APP_SERVER_URL,
-        REACT_APP_API_URL: process.env.REACT_APP_API_URL
+    // Alert if API_URL is missing (for debugging)
+    if (!API_URL || API_URL === 'http://localhost:5000/api') {
+      console.warn('[VideoPlayer] ⚠️ API_URL is missing or using default!', {
+        API_URL,
+        REACT_APP_API_URL: process.env.REACT_APP_API_URL,
+        REACT_APP_SERVER_URL: process.env.REACT_APP_SERVER_URL
       });
     }
     
