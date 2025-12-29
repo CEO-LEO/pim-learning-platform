@@ -11,17 +11,13 @@ router.get('/:filename', (req, res, next) => {
   const authHeader = req.headers.authorization;
   const tokenFromQuery = req.query.token;
   
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    // Use standard authentication middleware
-    return authenticateToken(req, res, next);
-  } else if (tokenFromQuery) {
-    // Support token in query parameter for video element (can't send custom headers)
+  // If token is in query parameter, add it to Authorization header
+  if (tokenFromQuery && !authHeader) {
     req.headers.authorization = `Bearer ${tokenFromQuery}`;
-    return authenticateToken(req, res, next);
-  } else {
-    // No token provided
-    return res.status(401).json({ error: 'Access token required' });
   }
+  
+  // Use standard authentication middleware
+  authenticateToken(req, res, next);
 }, (req, res) => {
   const { filename } = req.params;
   const videoPath = path.join(__dirname, '..', 'uploads', 'videos', filename);
@@ -33,12 +29,22 @@ router.get('/:filename', (req, res, next) => {
   
   // Check if file exists
   if (!fs.existsSync(videoPath)) {
-    return res.status(404).json({ error: 'Video file not found' });
+    console.error(`[VideoStream] Video file not found: ${videoPath}`);
+    console.error(`[VideoStream] Current directory: ${process.cwd()}`);
+    console.error(`[VideoStream] Uploads directory exists: ${fs.existsSync(path.join(__dirname, '..', 'uploads'))}`);
+    console.error(`[VideoStream] Videos directory exists: ${fs.existsSync(path.join(__dirname, '..', 'uploads', 'videos'))}`);
+    if (fs.existsSync(path.join(__dirname, '..', 'uploads', 'videos'))) {
+      const files = fs.readdirSync(path.join(__dirname, '..', 'uploads', 'videos'));
+      console.error(`[VideoStream] Files in videos directory: ${files.join(', ')}`);
+    }
+    return res.status(404).json({ error: 'Video file not found', filename, videoPath });
   }
   
   const stat = fs.statSync(videoPath);
   const fileSize = stat.size;
   const range = req.headers.range;
+  
+  console.log(`[VideoStream] Serving video: ${filename}, size: ${fileSize}, range: ${range || 'none'}`);
   
   if (range) {
     // Support range requests for video streaming
