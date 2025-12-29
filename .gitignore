@@ -43,10 +43,11 @@ Thumbs.db
 # Uploads
 server/uploads/*
 !server/uploads/.gitkeep
-# Video files are too large for GitHub - use external storage or Git LFS
-server/uploads/videos/*.mp4
-server/uploads/videos/*.webm
-server/uploads/videos/*.mov
+!server/uploads/videos/
+# Video files are tracked with Git LFS
+!server/uploads/videos/*.mp4
+!server/uploads/videos/*.webm
+!server/uploads/videos/*.mov
 
 # Debug
 *.log
