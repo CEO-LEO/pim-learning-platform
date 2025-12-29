@@ -42,14 +42,27 @@ router.get('/:filename', (req, res, next) => {
         console.error(`[VideoStream] Error reading videos directory: ${err.message}`);
       }
     }
-    // Try alternative path (in case of different deployment structure)
-    const altPath = path.join(process.cwd(), 'server', 'uploads', 'videos', filename);
-    if (fs.existsSync(altPath)) {
-      console.log(`[VideoStream] Found video at alternative path: ${altPath}`);
-      // Use alternative path
-      return streamVideo(altPath, req, res);
+    // Try alternative paths (in case of different deployment structure)
+    const altPaths = [
+      path.join(process.cwd(), 'server', 'uploads', 'videos', filename),
+      path.join(process.cwd(), 'uploads', 'videos', filename),
+      path.join(__dirname, '..', '..', 'uploads', 'videos', filename)
+    ];
+    
+    for (const altPath of altPaths) {
+      if (fs.existsSync(altPath)) {
+        console.log(`[VideoStream] Found video at alternative path: ${altPath}`);
+        return streamVideo(altPath, req, res);
+      }
     }
-    return res.status(404).json({ error: 'Video file not found', filename, videoPath });
+    
+    // If still not found, return detailed error
+    return res.status(404).json({ 
+      error: 'Video file not found', 
+      filename, 
+      videoPath,
+      message: 'Video file may not be deployed. Check Railway logs for Git LFS pull status.'
+    });
   }
   
   streamVideo(videoPath, req, res);
