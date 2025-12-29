@@ -192,6 +192,64 @@ const VideoPlayer = () => {
       // #region agent log
       fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:173',message:'Video data received',data:{videoId:response.data.video_id,url:response.data.url,urlType:typeof response.data.url,urlLength:response.data.url?.length,hasUrl:!!response.data.url},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
       // #endregion
+      
+      // Validate video URL exists before setting video
+      if (response.data.url) {
+        const videoSrc = getVideoUrl(response.data.url);
+        if (videoSrc) {
+          // Pre-flight check: verify video URL is accessible
+          const token = localStorage.getItem('token');
+          try {
+            const headResponse = await fetch(videoSrc, {
+              method: 'HEAD',
+              headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+            });
+            
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:180',message:'Pre-flight video URL check',data:{videoSrc,status:headResponse.status,statusText:headResponse.statusText,contentType:headResponse.headers.get('content-type')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B,C'})}).catch(()=>{});
+            // #endregion
+            
+            if (!headResponse.ok) {
+              const errorText = await headResponse.text();
+              let errorMessage = 'ไม่สามารถโหลดวิดีโอได้';
+              
+              if (headResponse.status === 404) {
+                errorMessage = 'ไม่พบไฟล์วิดีโอบนเซิร์ฟเวอร์ กรุณาตรวจสอบว่าไฟล์วิดีโอถูก deploy แล้ว';
+              } else if (headResponse.status === 401 || headResponse.status === 403) {
+                errorMessage = 'การยืนยันตัวตนล้มเหลว กรุณาเข้าสู่ระบบใหม่';
+              } else {
+                errorMessage = `ไม่สามารถโหลดวิดีโอได้ (HTTP ${headResponse.status})`;
+              }
+              
+              console.error('[VideoPlayer] Pre-flight check failed:', {
+                status: headResponse.status,
+                statusText: headResponse.statusText,
+                errorText,
+                videoSrc
+              });
+              
+              setError(errorMessage);
+              setLoading(false);
+              showToast(errorMessage, 'error');
+              return;
+            }
+            
+            // Check content type
+            const contentType = headResponse.headers.get('content-type');
+            if (contentType && !contentType.startsWith('video/')) {
+              console.error('[VideoPlayer] Invalid content type:', contentType);
+              setError('รูปแบบวิดีโอไม่รองรับ');
+              setLoading(false);
+              showToast('รูปแบบวิดีโอไม่รองรับ', 'error');
+              return;
+            }
+          } catch (err) {
+            console.error('[VideoPlayer] Pre-flight check error:', err);
+            // Continue anyway - let video element handle the error
+          }
+        }
+      }
+      
       setProgress(response.data.watch_progress || 0);
       const completeStatus = response.data.is_complete === 1;
       setIsComplete(completeStatus);
