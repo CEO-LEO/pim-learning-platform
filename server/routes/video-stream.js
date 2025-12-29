@@ -118,13 +118,24 @@ router.get('/:filename', (req, res, next) => {
       }
     }
     
-    // If still not found, return detailed error
-    return res.status(404).json({ 
-      error: 'Video file not found', 
-      filename, 
+    // If still not found, return detailed error with more diagnostic info
+    const diagnosticInfo = {
+      error: 'Video file not found',
+      filename,
       videoPath,
-      message: 'Video file may not be deployed. Check Railway logs for Git LFS pull status.'
-    });
+      cwd: process.cwd(),
+      __dirname: __dirname,
+      message: 'Video file may not be deployed. Check Railway logs for Git LFS pull status.',
+      troubleshooting: {
+        checkGitLFS: 'Verify Git LFS pull succeeded in Railway build logs',
+        checkPath: 'Verify video files are in server/uploads/videos/ directory',
+        checkRailwayVolume: 'Consider using Railway volumes for persistent file storage'
+      }
+    };
+    
+    console.error('[VideoStream] Detailed 404 error:', JSON.stringify(diagnosticInfo, null, 2));
+    
+    return res.status(404).json(diagnosticInfo);
   }
   
   streamVideo(videoPath, req, res);
