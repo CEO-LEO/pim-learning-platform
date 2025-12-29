@@ -83,12 +83,12 @@ const VideoPlayer = () => {
     hasRestoredPosition.current = false; // Reset when video changes
     return () => {
       // Copy ref value to avoid stale closure
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       const intervalId = progressIntervalRef.current;
       if (intervalId) {
         clearInterval(intervalId);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videoId]);
 
