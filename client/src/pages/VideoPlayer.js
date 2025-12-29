@@ -6,7 +6,18 @@ import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
-const SERVER_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000';
+// Use API_URL base for video URLs if SERVER_URL is not set
+const getServerUrl = () => {
+  if (process.env.REACT_APP_SERVER_URL) {
+    return process.env.REACT_APP_SERVER_URL;
+  }
+  // Extract base URL from API_URL (remove /api)
+  if (API_URL.includes('/api')) {
+    return API_URL.replace('/api', '');
+  }
+  return 'http://localhost:5000';
+};
+const SERVER_URL = getServerUrl();
 
 const VideoPlayer = () => {
   const { videoId } = useParams();
@@ -31,13 +42,19 @@ const VideoPlayer = () => {
 
   // Helper function to get full video URL
   const getVideoUrl = (url) => {
-    if (!url) return null;
+    if (!url) {
+      console.error('[VideoPlayer] No video URL provided');
+      return null;
+    }
     // If already a full URL (http:// or https://), return as is
     if (url.startsWith('http://') || url.startsWith('https://')) {
+      console.log('[VideoPlayer] Using full URL:', url);
       return url;
     }
     // If relative path, prepend server URL
-    return `${SERVER_URL}${url.startsWith('/') ? url : '/' + url}`;
+    const fullUrl = `${SERVER_URL}${url.startsWith('/') ? url : '/' + url}`;
+    console.log('[VideoPlayer] Constructed URL:', { original: url, serverUrl: SERVER_URL, fullUrl });
+    return fullUrl;
   };
 
   const showToast = (message, type = 'info') => {
@@ -502,6 +519,13 @@ const VideoPlayer = () => {
               onSeeking={handleSeeking}
               onSeeked={handleSeeked}
               onEnded={handleVideoEnded}
+              onError={(e) => {
+                console.error('[VideoPlayer] Video load error:', e);
+                console.error('[VideoPlayer] Video URL:', getVideoUrl(video.url));
+                console.error('[VideoPlayer] Video element error:', videoRef.current?.error);
+                setError('ไม่สามารถโหลดวิดีโอได้ กรุณาตรวจสอบ URL');
+                showToast('ไม่สามารถโหลดวิดีโอได้ กรุณาตรวจสอบ URL', 'error');
+              }}
               onLoadedMetadata={async () => {
                 // ... update duration logic ...
                 if (videoRef.current && videoRef.current.duration > 0) {
