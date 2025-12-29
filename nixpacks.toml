@@ -1,0 +1,17 @@
+[phases.setup]
+nixPkgs = ["git", "git-lfs", "nodejs-18_x", "npm"]
+
+[phases.install]
+cmds = [
+  "git lfs install",
+  "git lfs pull || echo 'Git LFS pull failed, continuing...'",
+  "cd server && npm install",
+  "cd ../client && npm install"
+]
+
+[phases.build]
+cmds = ["cd client && npm run build"]
+
+[start]
+cmd = "cd server && node index.js"
+
