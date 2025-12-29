@@ -18,6 +18,15 @@ router.get('/:filename', (req, res, next) => {
     return res.status(200).end();
   }
   
+  // Log request for debugging
+  console.log('[VideoStream] Request received:', {
+    filename: req.params.filename,
+    method: req.method,
+    hasAuthHeader: !!req.headers.authorization,
+    hasTokenQuery: !!req.query.token,
+    range: req.headers.range
+  });
+  
   // Try to authenticate - check Authorization header first, then query parameter
   const authHeader = req.headers.authorization;
   const tokenFromQuery = req.query.token;
@@ -25,6 +34,7 @@ router.get('/:filename', (req, res, next) => {
   // If token is in query parameter, add it to Authorization header
   if (tokenFromQuery && !authHeader) {
     req.headers.authorization = `Bearer ${tokenFromQuery}`;
+    console.log('[VideoStream] Token from query parameter added to Authorization header');
   }
   
   // Use standard authentication middleware
@@ -33,8 +43,16 @@ router.get('/:filename', (req, res, next) => {
   const { filename } = req.params;
   const videoPath = path.join(__dirname, '..', 'uploads', 'videos', filename);
   
+  console.log('[VideoStream] Processing video request:', {
+    filename,
+    videoPath,
+    cwd: process.cwd(),
+    __dirname
+  });
+  
   // Security: prevent directory traversal
   if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+    console.error('[VideoStream] Invalid filename detected:', filename);
     return res.status(400).json({ error: 'Invalid filename' });
   }
   

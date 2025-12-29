@@ -259,6 +259,15 @@ router.get('/:videoId', authenticateToken, (req, res) => {
             const duration = video.duration || 0;
             const watchProgress = duration > 0 ? Math.min(100, Math.floor((watchTime / duration) * 100)) : 0;
             
+            // Log video URL for debugging
+            console.log('[Videos] Returning video data:', {
+              video_id: video.video_id,
+              url: video.url,
+              urlType: typeof video.url,
+              urlLength: video.url?.length,
+              hasUrl: !!video.url
+            });
+            
             res.json({
               ...video,
               watch_time: watchTime,
