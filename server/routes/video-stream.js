@@ -7,6 +7,17 @@ const { authenticateToken } = require('./auth');
 // Stream video files with proper headers
 // Support both authenticated (with token) and query parameter token (for video element)
 router.get('/:filename', (req, res, next) => {
+  // Set CORS headers before authentication
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Range, Authorization');
+  res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length');
+  
+  // Handle OPTIONS request for CORS preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   // Try to authenticate - check Authorization header first, then query parameter
   const authHeader = req.headers.authorization;
   const tokenFromQuery = req.query.token;
@@ -74,6 +85,12 @@ function streamVideo(videoPath, req, res) {
   const range = req.headers.range;
   
   console.log(`[VideoStream] Serving video: ${path.basename(videoPath)}, size: ${fileSize}, range: ${range || 'none'}`);
+  
+  // Set CORS headers for video streaming
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Range, Authorization');
+  res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length');
   
   if (range) {
     // Support range requests for video streaming
