@@ -116,7 +116,7 @@ app.get('/api/health', (req, res) => {
   
   try {
     if (fs.existsSync(videosPath)) {
-      videoFiles = fs.readdirSync(videosPath).filter(f => f.endsWith('.mp4'));
+      videoFiles = fs.readdirSync(videosPath).filter(f => f.endsWith('.mp4') || f.endsWith('.webm') || f.endsWith('.mov'));
       videoFilesExist = videoFiles.length > 0;
     }
   } catch (err) {
@@ -127,12 +127,68 @@ app.get('/api/health', (req, res) => {
     status: 'ok', 
     message: 'PIM Learning Platform API is running',
     timestamp: new Date().toISOString(),
+    cwd: process.cwd(),
+    __dirname: __dirname,
     videoFiles: {
       directoryExists: fs.existsSync(videosPath),
+      directoryPath: videosPath,
       fileCount: videoFiles.length,
-      files: videoFiles.slice(0, 10), // Show first 10 files
+      files: videoFiles.slice(0, 20), // Show first 20 files
       hasFiles: videoFilesExist
+    },
+    env: {
+      NODE_ENV: process.env.NODE_ENV,
+      PORT: process.env.PORT,
+      hasJwtSecret: !!process.env.JWT_SECRET
     }
+  });
+});
+
+// Diagnostic endpoint for video URL testing
+app.get('/api/diagnose/video/:videoId', require('./routes/auth').authenticateToken, (req, res) => {
+  const db = require('./database/init');
+  const { videoId } = req.params;
+  const fs = require('fs');
+  const path = require('path');
+  
+  db.get('SELECT * FROM videos WHERE video_id = ?', [videoId], (err, video) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error', details: err.message });
+    }
+    
+    if (!video) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+    
+    // Check if video file exists
+    let filename = video.url;
+    if (filename && filename.includes('/')) {
+      filename = filename.split('/').pop();
+    }
+    
+    const videoPath = path.join(__dirname, 'uploads', 'videos', filename);
+    const fileExists = fs.existsSync(videoPath);
+    
+    res.json({
+      video: {
+        video_id: video.video_id,
+        title: video.title,
+        url: video.url,
+        urlType: typeof video.url,
+        urlLength: video.url?.length,
+        hasUrl: !!video.url
+      },
+      filename: filename,
+      fileCheck: {
+        expectedPath: videoPath,
+        exists: fileExists,
+        directoryExists: fs.existsSync(path.join(__dirname, 'uploads', 'videos'))
+      },
+      constructedUrl: {
+        base: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+        streamUrl: `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/videos/stream/${filename}`
+      }
+    });
   });
 });
 

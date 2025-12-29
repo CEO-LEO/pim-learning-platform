@@ -574,23 +574,48 @@ const VideoPlayer = () => {
           {video.url ? (() => {
             const videoSrc = getVideoUrl(video.url);
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:571',message:'Rendering video element',data:{originalUrl:video.url,videoSrc,hasVideoSrc:!!videoSrc},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,D'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:571',message:'Rendering video element',data:{originalUrl:video.url,videoSrc,hasVideoSrc:!!videoSrc,apiUrl:API_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,D'})}).catch(()=>{});
             // #endregion
+            
+            // Validate video URL before setting it
+            if (!videoSrc) {
+              console.error('[VideoPlayer] Invalid video URL:', { originalUrl: video.url, videoSrc });
+              return (
+                <div className="w-full h-full flex flex-col items-center justify-center text-white">
+                  <FiAlertCircle size={48} className="mb-4" />
+                  <p className="text-xl font-semibold mb-2">ไม่พบ URL วิดีโอ</p>
+                  <p className="text-sm opacity-75">กรุณาติดต่อผู้ดูแลระบบ</p>
+                </div>
+              );
+            }
+            
+            // Validate API_URL is set correctly
+            if (!API_URL || API_URL === 'http://localhost:5000/api') {
+              console.error('[VideoPlayer] API_URL not configured:', { API_URL, envApiUrl: process.env.REACT_APP_API_URL });
+              return (
+                <div className="w-full h-full flex flex-col items-center justify-center text-white">
+                  <FiAlertCircle size={48} className="mb-4" />
+                  <p className="text-xl font-semibold mb-2">การตั้งค่า API ไม่ถูกต้อง</p>
+                  <p className="text-sm opacity-75">กรุณาตรวจสอบ environment variables</p>
+                </div>
+              );
+            }
+            
             return (
               <video
-                  ref={videoRef}
-                  src={videoSrc}
-                  controls
-                  autoPlay
-                  muted
-                  controlsList="nodownload noplaybackrate"
-                  disablePictureInPicture
-                  onContextMenu={(e) => e.preventDefault()}
-                  className="w-full h-full object-contain"
-                  onTimeUpdate={handleTimeUpdate}
-                  onSeeking={handleSeeking}
-                  onSeeked={handleSeeked}
-                  onEnded={handleVideoEnded}
+                ref={videoRef}
+                src={videoSrc}
+                controls
+                autoPlay
+                muted
+                controlsList="nodownload noplaybackrate"
+                disablePictureInPicture
+                onContextMenu={(e) => e.preventDefault()}
+                className="w-full h-full object-contain"
+                onTimeUpdate={handleTimeUpdate}
+                onSeeking={handleSeeking}
+                onSeeked={handleSeeked}
+                onEnded={handleVideoEnded}
               onError={(e) => {
                 const videoElement = videoRef.current;
                 const error = videoElement?.error;
