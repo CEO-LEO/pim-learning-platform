@@ -210,23 +210,37 @@ const VideoPlayer = () => {
             // #endregion
             
             if (!headResponse.ok) {
-              const errorText = await headResponse.text();
+              let errorText = '';
+              try {
+                errorText = await headResponse.text();
+              } catch (e) {
+                errorText = 'Could not read error response';
+              }
+              
               let errorMessage = 'ไม่สามารถโหลดวิดีโอได้';
               
               if (headResponse.status === 404) {
-                errorMessage = 'ไม่พบไฟล์วิดีโอบนเซิร์ฟเวอร์ กรุณาตรวจสอบว่าไฟล์วิดีโอถูก deploy แล้ว';
+                errorMessage = 'ไม่พบไฟล์วิดีโอบนเซิร์ฟเวอร์ กรุณาตรวจสอบว่าไฟล์วิดีโอถูก deploy แล้ว (Git LFS pull อาจล้มเหลว)';
               } else if (headResponse.status === 401 || headResponse.status === 403) {
                 errorMessage = 'การยืนยันตัวตนล้มเหลว กรุณาเข้าสู่ระบบใหม่';
               } else {
                 errorMessage = `ไม่สามารถโหลดวิดีโอได้ (HTTP ${headResponse.status})`;
               }
               
-              console.error('[VideoPlayer] Pre-flight check failed:', {
+              const errorDetails = {
                 status: headResponse.status,
                 statusText: headResponse.statusText,
                 errorText,
-                videoSrc
-              });
+                videoSrc,
+                contentType: headResponse.headers.get('content-type'),
+                url: headResponse.url
+              };
+              
+              console.error('[VideoPlayer] Pre-flight check failed:', errorDetails);
+              
+              // #region agent log
+              fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:212',message:'Pre-flight check failed',data:errorDetails,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B,C'})}).catch(()=>{});
+              // #endregion
               
               setError(errorMessage);
               setLoading(false);
@@ -245,7 +259,20 @@ const VideoPlayer = () => {
             }
           } catch (err) {
             console.error('[VideoPlayer] Pre-flight check error:', err);
-            // Continue anyway - let video element handle the error
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:246',message:'Pre-flight check exception',data:{error:err.message,stack:err.stack,videoSrc},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D,E'})}).catch(()=>{});
+            // #endregion
+            
+            // If it's a network error (CORS, connection refused, etc.), show specific error
+            if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('CORS')) {
+              setError('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์วิดีโอได้ กรุณาตรวจสอบการตั้งค่า API_URL');
+              setLoading(false);
+              showToast('ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์วิดีโอได้', 'error');
+              return;
+            }
+            
+            // For other errors, continue anyway - let video element handle the error
+            console.warn('[VideoPlayer] Pre-flight check failed but continuing:', err.message);
           }
         }
       }
