@@ -33,6 +33,7 @@ const gradeRoutes = require('./routes/grades');
 const practicalRoutes = require('./routes/practical');
 const adminExportRoutes = require('./routes/admin-export');
 const roomRoutes = require('./routes/rooms');
+const videoStreamRoutes = require('./routes/video-stream');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -90,8 +91,19 @@ app.use('/api/practical', practicalRoutes);
 app.use('/api/admin/export', adminExportRoutes);
 app.use('/api/rooms', roomRoutes);
 
-// Serve uploaded files
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Video streaming route (with authentication)
+app.use('/api/videos/stream', videoStreamRoutes);
+
+// Serve uploaded files (public access for now, can be secured later)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res, filePath) => {
+    // Set proper headers for video files
+    if (filePath.endsWith('.mp4') || filePath.endsWith('.webm') || filePath.endsWith('.mov')) {
+      res.setHeader('Content-Type', 'video/mp4');
+      res.setHeader('Accept-Ranges', 'bytes');
+    }
+  }
+}));
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
