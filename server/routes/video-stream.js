@@ -31,10 +31,20 @@ router.get('/:filename', (req, res, next) => {
   const authHeader = req.headers.authorization;
   const tokenFromQuery = req.query.token;
   
+  // #region agent log
+  const fs = require('fs');
+  const logData1 = {location:'video-stream.js:31',message:'VideoStream middleware entry',data:{filename:req.params.filename,hasAuthHeader:!!authHeader,hasTokenQuery:!!tokenFromQuery,tokenQueryLength:tokenFromQuery?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
+  try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData1)+'\n');}catch(e){}
+  // #endregion
+  
   // If token is in query parameter, add it to Authorization header
   if (tokenFromQuery && !authHeader) {
     req.headers.authorization = `Bearer ${tokenFromQuery}`;
     console.log('[VideoStream] Token from query parameter added to Authorization header');
+    // #region agent log
+    const logData2 = {location:'video-stream.js:36',message:'Token from query added to header',data:{hasTokenQuery:!!tokenFromQuery},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'};
+    try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData2)+'\n');}catch(e){}
+    // #endregion
   }
   
   // Use standard authentication middleware
@@ -50,14 +60,29 @@ router.get('/:filename', (req, res, next) => {
     __dirname
   });
   
+  // #region agent log
+  const logData3 = {location:'video-stream.js:44',message:'VideoStream processing request',data:{filename,videoPath,cwd:process.cwd(),__dirname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'};
+  try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData3)+'\n');}catch(e){}
+  // #endregion
+  
   // Security: prevent directory traversal
   if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
     console.error('[VideoStream] Invalid filename detected:', filename);
+    // #region agent log
+    const logData4 = {location:'video-stream.js:54',message:'Invalid filename detected',data:{filename},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'};
+    try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData4)+'\n');}catch(e){}
+    // #endregion
     return res.status(400).json({ error: 'Invalid filename' });
   }
   
   // Check if file exists
-  if (!fs.existsSync(videoPath)) {
+  const fileExists = fs.existsSync(videoPath);
+  // #region agent log
+  const logData5 = {location:'video-stream.js:60',message:'Checking file existence',data:{filename,videoPath,fileExists},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'};
+  try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData5)+'\n');}catch(e){}
+  // #endregion
+  
+  if (!fileExists) {
     console.error(`[VideoStream] Video file not found: ${videoPath}`);
     console.error(`[VideoStream] Current directory: ${process.cwd()}`);
     console.error(`[VideoStream] __dirname: ${__dirname}`);

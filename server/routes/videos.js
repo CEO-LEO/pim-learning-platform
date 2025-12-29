@@ -268,6 +268,12 @@ router.get('/:videoId', authenticateToken, (req, res) => {
               hasUrl: !!video.url
             });
             
+            // #region agent log
+            const fs = require('fs');
+            const logData = {location:'videos.js:263',message:'Returning video data',data:{video_id:video.video_id,url:video.url,urlType:typeof video.url,urlLength:video.url?.length,hasUrl:!!video.url},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'};
+            try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData)+'\n');}catch(e){}
+            // #endregion
+            
             res.json({
               ...video,
               watch_time: watchTime,
