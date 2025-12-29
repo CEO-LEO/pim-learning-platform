@@ -370,7 +370,6 @@ const Modules = () => {
   const fetchModules = async () => {
     try {
       setLoading(true);
-      setError(null);
       const response = await axios.get(`${API_URL}/videos/modules`);
       setModules(response.data);
       if (moduleId) {
@@ -380,7 +379,6 @@ const Modules = () => {
     } catch (error) {
       console.error('Failed to fetch modules:', error);
       const errorMessage = error.response?.data?.error || 'ไม่สามารถโหลดข้อมูลหลักสูตรได้';
-      setError(errorMessage);
       showToast(errorMessage, 'error');
     } finally {
       setLoading(false);

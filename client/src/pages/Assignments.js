@@ -32,13 +32,11 @@ const Assignments = () => {
 
   const fetchAssignments = async (id) => {
     try {
-      setError(null);
       const response = await axios.get(`${API_URL}/assignments/module/${id}`);
       setAssignments(response.data);
     } catch (error) {
       console.error('Failed to fetch assignments:', error);
       const errorMessage = error.response?.data?.error || 'ไม่สามารถโหลดงานได้';
-      setError(errorMessage);
       showToast(errorMessage, 'error');
     } finally {
       setLoading(false);
@@ -47,13 +45,11 @@ const Assignments = () => {
 
   const fetchMySubmissions = async () => {
     try {
-      setError(null);
       const response = await axios.get(`${API_URL}/assignments/my/submissions`);
       setAssignments(response.data);
     } catch (error) {
       console.error('Failed to fetch submissions:', error);
       const errorMessage = error.response?.data?.error || 'ไม่สามารถโหลดงานที่ส่งแล้วได้';
-      setError(errorMessage);
       showToast(errorMessage, 'error');
     } finally {
       setLoading(false);
