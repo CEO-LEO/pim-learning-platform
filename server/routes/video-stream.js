@@ -56,6 +56,7 @@ router.get('/:filename', (req, res, next) => {
 }, (req, res) => {
   const { filename } = req.params;
   const videoPath = path.join(__dirname, '..', 'uploads', 'videos', filename);
+  const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
   
   console.log('[VideoStream] Processing video request:', {
     filename,
@@ -65,7 +66,6 @@ router.get('/:filename', (req, res, next) => {
   });
   
   // #region agent log
-  const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
   const logData3 = {location:'video-stream.js:44',message:'VideoStream processing request',data:{filename,videoPath,cwd:process.cwd(),__dirname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'};
   console.log('[DEBUG]', JSON.stringify(logData3));
   try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData3)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
@@ -75,7 +75,6 @@ router.get('/:filename', (req, res, next) => {
   if (filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
     console.error('[VideoStream] Invalid filename detected:', filename);
     // #region agent log
-    const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
     const logData4 = {location:'video-stream.js:54',message:'Invalid filename detected',data:{filename},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'};
     console.log('[DEBUG]', JSON.stringify(logData4));
     try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData4)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
@@ -86,7 +85,6 @@ router.get('/:filename', (req, res, next) => {
   // Check if file exists
   const fileExists = fs.existsSync(videoPath);
   // #region agent log
-  const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
   const logData5 = {location:'video-stream.js:60',message:'Checking file existence',data:{filename,videoPath,fileExists},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'};
   console.log('[DEBUG]', JSON.stringify(logData5));
   try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData5)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
