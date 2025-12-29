@@ -4,15 +4,16 @@ nixPkgs = ["git", "git-lfs", "nodejs-18_x", "npm"]
 [phases.install]
 cmds = [
   "echo '=== Installing Git LFS ==='",
-  "git lfs install || echo 'Git LFS install failed'",
+  "git lfs install || true",
   "echo '=== Pulling Git LFS files ==='",
-  "git lfs pull --all || echo 'Git LFS pull failed'",
+  "git lfs pull --all || echo 'Warning: Git LFS pull failed, continuing...'",
   "echo '=== Checking video files ==='",
   "ls -la server/uploads/videos/ 2>&1 || echo 'Video directory not found'",
   "find server/uploads/videos -name '*.mp4' -type f 2>&1 | head -5 || echo 'No video files found'",
-  "echo '=== Installing dependencies ==='",
-  "cd server && npm install",
-  "cd ../client && npm install"
+  "echo '=== Installing server dependencies ==='",
+  "cd server && npm install || exit 1",
+  "echo '=== Installing client dependencies ==='",
+  "cd ../client && npm install || exit 1"
 ]
 
 [phases.build]
