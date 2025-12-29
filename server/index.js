@@ -107,10 +107,32 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  const videosPath = path.join(__dirname, 'uploads', 'videos');
+  
+  let videoFiles = [];
+  let videoFilesExist = false;
+  
+  try {
+    if (fs.existsSync(videosPath)) {
+      videoFiles = fs.readdirSync(videosPath).filter(f => f.endsWith('.mp4'));
+      videoFilesExist = videoFiles.length > 0;
+    }
+  } catch (err) {
+    console.error('[Health] Error checking video files:', err.message);
+  }
+  
   res.json({ 
     status: 'ok', 
     message: 'PIM Learning Platform API is running',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    videoFiles: {
+      directoryExists: fs.existsSync(videosPath),
+      fileCount: videoFiles.length,
+      files: videoFiles.slice(0, 10), // Show first 10 files
+      hasFiles: videoFilesExist
+    }
   });
 });
 
