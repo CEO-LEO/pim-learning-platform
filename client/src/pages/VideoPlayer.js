@@ -61,7 +61,14 @@ const VideoPlayer = () => {
     }
     // If relative path, prepend server URL
     const fullUrl = `${SERVER_URL}${url.startsWith('/') ? url : '/' + url}`;
-    console.log('[VideoPlayer] Constructed URL:', { original: url, serverUrl: SERVER_URL, fullUrl });
+    console.log('[VideoPlayer] Constructed URL:', { 
+      original: url, 
+      serverUrl: SERVER_URL, 
+      fullUrl,
+      hasServerUrl: !!SERVER_URL,
+      envApiUrl: process.env.REACT_APP_API_URL,
+      envServerUrl: process.env.REACT_APP_SERVER_URL
+    });
     return fullUrl;
   };
 
@@ -530,11 +537,43 @@ const VideoPlayer = () => {
               onSeeked={handleSeeked}
               onEnded={handleVideoEnded}
               onError={(e) => {
-                console.error('[VideoPlayer] Video load error:', e);
-                console.error('[VideoPlayer] Video URL:', getVideoUrl(video.url));
-                console.error('[VideoPlayer] Video element error:', videoRef.current?.error);
-                setError('ไม่สามารถโหลดวิดีโอได้ กรุณาตรวจสอบ URL');
-                showToast('ไม่สามารถโหลดวิดีโอได้ กรุณาตรวจสอบ URL', 'error');
+                const videoElement = videoRef.current;
+                const error = videoElement?.error;
+                const videoUrl = getVideoUrl(video.url);
+                
+                console.error('[VideoPlayer] Video load error:', {
+                  event: e,
+                  errorCode: error?.code,
+                  errorMessage: error?.message,
+                  videoUrl: videoUrl,
+                  serverUrl: SERVER_URL,
+                  originalUrl: video.url,
+                  networkState: videoElement?.networkState,
+                  readyState: videoElement?.readyState
+                });
+                
+                let errorMessage = 'ไม่สามารถโหลดวิดีโอได้';
+                if (error) {
+                  switch (error.code) {
+                    case 1: // MEDIA_ERR_ABORTED
+                      errorMessage = 'การโหลดวิดีโอถูกยกเลิก';
+                      break;
+                    case 2: // MEDIA_ERR_NETWORK
+                      errorMessage = 'เกิดข้อผิดพลาดจากเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ';
+                      break;
+                    case 3: // MEDIA_ERR_DECODE
+                      errorMessage = 'ไม่สามารถถอดรหัสวิดีโอได้';
+                      break;
+                    case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED
+                      errorMessage = 'รูปแบบวิดีโอไม่รองรับ หรือ URL ไม่ถูกต้อง';
+                      break;
+                    default:
+                      errorMessage = `ไม่สามารถโหลดวิดีโอได้ (Error ${error.code})`;
+                  }
+                }
+                
+                setError(errorMessage);
+                showToast(errorMessage, 'error');
               }}
               onLoadedMetadata={async () => {
                 // ... update duration logic ...
