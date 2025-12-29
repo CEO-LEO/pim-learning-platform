@@ -31,20 +31,36 @@ router.get('/:filename', (req, res, next) => {
   if (!fs.existsSync(videoPath)) {
     console.error(`[VideoStream] Video file not found: ${videoPath}`);
     console.error(`[VideoStream] Current directory: ${process.cwd()}`);
+    console.error(`[VideoStream] __dirname: ${__dirname}`);
     console.error(`[VideoStream] Uploads directory exists: ${fs.existsSync(path.join(__dirname, '..', 'uploads'))}`);
     console.error(`[VideoStream] Videos directory exists: ${fs.existsSync(path.join(__dirname, '..', 'uploads', 'videos'))}`);
     if (fs.existsSync(path.join(__dirname, '..', 'uploads', 'videos'))) {
-      const files = fs.readdirSync(path.join(__dirname, '..', 'uploads', 'videos'));
-      console.error(`[VideoStream] Files in videos directory: ${files.join(', ')}`);
+      try {
+        const files = fs.readdirSync(path.join(__dirname, '..', 'uploads', 'videos'));
+        console.error(`[VideoStream] Files in videos directory (${files.length}): ${files.slice(0, 10).join(', ')}`);
+      } catch (err) {
+        console.error(`[VideoStream] Error reading videos directory: ${err.message}`);
+      }
+    }
+    // Try alternative path (in case of different deployment structure)
+    const altPath = path.join(process.cwd(), 'server', 'uploads', 'videos', filename);
+    if (fs.existsSync(altPath)) {
+      console.log(`[VideoStream] Found video at alternative path: ${altPath}`);
+      // Use alternative path
+      return streamVideo(altPath, req, res);
     }
     return res.status(404).json({ error: 'Video file not found', filename, videoPath });
   }
   
+  streamVideo(videoPath, req, res);
+});
+
+function streamVideo(videoPath, req, res) {
   const stat = fs.statSync(videoPath);
   const fileSize = stat.size;
   const range = req.headers.range;
   
-  console.log(`[VideoStream] Serving video: ${filename}, size: ${fileSize}, range: ${range || 'none'}`);
+  console.log(`[VideoStream] Serving video: ${path.basename(videoPath)}, size: ${fileSize}, range: ${range || 'none'}`);
   
   if (range) {
     // Support range requests for video streaming
@@ -58,6 +74,7 @@ router.get('/:filename', (req, res, next) => {
       'Accept-Ranges': 'bytes',
       'Content-Length': chunksize,
       'Content-Type': 'video/mp4',
+      'Cache-Control': 'public, max-age=31536000',
     };
     res.writeHead(206, head);
     file.pipe(res);
@@ -66,11 +83,13 @@ router.get('/:filename', (req, res, next) => {
     const head = {
       'Content-Length': fileSize,
       'Content-Type': 'video/mp4',
+      'Accept-Ranges': 'bytes',
+      'Cache-Control': 'public, max-age=31536000',
     };
     res.writeHead(200, head);
     fs.createReadStream(videoPath).pipe(res);
   }
-});
+}
 
 module.exports = router;
 

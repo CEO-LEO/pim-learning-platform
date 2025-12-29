@@ -4,8 +4,10 @@ nixPkgs = ["git", "git-lfs", "nodejs-18_x", "npm"]
 [phases.install]
 cmds = [
   "git lfs install",
-  "git lfs pull",
-  "ls -la server/uploads/videos/ || echo 'Video directory check'",
+  "git lfs pull --all",
+  "echo 'Checking video files...'",
+  "ls -la server/uploads/videos/ 2>&1 || echo 'Video directory not found'",
+  "find server/uploads/videos -name '*.mp4' -type f 2>&1 | head -5 || echo 'No video files found'",
   "cd server && npm install",
   "cd ../client && npm install"
 ]
