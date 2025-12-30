@@ -113,15 +113,31 @@ app.get('/api/health', (req, res) => {
   
   let videoFiles = [];
   let videoFilesExist = false;
+  let allFiles = [];
   
   try {
     if (fs.existsSync(videosPath)) {
-      videoFiles = fs.readdirSync(videosPath).filter(f => f.endsWith('.mp4') || f.endsWith('.webm') || f.endsWith('.mov'));
+      allFiles = fs.readdirSync(videosPath);
+      videoFiles = allFiles.filter(f => f.endsWith('.mp4') || f.endsWith('.webm') || f.endsWith('.mov'));
       videoFilesExist = videoFiles.length > 0;
     }
   } catch (err) {
     console.error('[Health] Error checking video files:', err.message);
   }
+  
+  // Check for Git LFS pointer files (indicates LFS files weren't pulled)
+  const lfsPointers = allFiles.filter(f => {
+    try {
+      const filePath = path.join(videosPath, f);
+      if (fs.statSync(filePath).isFile() && fs.statSync(filePath).size < 200) {
+        const content = fs.readFileSync(filePath, 'utf8');
+        return content.includes('version https://git-lfs.github.com/spec/v1');
+      }
+    } catch (e) {
+      return false;
+    }
+    return false;
+  });
   
   res.json({ 
     status: 'ok', 
@@ -133,14 +149,19 @@ app.get('/api/health', (req, res) => {
       directoryExists: fs.existsSync(videosPath),
       directoryPath: videosPath,
       fileCount: videoFiles.length,
+      totalFilesInDir: allFiles.length,
       files: videoFiles.slice(0, 20), // Show first 20 files
-      hasFiles: videoFilesExist
+      allFiles: allFiles.slice(0, 10), // Show all files for debugging
+      hasFiles: videoFilesExist,
+      hasLfsPointers: lfsPointers.length > 0,
+      lfsPointers: lfsPointers.slice(0, 5) // Show LFS pointer files if any
     },
     env: {
       NODE_ENV: process.env.NODE_ENV,
       PORT: process.env.PORT,
       hasJwtSecret: !!process.env.JWT_SECRET
-    }
+    },
+    warning: videoFilesExist ? null : 'No video files found. Git LFS pull may have failed or files not deployed.'
   });
 });
 
