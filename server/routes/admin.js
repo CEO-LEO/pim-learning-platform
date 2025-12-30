@@ -398,5 +398,51 @@ router.get('/storage/status', authenticateToken, requireAdmin, (req, res) => {
   }
 });
 
+// Get video details by ID (for debugging)
+router.get('/video/:videoId', authenticateToken, requireAdmin, (req, res) => {
+  const { videoId } = req.params;
+  
+  db.get(
+    `SELECT video_id, title, url, module_id, order_index, duration 
+     FROM videos 
+     WHERE video_id = ?`,
+    [videoId],
+    (err, video) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error', message: err.message });
+      }
+      
+      if (!video) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+      
+      const result = {
+        video_id: video.video_id,
+        title: video.title,
+        module_id: video.module_id,
+        order_index: video.order_index,
+        duration: video.duration,
+        url: video.url || null,
+        url_info: {
+          has_url: !!video.url,
+          url_length: video.url ? video.url.length : 0,
+          is_empty: !video.url || video.url.trim() === '',
+          url_type: typeof video.url
+        }
+      };
+      
+      // Extract filename if URL exists
+      if (video.url) {
+        result.filename = video.url.includes('/') 
+          ? video.url.split('/').pop() 
+          : video.url;
+        result.expected_path = `server/uploads/videos/${result.filename}`;
+      }
+      
+      res.json(result);
+    }
+  );
+});
+
 module.exports = router;
 

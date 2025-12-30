@@ -133,7 +133,20 @@ const VideoPlayer = () => {
 
   const fetchVideo = async () => {
     try {
-      console.log('[DEBUG] fetchVideo called', { videoId, hasToken: !!localStorage.getItem('token') });
+      const token = localStorage.getItem('token');
+      console.log('[DEBUG] fetchVideo called', { 
+        videoId, 
+        hasToken: !!token,
+        tokenLength: token?.length,
+        tokenPreview: token ? `${token.substring(0, 20)}...` : 'none'
+      });
+      
+      if (!token) {
+        console.error('[VideoPlayer] No token found, redirecting to login');
+        navigate('/login');
+        return;
+      }
+      
       setError(null);
       setErrorData(null);
       
@@ -155,10 +168,32 @@ const VideoPlayer = () => {
       console.log('[DEBUG] Making request', { url: `${API_URL}/videos/${videoId}`, hasToken: !!token });
       
       const response = await axios.get(`${API_URL}/videos/${videoId}`, config);
-      console.log('[DEBUG] Request successful', { status: response.status });
+      console.log('[DEBUG] Request successful', { 
+        status: response.status,
+        videoData: {
+          video_id: response.data.video_id,
+          title: response.data.title,
+          url: response.data.url,
+          hasUrl: !!response.data.url,
+          urlLength: response.data.url?.length
+        }
+      });
       setVideo(response.data);
       
       // Validate video URL exists before setting video
+      if (!response.data.url || response.data.url.trim() === '') {
+        const errorMsg = 'วิดีโอนี้ยังไม่มีไฟล์วิดีโอ กรุณาติดต่อผู้ดูแลระบบ';
+        console.error('[VideoPlayer] Video URL is empty or missing:', {
+          video_id: response.data.video_id,
+          title: response.data.title,
+          url: response.data.url
+        });
+        setError(errorMsg);
+        setLoading(false);
+        showToast(errorMsg, 'error');
+        return;
+      }
+      
       if (response.data.url) {
         const videoSrc = getVideoUrl(response.data.url);
         if (videoSrc) {
@@ -296,7 +331,9 @@ const VideoPlayer = () => {
       console.error('[DEBUG] Failed to fetch video:', error);
       console.error('[DEBUG] Error details:', { 
         hasResponse: !!error.response, 
-        status: error.response?.status, 
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data, 
         statusText: error.response?.statusText,
         errorMsg: error.response?.data?.error,
         errorMessage: error.message,

@@ -249,11 +249,22 @@ router.get('/:videoId', authenticateToken, (req, res) => {
             // Log video URL for debugging
             console.log('[Videos] Returning video data:', {
               video_id: video.video_id,
+              title: video.title,
               url: video.url,
               urlType: typeof video.url,
               urlLength: video.url?.length,
-              hasUrl: !!video.url
+              hasUrl: !!video.url,
+              urlIsEmpty: !video.url || video.url.trim() === ''
             });
+            
+            // Warn if video URL is missing or empty
+            if (!video.url || video.url.trim() === '') {
+              console.warn('[Videos] ⚠️ Video has no URL:', {
+                video_id: video.video_id,
+                title: video.title,
+                module_id: video.module_id
+              });
+            }
             
             res.json({
               ...video,
