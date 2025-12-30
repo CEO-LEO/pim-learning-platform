@@ -326,7 +326,6 @@ const VideoPlayer = () => {
         status: error.response?.status,
         statusText: error.response?.statusText,
         data: error.response?.data, 
-        statusText: error.response?.statusText,
         errorMsg: error.response?.data?.error,
         errorMessage: error.message,
         requestMade: !!error.request 
