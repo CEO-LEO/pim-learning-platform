@@ -266,12 +266,12 @@ const Booking = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50" style={{ marginTop: 0, paddingTop: '3rem', paddingBottom: '4rem' }}>
       <div className="w-full max-w-full mx-auto px-8 lg:px-12 xl:px-16">
         {/* Hero Header */}
-        <div className="mb-8">
-          <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 rounded-2xl p-8 md:p-10 text-white shadow-xl">
+        <div className="mb-6">
+          <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 rounded-xl p-6 text-white shadow-lg">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex-1">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-4">จองรอบฝึกปฏิบัติ (Practical Training)</h1>
-                <p className="text-lg md:text-xl lg:text-2xl text-purple-50 mb-4">เลือกวันและเวลาที่สะดวกเพื่อเข้าฝึกปฏิบัติที่ร้าน 7-Eleven Demonstration Store (จำกัด 100 ท่าน/รอบ)</p>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">จองรอบฝึกปฏิบัติ (Practical Training)</h1>
+                <p className="text-sm md:text-base text-purple-50 mb-2">เลือกวันและเวลาที่สะดวกเพื่อเข้าฝึกปฏิบัติที่ร้าน 7-Eleven Demonstration Store (จำกัด 100 ท่าน/รอบ)</p>
                 {lastUpdate && (
                   <p className="text-sm text-purple-200 mt-4 flex items-center space-x-2">
                     <FiRefreshCw size={16} className="animate-spin" />
@@ -328,11 +328,11 @@ const Booking = () => {
         ) : (
           <div className="mb-8">
             {/* Calendar Header */}
-            <div className="bg-white rounded-3xl shadow-xl p-8 mb-8 border border-gray-100">
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-800 flex items-center space-x-4">
-                  <div className="p-4 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-2xl shadow-lg">
-                    <FiCalendar size={32} />
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center space-x-2">
+                  <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-lg shadow-md">
+                    <FiCalendar size={20} />
                   </div>
                   <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                     {monthName}
@@ -341,21 +341,21 @@ const Booking = () => {
                 <div className="flex items-center space-x-3">
                   <button
                     onClick={() => navigateMonth(-1)}
-                    className="p-3 bg-gradient-to-br from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 rounded-xl transition-all transform hover:scale-110 shadow-md"
+                    className="p-2 bg-gradient-to-br from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 rounded-lg transition-all transform hover:scale-110 shadow-sm"
                   >
-                    <FiChevronLeft size={24} className="text-purple-600" />
+                    <FiChevronLeft size={18} className="text-purple-600" />
                   </button>
                   <button
                     onClick={() => setCurrentMonth(new Date())}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl font-bold text-base transition-all transform hover:scale-105 shadow-lg"
+                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg font-semibold text-sm transition-all transform hover:scale-105 shadow-md"
                   >
                     วันนี้
                   </button>
                   <button
                     onClick={() => navigateMonth(1)}
-                    className="p-3 bg-gradient-to-br from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 rounded-xl transition-all transform hover:scale-110 shadow-md"
+                    className="p-2 bg-gradient-to-br from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 rounded-lg transition-all transform hover:scale-110 shadow-sm"
                   >
-                    <FiChevronRight size={24} className="text-purple-600" />
+                    <FiChevronRight size={18} className="text-purple-600" />
                   </button>
                 </div>
                 </div>
@@ -472,9 +472,9 @@ const Booking = () => {
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-8">
                     <div>
-                      <h3 className="text-3xl md:text-4xl font-bold text-gray-800 flex items-center space-x-3 mb-2">
-                        <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-xl shadow-lg">
-                          <FiCalendar size={28} />
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center space-x-2 mb-2">
+                        <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-lg shadow-md">
+                          <FiCalendar size={18} />
                         </div>
                         <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                           {selectedDate.toLocaleDateString('th-TH', {
@@ -485,7 +485,7 @@ const Booking = () => {
                           })}
                         </span>
                       </h3>
-                      <p className="text-base md:text-lg text-gray-600 ml-14 font-semibold">เลือกรอบที่ต้องการจอง</p>
+                      <p className="text-sm text-gray-600 ml-10 font-medium">เลือกรอบที่ต้องการจอง</p>
                     </div>
                     <button
                       onClick={() => setSelectedDate(null)}
@@ -527,22 +527,22 @@ const Booking = () => {
                         
                         <div className="space-y-5 relative z-10" style={{ pointerEvents: 'none' }}>
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                              <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-xl shadow-lg">
-                                <FiClock size={24} />
+                            <div className="flex items-center space-x-2">
+                              <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-lg shadow-md">
+                                <FiClock size={16} />
                               </div>
                 <div>
-                                <span className="text-xl md:text-2xl font-bold text-gray-800 block">
+                                <span className="text-base font-semibold text-gray-800 block">
                                   {slot.start_time} - {slot.end_time} น.
                                 </span>
-                                <span className="text-sm text-gray-600 font-semibold">รอบฝึกปฏิบัติ</span>
+                                <span className="text-xs text-gray-600">รอบฝึกปฏิบัติ</span>
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between bg-white rounded-xl p-4 border-2 border-gray-200 shadow-sm">
-                            <span className="text-base md:text-lg font-bold text-gray-700">ที่นั่งว่าง</span>
-                            <span className={`px-4 py-2 rounded-full font-bold text-base md:text-lg shadow-md ${
+                          <div className="flex items-center justify-between bg-white rounded-lg p-3 border-2 border-gray-200 shadow-sm">
+                            <span className="text-sm font-semibold text-gray-700">ที่นั่งว่าง</span>
+                            <span className={`px-3 py-1.5 rounded-full font-semibold text-sm shadow-sm ${
                               isFull
                                 ? 'bg-red-200 text-red-700 border-2 border-red-300'
                                 : slot.remaining_count < 10
@@ -592,7 +592,7 @@ const Booking = () => {
                               handleBook(slot.exam_id, e);
                             }}
                             disabled={isFull || isBooking || !!registration}
-                            className={`w-full py-4 md:py-5 rounded-xl font-bold text-lg md:text-xl shadow-lg transition-all relative z-50 transform hover:scale-105 active:scale-95 ${
+                            className={`w-full py-3 rounded-lg font-semibold text-base shadow-md transition-all relative z-50 transform hover:scale-105 active:scale-95 ${
                               isFull || registration
                                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
                                 : isBooking

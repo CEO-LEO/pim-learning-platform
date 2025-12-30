@@ -165,9 +165,25 @@ const VideoPlayer = () => {
           // Pre-flight check: verify video URL is accessible
           const token = localStorage.getItem('token');
           try {
+            console.log('[VideoPlayer] Pre-flight HEAD request to:', videoSrc);
             const headResponse = await fetch(videoSrc, {
               method: 'HEAD',
-              headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+              headers: token ? { 
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'video/*'
+              } : {
+                'Accept': 'video/*'
+              },
+              credentials: 'include'
+            });
+            
+            console.log('[VideoPlayer] HEAD response:', {
+              status: headResponse.status,
+              statusText: headResponse.statusText,
+              contentType: headResponse.headers.get('content-type'),
+              contentLength: headResponse.headers.get('content-length'),
+              url: headResponse.url,
+              headers: Object.fromEntries(headResponse.headers.entries())
             });
             
             if (!headResponse.ok) {
@@ -220,13 +236,37 @@ const VideoPlayer = () => {
             
             // Check content type
             const contentType = headResponse.headers.get('content-type');
-            if (contentType && !contentType.startsWith('video/')) {
-              console.error('[VideoPlayer] Invalid content type:', contentType);
-              setError('รูปแบบวิดีโอไม่รองรับ');
-              setLoading(false);
-              showToast('รูปแบบวิดีโอไม่รองรับ', 'error');
-              return;
+            console.log('[VideoPlayer] HEAD response content-type:', contentType);
+            
+            // If status is OK but content-type is not video, it might be an error response
+            if (headResponse.ok && contentType && !contentType.startsWith('video/')) {
+              console.error('[VideoPlayer] Invalid content type:', contentType, {
+                status: headResponse.status,
+                url: headResponse.url,
+                headers: Object.fromEntries(headResponse.headers.entries())
+              });
+              
+              // If it's a JSON error response, try to parse it for better error message
+              if (contentType.includes('application/json')) {
+                try {
+                  // For HEAD request, we can't read body, so we'll continue and let video element handle it
+                  console.warn('[VideoPlayer] Got JSON response in HEAD request, will let video element handle error');
+                } catch (e) {
+                  // If can't parse, continue with generic error
+                }
+              }
+              
+              // Don't block here - let video element try to load and show its own error
+              console.warn('[VideoPlayer] Content-type check failed but continuing to let video element handle');
             }
+            
+            // If no content-type header, log warning but continue (some servers don't send it in HEAD)
+            if (!contentType) {
+              console.warn('[VideoPlayer] No content-type header in HEAD response, continuing anyway');
+            }
+            
+            // If HEAD request succeeds, continue to load video
+            console.log('[VideoPlayer] Pre-flight check passed, video should load');
           } catch (err) {
             console.error('[VideoPlayer] Pre-flight check error:', err);
             
@@ -657,7 +697,7 @@ const VideoPlayer = () => {
                 onSeeking={handleSeeking}
                 onSeeked={handleSeeked}
                 onEnded={handleVideoEnded}
-              onError={(e) => {
+                onError={(e) => {
                 const videoElement = videoRef.current;
                 const error = videoElement?.error;
                 const videoUrl = getVideoUrl(video.url);
@@ -673,6 +713,7 @@ const VideoPlayer = () => {
                   readyState: videoElement?.readyState,
                   videoSrc: videoElement?.src,
                   videoCurrentSrc: videoElement?.currentSrc,
+                  API_URL: API_URL,
                   videoElement: videoElement ? {
                     src: videoElement.src,
                     currentSrc: videoElement.currentSrc,
@@ -686,6 +727,16 @@ const VideoPlayer = () => {
                 };
                 
                 console.error('[VideoPlayer] Video load error:', errorData);
+                
+                // Set error state for UI
+                if (error?.code === 4) {
+                  setError('รูปแบบวิดีโอไม่รองรับ หรือ URL ไม่ถูกต้อง');
+                } else if (error?.code === 2) {
+                  setError('เกิดข้อผิดพลาดจากเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ');
+                } else {
+                  setError('ไม่สามารถโหลดวิดีโอได้');
+                }
+                setLoading(false);
                 
                 // Try to fetch the video URL to check if it exists
                 if (videoUrl) {

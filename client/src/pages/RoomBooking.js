@@ -213,13 +213,13 @@ const RoomBooking = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50" style={{ marginTop: 0, paddingTop: '3rem', paddingBottom: '4rem' }}>
       <div className="w-full max-w-full mx-auto px-8 lg:px-12 xl:px-16">
         {/* Hero Header */}
-        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-20 md:p-24 text-white shadow-2xl mb-20 transform transition-all hover:scale-[1.01]">
-          <div className="flex items-center justify-between flex-wrap gap-8">
+        <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-xl p-6 text-white shadow-lg mb-6 transform transition-all hover:scale-[1.01]">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex-1">
-              <h1 className="text-7xl sm:text-8xl md:text-9xl font-bold mb-10">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-3">
                 จองห้องเข้าใช้งาน
               </h1>
-              <p className="text-3xl md:text-4xl lg:text-5xl text-indigo-100 mb-8">
+              <p className="text-sm md:text-base text-indigo-100 mb-3">
                 จองห้องปฏิบัติการสำหรับฝึกซ้อมด้วยตัวเอง หรือใช้งานสิ่งอำนวยความสะดวกในศูนย์ Demo Store
               </p>
               {lastUpdate && (
@@ -229,9 +229,9 @@ const RoomBooking = () => {
                 </p>
               )}
             </div>
-            <div className="bg-white/20 backdrop-blur-sm rounded-3xl p-10 border-2 border-white/30 shadow-xl">
-              <div className="text-6xl font-bold mb-3">{activeBookings.length}</div>
-              <div className="text-xl text-indigo-100 font-semibold">การจองที่ใช้งานอยู่</div>
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 border-2 border-white/30 shadow-md">
+              <div className="text-3xl font-bold mb-1">{activeBookings.length}</div>
+              <div className="text-sm text-indigo-100 font-medium">การจองที่ใช้งานอยู่</div>
             </div>
           </div>
         </div>
@@ -240,9 +240,9 @@ const RoomBooking = () => {
           {/* Room Selection Section */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-6xl font-bold text-gray-800 flex items-center space-x-6">
-                <div className="p-6 bg-indigo-100 rounded-3xl">
-                  <FiHome className="text-indigo-600" size={48} />
+              <h2 className="text-2xl font-bold text-gray-800 flex items-center space-x-3">
+                <div className="p-2 bg-indigo-100 rounded-lg">
+                  <FiHome className="text-indigo-600" size={20} />
                 </div>
                 <span>เลือกห้องที่ต้องการจอง</span>
               </h2>
@@ -254,7 +254,7 @@ const RoomBooking = () => {
                 <div
                   key={room.room_id}
                   onClick={() => setSelectedRoom(room)}
-                  className={`group relative cursor-pointer rounded-3xl p-14 border-4 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 overflow-hidden ${
+                  className={`group relative cursor-pointer rounded-xl p-6 border-2 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 overflow-hidden ${
                     selectedRoom?.room_id === room.room_id
                       ? 'border-indigo-500 bg-gradient-to-br from-indigo-50 via-white to-purple-50 ring-4 ring-indigo-200'
                       : 'border-white bg-white hover:border-indigo-300 bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30'
@@ -262,39 +262,39 @@ const RoomBooking = () => {
                 >
                   {/* Shine effect */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                  <div className="relative z-10 flex items-start space-x-8 mb-8">
-                    <div className={`p-6 rounded-3xl transition-all duration-300 shadow-lg border-2 ${
+                  <div className="relative z-10 flex items-start space-x-4 mb-4">
+                    <div className={`p-3 rounded-lg transition-all duration-300 shadow-md border-2 ${
                       selectedRoom?.room_id === room.room_id
-                        ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-xl scale-110 border-indigo-300 transform group-hover:rotate-12'
+                        ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white shadow-lg scale-110 border-indigo-300 transform group-hover:rotate-12'
                         : 'bg-gradient-to-br from-indigo-100 to-purple-100 text-indigo-600 group-hover:scale-110 border-indigo-200'
                     }`}>
-                      <FiHome size={48} className="drop-shadow-lg" />
+                      <FiHome size={20} className="drop-shadow-lg" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-4xl font-bold text-gray-800 mb-3">{room.name}</h3>
-                      <div className="flex items-center space-x-4 text-gray-600">
-                        <FiUsers size={28} />
-                        <span className="font-bold text-2xl">รองรับ {room.capacity} ท่าน</span>
+                      <h3 className="text-lg font-bold text-gray-800 mb-2">{room.name}</h3>
+                      <div className="flex items-center space-x-2 text-gray-600">
+                        <FiUsers size={16} />
+                        <span className="font-semibold text-sm">รองรับ {room.capacity} ท่าน</span>
                       </div>
                     </div>
                     {selectedRoom?.room_id === room.room_id && (
-                      <div className="bg-indigo-500 text-white rounded-full p-4">
-                        <FiCheckCircle size={36} />
+                      <div className="bg-indigo-500 text-white rounded-full p-2">
+                        <FiCheckCircle size={18} />
                       </div>
                     )}
                   </div>
-                  <p className="text-gray-600 leading-relaxed text-2xl">{room.description}</p>
+                  <p className="text-gray-600 leading-relaxed text-sm">{room.description}</p>
                 </div>
               ))}
             </div>
 
             {/* Booking Form */}
             {selectedRoom && (
-              <div className="bg-white rounded-3xl p-12 shadow-2xl border-2 border-indigo-500 animate-in fade-in slide-in-from-bottom-4">
-                <div className="flex items-center justify-between mb-8">
-                  <h3 className="text-3xl font-bold text-gray-800 flex items-center space-x-4">
-                    <div className="p-3 bg-indigo-100 rounded-xl">
-                      <FiInfo className="text-indigo-600" size={32} />
+              <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-indigo-500 animate-in fade-in slide-in-from-bottom-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-gray-800 flex items-center space-x-2">
+                    <div className="p-2 bg-indigo-100 rounded-lg">
+                      <FiInfo className="text-indigo-600" size={18} />
                     </div>
                     <span>ระบุวันและเวลาที่จอง</span>
                   </h3>
@@ -306,18 +306,18 @@ const RoomBooking = () => {
                   </button>
                 </div>
 
-                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-3xl p-8 mb-8">
-                  <div className="flex items-center space-x-4 mb-5">
-                    <FiHome className="text-indigo-600" size={32} />
-                    <h4 className="text-2xl font-bold text-gray-800">{selectedRoom.name}</h4>
+                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 mb-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <FiHome className="text-indigo-600" size={18} />
+                    <h4 className="text-base font-bold text-gray-800">{selectedRoom.name}</h4>
                   </div>
-                  <p className="text-gray-600 text-lg">{selectedRoom.description}</p>
+                  <p className="text-gray-600 text-sm">{selectedRoom.description}</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xl font-bold text-gray-700 mb-4 flex items-center space-x-3">
-                      <FiCalendar className="text-indigo-600" size={26} />
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+                      <FiCalendar className="text-indigo-600" size={16} />
                       <span>วันที่จอง</span>
                     </label>
                     <input
@@ -325,18 +325,18 @@ const RoomBooking = () => {
                       value={bookingDate}
                       onChange={(e) => setBookingDate(e.target.value)}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full p-5 border-2 border-gray-200 rounded-xl text-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 focus:outline-none transition-all"
+                      className="w-full p-2.5 border-2 border-gray-200 rounded-lg text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all"
                     />
                   </div>
                   <div>
-                    <label className="block text-xl font-bold text-gray-700 mb-4 flex items-center space-x-3">
-                      <FiClock className="text-indigo-600" size={26} />
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+                      <FiClock className="text-indigo-600" size={16} />
                       <span>เวลาเริ่ม</span>
                     </label>
                     <select
                       value={startTime}
                       onChange={(e) => setStartTime(e.target.value)}
-                      className="w-full p-5 border-2 border-gray-200 rounded-xl text-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 focus:outline-none transition-all bg-white"
+                      className="w-full p-2.5 border-2 border-gray-200 rounded-lg text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all bg-white"
                     >
                       {timeOptions.map(option => (
                         <option key={option.value} value={option.value}>
@@ -346,14 +346,14 @@ const RoomBooking = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xl font-bold text-gray-700 mb-4 flex items-center space-x-3">
-                      <FiClock className="text-indigo-600" size={26} />
+                    <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+                      <FiClock className="text-indigo-600" size={16} />
                       <span>เวลาสิ้นสุด</span>
                     </label>
                     <select
                       value={endTime}
                       onChange={(e) => setEndTime(e.target.value)}
-                      className="w-full p-5 border-2 border-gray-200 rounded-xl text-xl focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 focus:outline-none transition-all bg-white"
+                      className="w-full p-2.5 border-2 border-gray-200 rounded-lg text-base focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 focus:outline-none transition-all bg-white"
                     >
                       {timeOptions.filter(opt => opt.value > startTime).map(option => (
                         <option key={option.value} value={option.value}>
@@ -364,20 +364,20 @@ const RoomBooking = () => {
                   </div>
                 </div>
 
-                <div className="mt-10 flex space-x-5">
+                <div className="mt-6 flex space-x-3">
                   <button
                     onClick={handleBook}
                     disabled={booking}
-                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-6 rounded-xl text-2xl font-bold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-3"
+                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 rounded-lg text-base font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
                   >
                     {booking ? (
                       <>
-                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
+                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                         <span>กำลังจอง...</span>
                       </>
                     ) : (
                       <>
-                        <FiCheckCircle size={32} />
+                        <FiCheckCircle size={18} />
                         <span>ยืนยันการจองห้อง</span>
                       </>
                     )}
@@ -389,7 +389,7 @@ const RoomBooking = () => {
                       setStartTime('09:00');
                       setEndTime('10:00');
                     }}
-                    className="px-10 py-6 border-2 border-gray-300 rounded-xl text-xl font-bold hover:bg-gray-50 text-gray-700 transition-all duration-200"
+                    className="px-6 py-3 border-2 border-gray-300 rounded-lg text-sm font-semibold hover:bg-gray-50 text-gray-700 transition-all duration-200"
                   >
                     ยกเลิก
                   </button>
@@ -399,10 +399,10 @@ const RoomBooking = () => {
           </div>
 
           {/* My Bookings Sidebar */}
-          <div className="space-y-10">
-            <h2 className="text-4xl font-bold text-gray-800 flex items-center space-x-5">
-              <div className="p-4 bg-green-100 rounded-2xl">
-                <FiCheckCircle className="text-green-600" size={36} />
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-gray-800 flex items-center space-x-2">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <FiCheckCircle className="text-green-600" size={18} />
               </div>
               <span>การจองของฉัน</span>
             </h2>
@@ -513,23 +513,23 @@ const BookingCard = ({ booking, onCancel }) => {
   const isPast = bookingDate < new Date();
 
   return (
-    <div className={`bg-white rounded-3xl p-10 shadow-xl border-l-4 transition-all duration-300 hover:shadow-2xl ${
+    <div className={`bg-white rounded-xl p-4 shadow-md border-l-4 transition-all duration-300 hover:shadow-lg ${
       isCancelled 
         ? 'border-gray-400 opacity-75' 
         : isPast
         ? 'border-green-500'
         : 'border-indigo-500'
     }`}>
-      <div className="flex justify-between items-start mb-8">
+      <div className="flex justify-between items-start mb-3">
         <div className="flex-1">
-          <h4 className={`text-3xl font-bold mb-3 ${
+          <h4 className={`text-base font-bold mb-2 ${
             isCancelled ? 'text-gray-400 line-through' : 'text-gray-800'
           }`}>
             {booking.room_name}
           </h4>
           {isCancelled && (
-            <span className="inline-flex items-center space-x-3 px-4 py-2 bg-red-100 text-red-700 rounded-full text-base font-bold">
-              <FiAlertCircle size={20} />
+            <span className="inline-flex items-center space-x-1.5 px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">
+              <FiAlertCircle size={12} />
               <span>ยกเลิกแล้ว</span>
             </span>
           )}
@@ -537,18 +537,18 @@ const BookingCard = ({ booking, onCancel }) => {
         {onCancel && !isCancelled && (
           <button
             onClick={() => onCancel(booking.booking_id)}
-            className="p-4 text-red-500 hover:bg-red-50 rounded-xl transition-all duration-200 hover:scale-110"
+            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200 hover:scale-110"
             title="ยกเลิกการจอง"
           >
-            <FiTrash2 size={28} />
+            <FiTrash2 size={16} />
           </button>
         )}
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center space-x-5 text-gray-700">
-          <FiCalendar className="text-indigo-600 flex-shrink-0" size={28} />
-          <span className="font-bold text-xl">
+      <div className="space-y-2">
+        <div className="flex items-center space-x-2 text-gray-700">
+          <FiCalendar className="text-indigo-600 flex-shrink-0" size={14} />
+          <span className="font-semibold text-sm">
             {bookingDate.toLocaleDateString('th-TH', {
               weekday: 'long',
               year: 'numeric',
@@ -557,9 +557,9 @@ const BookingCard = ({ booking, onCancel }) => {
             })}
           </span>
         </div>
-        <div className="flex items-center space-x-5 text-gray-700">
-          <FiClock className="text-indigo-600 flex-shrink-0" size={28} />
-          <span className="font-bold text-xl">{booking.start_time} - {booking.end_time} น.</span>
+        <div className="flex items-center space-x-2 text-gray-700">
+          <FiClock className="text-indigo-600 flex-shrink-0" size={14} />
+          <span className="font-semibold text-sm">{booking.start_time} - {booking.end_time} น.</span>
         </div>
       </div>
     </div>

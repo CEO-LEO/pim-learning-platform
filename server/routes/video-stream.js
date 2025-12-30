@@ -2,16 +2,20 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
-const { authenticateToken } = require('./auth');
+const jwt = require('jsonwebtoken');
 
-// Stream video files with proper headers
-// Support both authenticated (with token) and query parameter token (for video element)
-router.get('/:filename', (req, res, next) => {
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('[VideoStream] ERROR: JWT_SECRET environment variable is not set!');
+}
+
+// Custom authentication for video streaming that handles errors gracefully
+function authenticateVideoRequest(req, res, next) {
   // Set CORS headers before authentication
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Range, Authorization');
-  res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length');
+  res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length, Content-Type');
   
   // Handle OPTIONS request for CORS preflight
   if (req.method === 'OPTIONS') {
@@ -37,9 +41,37 @@ router.get('/:filename', (req, res, next) => {
     console.log('[VideoStream] Token from query parameter added to Authorization header');
   }
   
-  // Use standard authentication middleware
-  authenticateToken(req, res, next);
-}, (req, res) => {
+  // Extract token
+  const token = (authHeader && authHeader.split(' ')[1]) || tokenFromQuery;
+  
+  if (!token) {
+    console.error('[VideoStream] No token provided');
+    return res.status(401).json({ error: 'Access token required' });
+  }
+  
+  if (!JWT_SECRET) {
+    console.error('[VideoStream] JWT_SECRET is not configured');
+    return res.status(500).json({ error: 'Server configuration error' });
+  }
+  
+  // Verify token
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      console.error('[VideoStream] Token verification failed:', err.message);
+      return res.status(403).json({ error: 'Invalid or expired token' });
+    }
+    req.user = user;
+    next();
+  });
+}
+
+// Stream video files with proper headers
+// Support both authenticated (with token) and query parameter token (for video element)
+// Support both GET and HEAD requests
+router.get('/:filename', authenticateVideoRequest, handleVideoRequest);
+router.head('/:filename', authenticateVideoRequest, handleVideoRequest);
+
+function handleVideoRequest(req, res) {
   const { filename } = req.params;
   const videoPath = path.join(__dirname, '..', 'uploads', 'videos', filename);
   
@@ -58,6 +90,36 @@ router.get('/:filename', (req, res, next) => {
   
   // Check if file exists
   const fileExists = fs.existsSync(videoPath);
+  
+  // Check if file is an LFS pointer (very small file with LFS pointer content)
+  if (fileExists) {
+    try {
+      const stats = fs.statSync(videoPath);
+      if (stats.size < 200) {
+        // Check if it's an LFS pointer
+        const content = fs.readFileSync(videoPath, 'utf8');
+        if (content.includes('version https://git-lfs.github.com/spec/v1')) {
+          console.error(`[VideoStream] File is an LFS pointer, not actual video: ${filename}`);
+          return res.status(404).json({
+            error: 'Video file not available',
+            message: 'Video file is a Git LFS pointer and was not pulled during deployment',
+            filename: filename,
+            troubleshooting: {
+              issue: 'Git LFS files were not pulled during Railway build',
+              solutions: [
+                'Check Railway build logs for Git LFS pull errors',
+                'Use Railway Volumes to store video files',
+                'Use external storage (S3, Cloudflare R2) for video files',
+                'Ensure Git LFS is properly configured in repository'
+              ]
+            }
+          });
+        }
+      }
+    } catch (err) {
+      console.error(`[VideoStream] Error checking file: ${err.message}`);
+    }
+  }
   
   if (!fileExists) {
     console.error(`[VideoStream] Video file not found: ${videoPath}`);
@@ -108,20 +170,38 @@ router.get('/:filename', (req, res, next) => {
   }
   
   streamVideo(videoPath, req, res);
-});
+}
+
+// Get content type based on file extension
+function getContentType(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  const contentTypes = {
+    '.mp4': 'video/mp4',
+    '.webm': 'video/webm',
+    '.mov': 'video/quicktime',
+    '.avi': 'video/x-msvideo',
+    '.mkv': 'video/x-matroska',
+    '.m4v': 'video/mp4',
+    '.flv': 'video/x-flv',
+    '.ogv': 'video/ogg'
+  };
+  return contentTypes[ext] || 'video/mp4'; // Default to mp4
+}
 
 function streamVideo(videoPath, req, res) {
   const stat = fs.statSync(videoPath);
   const fileSize = stat.size;
   const range = req.headers.range;
+  const contentType = getContentType(videoPath);
+  const isHeadRequest = req.method === 'HEAD';
   
-  console.log(`[VideoStream] Serving video: ${path.basename(videoPath)}, size: ${fileSize}, range: ${range || 'none'}`);
+  console.log(`[VideoStream] Serving video: ${path.basename(videoPath)}, method: ${req.method}, size: ${fileSize}, range: ${range || 'none'}, content-type: ${contentType}`);
   
   // Set CORS headers for video streaming
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Range, Authorization');
-  res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length');
+  res.setHeader('Access-Control-Expose-Headers', 'Content-Range, Accept-Ranges, Content-Length, Content-Type');
   
   if (range) {
     // Support range requests for video streaming
@@ -129,26 +209,34 @@ function streamVideo(videoPath, req, res) {
     const start = parseInt(parts[0], 10);
     const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
     const chunksize = (end - start) + 1;
-    const file = fs.createReadStream(videoPath, { start, end });
     const head = {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunksize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': contentType,
       'Cache-Control': 'public, max-age=31536000',
     };
     res.writeHead(206, head);
-    file.pipe(res);
+    if (!isHeadRequest) {
+      const file = fs.createReadStream(videoPath, { start, end });
+      file.pipe(res);
+    } else {
+      res.end();
+    }
   } else {
     // Full file request
     const head = {
       'Content-Length': fileSize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': contentType,
       'Accept-Ranges': 'bytes',
       'Cache-Control': 'public, max-age=31536000',
     };
     res.writeHead(200, head);
-    fs.createReadStream(videoPath).pipe(res);
+    if (!isHeadRequest) {
+      fs.createReadStream(videoPath).pipe(res);
+    } else {
+      res.end();
+    }
   }
 }
 

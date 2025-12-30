@@ -296,5 +296,107 @@ router.post('/assessments', authenticateToken, requireAdmin, (req, res) => {
   );
 });
 
+// Check video storage status (Volume/filesystem)
+router.get('/storage/status', authenticateToken, requireAdmin, (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  
+  const videosPath = path.join(__dirname, '..', 'uploads', 'videos');
+  const directoryExists = fs.existsSync(videosPath);
+  
+  let stats = {
+    directoryExists,
+    directoryPath: videosPath,
+    files: [],
+    realFiles: [],
+    lfsPointers: [],
+    totalSize: 0,
+    totalSizeMB: 0
+  };
+  
+  if (directoryExists) {
+    try {
+      const files = fs.readdirSync(videosPath);
+      const videoFiles = files.filter(f => 
+        f.endsWith('.mp4') || f.endsWith('.webm') || f.endsWith('.mov')
+      );
+      
+      videoFiles.forEach(filename => {
+        const filePath = path.join(videosPath, filename);
+        try {
+          const fileStats = fs.statSync(filePath);
+          const size = fileStats.size;
+          const sizeMB = (size / (1024 * 1024)).toFixed(2);
+          
+          if (size < 200) {
+            // Check if LFS pointer
+            const content = fs.readFileSync(filePath, 'utf8');
+            if (content.includes('version https://git-lfs.github.com/spec/v1')) {
+              stats.lfsPointers.push({
+                filename,
+                size,
+                sizeMB: '0.00'
+              });
+            }
+          } else {
+            stats.realFiles.push({
+              filename,
+              size,
+              sizeMB
+            });
+            stats.totalSize += size;
+          }
+          
+          stats.files.push({
+            filename,
+            size,
+            sizeMB,
+            isLfsPointer: size < 200
+          });
+        } catch (err) {
+          // Ignore errors
+        }
+      });
+      
+      stats.totalSizeMB = (stats.totalSize / (1024 * 1024)).toFixed(2);
+      stats.realFileCount = stats.realFiles.length;
+      stats.lfsPointerCount = stats.lfsPointers.length;
+      stats.totalFileCount = stats.files.length;
+      
+      // Check if volume is mounted (Railway volumes are typically at /app)
+      const isVolumeMounted = videosPath.includes('/app') || process.env.RAILWAY_VOLUME_MOUNT_PATH;
+      
+      res.json({
+        ...stats,
+        isVolumeMounted,
+        volumePath: process.env.RAILWAY_VOLUME_MOUNT_PATH || 'Not set',
+        recommendations: stats.lfsPointerCount > 0 ? [
+          'Some files are LFS pointers. Consider using Railway Volumes.',
+          'Upload actual video files to the volume.',
+          'Or use external storage (S3, Cloudflare R2) for video files.'
+        ] : [
+          'All video files are real files. ✅',
+          'Consider using Railway Volumes for persistent storage.',
+          'Backup video files regularly.'
+        ]
+      });
+    } catch (err) {
+      res.status(500).json({ 
+        error: 'Failed to read video directory', 
+        details: err.message 
+      });
+    }
+  } else {
+    res.json({
+      ...stats,
+      recommendations: [
+        'Video directory does not exist.',
+        'Create the directory or mount a Railway Volume.',
+        'Mount path should be: /app/server/uploads/videos'
+      ]
+    });
+  }
+});
+
 module.exports = router;
 

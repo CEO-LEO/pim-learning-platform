@@ -126,17 +126,32 @@ app.get('/api/health', (req, res) => {
   }
   
   // Check for Git LFS pointer files (indicates LFS files weren't pulled)
-  const lfsPointers = allFiles.filter(f => {
+  const lfsPointers = [];
+  const realVideoFiles = [];
+  
+  allFiles.forEach(f => {
     try {
       const filePath = path.join(videosPath, f);
-      if (fs.statSync(filePath).isFile() && fs.statSync(filePath).size < 200) {
-        const content = fs.readFileSync(filePath, 'utf8');
-        return content.includes('version https://git-lfs.github.com/spec/v1');
+      if (fs.statSync(filePath).isFile()) {
+        const size = fs.statSync(filePath).size;
+        if (size < 200) {
+          // Check if it's an LFS pointer
+          const content = fs.readFileSync(filePath, 'utf8');
+          if (content.includes('version https://git-lfs.github.com/spec/v1')) {
+            lfsPointers.push(f);
+          }
+        } else {
+          // Real video file (size > 200 bytes)
+          realVideoFiles.push({
+            filename: f,
+            size: size,
+            sizeMB: (size / (1024 * 1024)).toFixed(2)
+          });
+        }
       }
     } catch (e) {
-      return false;
+      // Ignore errors
     }
-    return false;
   });
   
   res.json({ 
@@ -149,12 +164,16 @@ app.get('/api/health', (req, res) => {
       directoryExists: fs.existsSync(videosPath),
       directoryPath: videosPath,
       fileCount: videoFiles.length,
+      realVideoFileCount: realVideoFiles.length,
+      lfsPointerCount: lfsPointers.length,
       totalFilesInDir: allFiles.length,
       files: videoFiles.slice(0, 20), // Show first 20 files
+      realFiles: realVideoFiles.slice(0, 20), // Show real video files with sizes
       allFiles: allFiles.slice(0, 10), // Show all files for debugging
       hasFiles: videoFilesExist,
       hasLfsPointers: lfsPointers.length > 0,
-      lfsPointers: lfsPointers.slice(0, 5) // Show LFS pointer files if any
+      lfsPointers: lfsPointers, // Show all LFS pointer files
+      warning: lfsPointers.length > 0 ? `${lfsPointers.length} files are LFS pointers and need to be replaced with actual video files` : null
     },
     env: {
       NODE_ENV: process.env.NODE_ENV,
@@ -209,6 +228,102 @@ app.get('/api/diagnose/video/:videoId', require('./routes/auth').authenticateTok
         base: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
         streamUrl: `${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/videos/stream/${filename}`
       }
+    });
+  });
+});
+
+// Comprehensive video diagnostic endpoint - check all videos
+app.get('/api/diagnose/videos/all', require('./routes/auth').authenticateToken, (req, res) => {
+  const db = require('./database/init');
+  const fs = require('fs');
+  const path = require('path');
+  
+  // Check if user is admin
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+  
+  const videosPath = path.join(__dirname, 'uploads', 'videos');
+  const videosDirExists = fs.existsSync(videosPath);
+  
+  // Get all video files on server
+  let serverFiles = [];
+  if (videosDirExists) {
+    try {
+      serverFiles = fs.readdirSync(videosPath).filter(f => {
+        const filePath = path.join(videosPath, f);
+        return fs.statSync(filePath).isFile() && 
+               (f.endsWith('.mp4') || f.endsWith('.webm') || f.endsWith('.mov'));
+      });
+    } catch (err) {
+      console.error('[Diagnose] Error reading videos directory:', err);
+    }
+  }
+  
+  // Get all videos from database
+  db.all('SELECT video_id, module_id, title, url, duration, order_index FROM videos ORDER BY module_id, order_index', [], (err, dbVideos) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error', details: err.message });
+    }
+    
+    // Check each video
+    const videoChecks = dbVideos.map(video => {
+      let filename = video.url;
+      if (filename && filename.includes('/')) {
+        filename = filename.split('/').pop();
+      }
+      
+      const videoPath = path.join(__dirname, 'uploads', 'videos', filename || '');
+      const fileExists = filename ? fs.existsSync(videoPath) : false;
+      
+      let fileSize = 0;
+      if (fileExists) {
+        try {
+          fileSize = fs.statSync(videoPath).size;
+        } catch (e) {
+          // Ignore
+        }
+      }
+      
+      return {
+        video_id: video.video_id,
+        title: video.title,
+        module_id: video.module_id,
+        order_index: video.order_index,
+        database: {
+          url: video.url,
+          hasUrl: !!video.url,
+          filename: filename || null
+        },
+        file: {
+          exists: fileExists,
+          path: videoPath,
+          size: fileSize,
+          sizeMB: fileSize > 0 ? (fileSize / (1024 * 1024)).toFixed(2) : 0
+        },
+        status: fileExists ? 'OK' : (video.url ? 'MISSING_FILE' : 'NO_URL')
+      };
+    });
+    
+    // Summary
+    const summary = {
+      totalVideosInDb: dbVideos.length,
+      videosWithUrl: dbVideos.filter(v => v.url && v.url.trim()).length,
+      videosWithFile: videoChecks.filter(v => v.file.exists).length,
+      videosMissingFile: videoChecks.filter(v => v.status === 'MISSING_FILE').length,
+      videosNoUrl: videoChecks.filter(v => v.status === 'NO_URL').length,
+      serverFiles: {
+        count: serverFiles.length,
+        files: serverFiles.slice(0, 50) // Show first 50 files
+      },
+      directoryExists: videosDirExists,
+      directoryPath: videosPath
+    };
+    
+    res.json({
+      summary,
+      videos: videoChecks,
+      timestamp: new Date().toISOString()
     });
   });
 });

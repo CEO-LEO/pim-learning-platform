@@ -156,8 +156,8 @@ const MyExams = () => {
     const Icon = config.icon;
 
     return (
-      <span className={`px-10 py-5 ${config.bg} ${config.text} rounded-full text-xl font-bold flex items-center space-x-4 shadow-lg`}>
-        <Icon size={28} />
+      <span className={`px-4 py-2 ${config.bg} ${config.text} rounded-full text-sm font-semibold flex items-center space-x-2 shadow-md`}>
+        <Icon size={16} />
         <span>{config.label}</span>
       </span>
     );
@@ -216,10 +216,10 @@ const MyExams = () => {
         <div className="mb-16">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-6">
             <div>
-              <h1 className="text-7xl sm:text-8xl lg:text-9xl font-bold text-gray-800 mb-8 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-3 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 การสอบของฉัน
               </h1>
-              <p className="text-4xl text-gray-600">ดูผลสอบและรอบสอบที่ลงทะเบียนไว้</p>
+              <p className="text-lg text-gray-600">ดูผลสอบและรอบสอบที่ลงทะเบียนไว้</p>
               {lastUpdate && (
                 <p className="text-sm text-gray-500 mt-2 flex items-center space-x-2">
                   <FiRefreshCw size={14} className="animate-spin" />
@@ -229,9 +229,9 @@ const MyExams = () => {
             </div>
             <Link
               to="/exams"
-              className="inline-flex items-center space-x-3 bg-white hover:bg-blue-50 text-blue-600 border-2 border-blue-600 px-8 py-4 rounded-xl font-bold text-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+              className="inline-flex items-center space-x-2 bg-white hover:bg-blue-50 text-blue-600 border-2 border-blue-600 px-4 py-2 rounded-lg font-semibold text-base transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
             >
-              <FiArrowLeft size={24} />
+              <FiArrowLeft size={18} />
               <span>ลงทะเบียนสอบ</span>
             </Link>
           </div>
@@ -274,9 +274,9 @@ const MyExams = () => {
             {/* Upcoming Exams */}
             {groupedExams.upcoming.length > 0 && (
               <div>
-                <h2 className="text-5xl font-bold text-gray-800 mb-12 flex items-center space-x-5">
-                  <div className="p-5 bg-blue-100 rounded-3xl">
-                    <FiCalendar className="text-blue-600" size={44} />
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center space-x-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <FiCalendar className="text-blue-600" size={20} />
                   </div>
                   <span>การสอบที่กำลังจะมาถึง ({groupedExams.upcoming.length})</span>
                 </h2>
@@ -296,9 +296,9 @@ const MyExams = () => {
             {/* Completed Exams */}
             {groupedExams.completed.length > 0 && (
               <div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center space-x-3">
-                  <div className="p-3 bg-green-100 rounded-xl">
-                    <FiCheckCircle className="text-green-600" size={28} />
+                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
+                  <div className="p-2 bg-green-100 rounded-lg">
+                    <FiCheckCircle className="text-green-600" size={18} />
                   </div>
                   <span>การสอบที่เสร็จสิ้น ({groupedExams.completed.length})</span>
                 </h2>
@@ -318,9 +318,9 @@ const MyExams = () => {
             {/* Cancelled Exams */}
             {groupedExams.cancelled.length > 0 && (
               <div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-6 flex items-center space-x-3">
-                  <div className="p-3 bg-gray-100 rounded-xl">
-                    <FiXCircle className="text-gray-600" size={28} />
+                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
+                  <div className="p-2 bg-gray-100 rounded-lg">
+                    <FiXCircle className="text-gray-600" size={18} />
                   </div>
                   <span>การสอบที่ยกเลิก ({groupedExams.cancelled.length})</span>
                 </h2>
@@ -403,26 +403,26 @@ const ExamCard = ({ exam, onCancel, getStatusBadge }) => {
   const isPast = examDate < new Date();
 
   return (
-    <div className={`bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border-l-4 ${
+    <div className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border-l-4 ${
       isCancelled ? 'border-gray-400 opacity-75' :
       isPast ? 'border-green-500' :
       'border-blue-500'
     }`}>
-      <div className="p-16">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-10">
+      <div className="p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           {/* Left Side - Exam Info */}
           <div className="flex-1">
-            <div className="flex items-start justify-between mb-10">
-              <h3 className="text-5xl font-bold text-gray-800 mb-5">
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
                 {exam.exam_name || 'การสอบปฏิบัติ'}
               </h3>
               {getStatusBadge(status)}
             </div>
             
-            <div className="space-y-6">
-              <div className="flex items-center space-x-6 text-gray-700">
-                <FiCalendar className="text-blue-600 flex-shrink-0" size={36} />
-                <span className="font-bold text-2xl">
+            <div className="space-y-3">
+              <div className="flex items-center space-x-3 text-gray-700">
+                <FiCalendar className="text-blue-600 flex-shrink-0" size={18} />
+                <span className="font-semibold text-base">
                   {examDate.toLocaleDateString('th-TH', {
                     weekday: 'long',
                     year: 'numeric',
@@ -432,25 +432,25 @@ const ExamCard = ({ exam, onCancel, getStatusBadge }) => {
                 </span>
               </div>
               
-              <div className="flex items-center space-x-6 text-gray-700">
-                <FiClock className="text-blue-600 flex-shrink-0" size={36} />
-                <span className="font-bold text-2xl">{exam.start_time} - {exam.end_time} น.</span>
+              <div className="flex items-center space-x-3 text-gray-700">
+                <FiClock className="text-blue-600 flex-shrink-0" size={18} />
+                <span className="font-semibold text-base">{exam.start_time} - {exam.end_time} น.</span>
               </div>
 
               {/* Score Display */}
               {exam.score !== null && exam.score !== undefined && (
-                <div className="mt-10 p-10 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-3xl border-2 border-blue-200">
+                <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-lg border-2 border-blue-200">
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-gray-700">คะแนนสอบ</span>
-                    <span className={`text-6xl font-bold ${
+                    <span className="text-base font-semibold text-gray-700">คะแนนสอบ</span>
+                    <span className={`text-3xl font-bold ${
                       exam.passed ? 'text-green-600' : 'text-red-600'
                     }`}>
                       {exam.score}%
                     </span>
                   </div>
                   {exam.passed && (
-                    <div className="mt-5 flex items-center space-x-4 text-green-600 text-xl font-bold">
-                      <FiCheckCircle size={28} />
+                    <div className="mt-2 flex items-center space-x-2 text-green-600 text-sm font-semibold">
+                      <FiCheckCircle size={16} />
                       <span>ผ่านเกณฑ์</span>
                     </div>
                   )}
@@ -459,8 +459,8 @@ const ExamCard = ({ exam, onCancel, getStatusBadge }) => {
 
               {/* Feedback */}
               {exam.feedback && (
-                <div className="mt-10 p-10 bg-blue-50 rounded-3xl border-2 border-blue-200">
-                  <p className="text-xl text-gray-700 leading-relaxed">{exam.feedback}</p>
+                <div className="mt-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                  <p className="text-sm text-gray-700 leading-relaxed">{exam.feedback}</p>
                 </div>
               )}
             </div>
@@ -468,12 +468,12 @@ const ExamCard = ({ exam, onCancel, getStatusBadge }) => {
 
           {/* Right Side - Actions */}
           {isRegistered && !isPast && (
-            <div className="flex sm:flex-col items-center sm:items-end space-x-5 sm:space-x-0 sm:space-y-5">
+            <div className="flex sm:flex-col items-center sm:items-end space-x-3 sm:space-x-0 sm:space-y-3">
               <button
                 onClick={() => onCancel(exam.registration_id)}
-                className="px-10 py-5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-4"
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 flex items-center space-x-2"
               >
-                <FiTrash2 size={32} />
+                <FiTrash2 size={16} />
                 <span>ยกเลิก</span>
               </button>
             </div>

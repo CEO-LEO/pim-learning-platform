@@ -123,7 +123,7 @@ const ExamRegistration = () => {
       return (
         <div
           key={exam.exam_id}
-          className={`group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 transform hover:-translate-y-1 ${
+          className={`group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border-2 transform hover:-translate-y-1 ${
             isRegistered 
               ? 'border-green-400 bg-gradient-to-br from-green-50 via-white to-green-50/50' 
               : isFull 
@@ -136,34 +136,34 @@ const ExamRegistration = () => {
           
           {/* Status Badge */}
           {isRegistered && (
-            <div className="absolute top-6 right-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-full text-lg font-bold flex items-center space-x-2 shadow-xl z-10 backdrop-blur-sm border-2 border-white/30">
-              <FiCheckCircle size={20} />
+            <div className="absolute top-3 right-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center space-x-1.5 shadow-lg z-10 backdrop-blur-sm border-2 border-white/30">
+              <FiCheckCircle size={14} />
               <span>ลงทะเบียนแล้ว</span>
             </div>
           )}
           
           {isFull && !isRegistered && (
-            <div className="absolute top-6 right-6 bg-gradient-to-r from-red-500 to-rose-500 text-white px-6 py-3 rounded-full text-lg font-bold flex items-center space-x-2 shadow-xl z-10 backdrop-blur-sm border-2 border-white/30">
-              <FiAlertCircle size={20} />
+            <div className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-rose-500 text-white px-3 py-1.5 rounded-full text-sm font-semibold flex items-center space-x-1.5 shadow-lg z-10 backdrop-blur-sm border-2 border-white/30">
+              <FiAlertCircle size={14} />
               <span>เต็มแล้ว</span>
             </div>
           )}
 
-            <div className="relative z-10 p-16">
+            <div className="relative z-10 p-6">
               {/* Header */}
-              <div className="mb-12">
-                <h3 className="text-4xl font-bold text-gray-800 mb-10 flex items-center space-x-5">
-                  <div className={`p-5 rounded-3xl shadow-lg transform group-hover:rotate-12 transition-transform duration-300 ${isRegistered ? 'bg-gradient-to-br from-green-100 to-emerald-100 text-green-600 border-2 border-green-200' : 'bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-600 border-2 border-blue-200'}`}>
-                    <FiCalendar size={40} />
+              <div className="mb-4">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center space-x-3">
+                  <div className={`p-2 rounded-lg shadow-md transform group-hover:rotate-12 transition-transform duration-300 ${isRegistered ? 'bg-gradient-to-br from-green-100 to-emerald-100 text-green-600 border-2 border-green-200' : 'bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-600 border-2 border-blue-200'}`}>
+                    <FiCalendar size={20} />
                   </div>
                   <span className="group-hover:text-blue-600 transition-colors">รอบสอบปฏิบัติ</span>
                 </h3>
               
               {/* Exam Details */}
-              <div className="space-y-6">
-                <div className="flex items-center space-x-6 text-gray-700 mb-5">
-                  <FiCalendar className="text-blue-600 flex-shrink-0" size={36} />
-                  <span className="font-bold text-2xl">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 text-gray-700">
+                  <FiCalendar className="text-blue-600 flex-shrink-0" size={18} />
+                  <span className="font-semibold text-base">
                     {new Date(exam.date).toLocaleDateString('th-TH', {
                       weekday: 'long',
                       year: 'numeric',
@@ -173,13 +173,13 @@ const ExamRegistration = () => {
                   </span>
                 </div>
                 
-                <div className="flex items-center space-x-6 text-gray-700 mb-5">
-                  <FiClock className="text-blue-600 flex-shrink-0" size={36} />
-                  <span className="font-bold text-2xl">{exam.start_time} - {exam.end_time} น.</span>
+                <div className="flex items-center space-x-3 text-gray-700">
+                  <FiClock className="text-blue-600 flex-shrink-0" size={18} />
+                  <span className="font-semibold text-base">{exam.start_time} - {exam.end_time} น.</span>
                 </div>
                 
-                <div className="flex items-center space-x-6 text-gray-700">
-                  <FiUsers className="text-blue-600 flex-shrink-0" size={36} />
+                <div className="flex items-center space-x-3 text-gray-700">
+                  <FiUsers className="text-blue-600 flex-shrink-0" size={18} />
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-medium">
@@ -187,9 +187,9 @@ const ExamRegistration = () => {
                       </span>
                     </div>
                     {/* Progress Bar */}
-                    <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner border border-gray-300">
+                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner border border-gray-300">
                       <div 
-                        className={`h-full transition-all duration-500 shadow-lg ${
+                        className={`h-full transition-all duration-500 shadow-md ${
                           progressPercent >= 90 ? 'bg-gradient-to-r from-red-500 to-rose-600' : 
                           progressPercent >= 70 ? 'bg-gradient-to-r from-orange-500 to-amber-600' : 
                           'bg-gradient-to-r from-green-500 to-emerald-600'
@@ -205,48 +205,48 @@ const ExamRegistration = () => {
             </div>
 
             {/* Action Button */}
-            <div className="pt-10 border-t-2 border-gray-200">
+            <div className="pt-4 border-t-2 border-gray-200">
               {isRegistered ? (
-                <div className="space-y-6">
+                <div className="space-y-3">
                   <button
                     disabled
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-8 rounded-xl font-bold text-3xl cursor-not-allowed flex items-center justify-center space-x-5 shadow-lg"
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-3 rounded-lg font-semibold text-base cursor-not-allowed flex items-center justify-center space-x-2 shadow-md"
                   >
-                    <FiCheckCircle size={40} />
+                    <FiCheckCircle size={18} />
                     <span>ลงทะเบียนแล้ว</span>
                   </button>
                   <Link
                     to="/my-exams"
-                    className="w-full bg-red-500 hover:bg-red-600 text-white py-6 rounded-xl font-bold text-2xl flex items-center justify-center space-x-4 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
+                    className="w-full bg-red-500 hover:bg-red-600 text-white py-2.5 rounded-lg font-semibold text-sm flex items-center justify-center space-x-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                   >
-                    <FiXCircle size={36} />
+                    <FiXCircle size={16} />
                     <span>ยกเลิกการลงทะเบียน</span>
-                    <FiArrowRight size={32} />
+                    <FiArrowRight size={16} />
                   </Link>
                 </div>
               ) : isFull ? (
                 <button
                   disabled
-                  className="w-full bg-gray-300 text-gray-600 py-8 rounded-xl font-bold text-3xl cursor-not-allowed flex items-center justify-center space-x-4"
+                  className="w-full bg-gray-300 text-gray-600 py-3 rounded-lg font-semibold text-base cursor-not-allowed flex items-center justify-center space-x-2"
                 >
-                  <FiAlertCircle size={38} />
+                  <FiAlertCircle size={18} />
                   <span>เต็มแล้ว</span>
                 </button>
               ) : (
                 <button
                   onClick={() => handleRegister(exam.exam_id)}
                   disabled={registering === exam.exam_id}
-                  className="relative w-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 hover:from-blue-700 hover:via-blue-600 hover:to-cyan-600 text-white py-9 rounded-xl font-bold text-3xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-5 shadow-lg hover:shadow-xl transform hover:scale-[1.02] disabled:transform-none overflow-hidden group/btn"
+                  className="relative w-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 hover:from-blue-700 hover:via-blue-600 hover:to-cyan-600 text-white py-3 rounded-lg font-semibold text-base transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transform hover:scale-[1.02] disabled:transform-none overflow-hidden group/btn"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
                   {registering === exam.exam_id ? (
                     <>
-                      <div className="animate-spin rounded-full h-10 w-10 border-2 border-white border-t-transparent"></div>
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
                       <span>กำลังลงทะเบียน...</span>
                     </>
                   ) : (
                     <>
-                      <FiCheckCircle size={40} />
+                      <FiCheckCircle size={18} />
                       <span>ยืนยันลงทะเบียน</span>
                     </>
                   )}
@@ -282,13 +282,13 @@ const ExamRegistration = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50" style={{ marginTop: 0, paddingTop: '3rem', paddingBottom: '4rem' }}>
       <div className="w-full max-w-full mx-auto px-8 lg:px-12 xl:px-16">
         {/* Header */}
-        <div className="mb-16">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-6">
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
-              <h1 className="text-7xl sm:text-8xl lg:text-9xl font-bold text-gray-800 mb-8 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800 mb-3 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                 ลงทะเบียนเข้าทดสอบปฏิบัติ
               </h1>
-              <p className="text-4xl text-gray-600">เลือกรอบสอบที่ต้องการลงทะเบียน</p>
+              <p className="text-lg text-gray-600">เลือกรอบสอบที่ต้องการลงทะเบียน</p>
               {lastUpdate && (
                 <p className="text-sm text-gray-500 mt-2 flex items-center space-x-2">
                   <FiRefreshCw size={14} className="animate-spin" />
@@ -298,10 +298,10 @@ const ExamRegistration = () => {
             </div>
           <Link
             to="/my-exams"
-            className="inline-flex items-center space-x-3 bg-white hover:bg-blue-50 text-blue-600 border-2 border-blue-600 px-8 py-4 rounded-xl font-bold text-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+            className="inline-flex items-center space-x-2 bg-white hover:bg-blue-50 text-blue-600 border-2 border-blue-600 px-4 py-2 rounded-lg font-semibold text-base transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
           >
             <span>การสอบของฉัน</span>
-            <FiArrowRight size={24} />
+            <FiArrowRight size={18} />
           </Link>
           </div>
         </div>
@@ -329,7 +329,7 @@ const ExamRegistration = () => {
             <p className="text-gray-500">กรุณาตรวจสอบอีกครั้งในภายหลัง</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 2xl:grid-cols-6 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {examCards}
           </div>
         )}
