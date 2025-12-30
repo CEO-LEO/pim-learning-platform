@@ -182,13 +182,8 @@ router.post('/progress', authenticateToken, (req, res) => {
 
 // Get video by ID
 router.get('/:videoId', authenticateToken, (req, res) => {
-  const fs = require('fs');
   const { videoId } = req.params;
   const { userId } = req.user;
-  // #region agent log
-  const logData = {location:'videos.js:152',message:'GET /:videoId entry',data:{videoId,userId,hasUser:!!req.user},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D,E'};
-  try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData)+'\n');}catch(e){}
-  // #endregion
 
   // 🛡️ Pre-test check: Must complete Pre-test (any attempt, passed or failed) before fetching video details
   db.get(
@@ -196,18 +191,10 @@ router.get('/:videoId', authenticateToken, (req, res) => {
      FROM videos v WHERE v.video_id = ?`,
     [userId, videoId],
     (err, video) => {
-      // #region agent log
-      const logData2 = {location:'videos.js:161',message:'Database query result',data:{hasError:!!err,errorMsg:err?.message,hasVideo:!!video,pretestDone:video?.pretest_done,moduleId:video?.module_id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D,E'};
-      try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData2)+'\n');}catch(e){}
-      // #endregion
       if (err) return res.status(500).json({ error: 'Database error' });
       if (!video) return res.status(404).json({ error: 'Video not found' });
       
       if (video.pretest_done === 0) {
-        // #region agent log
-        const logData3 = {location:'videos.js:165',message:'Pre-test check failed',data:{pretestDone:video.pretest_done,moduleId:video.module_id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'};
-        try{fs.appendFileSync('c:\\PIMX\\.cursor\\debug.log',JSON.stringify(logData3)+'\n');}catch(e){}
-        // #endregion
         return res.status(403).json({ error: 'กรุณาทำแบบทดสอบก่อนเรียน (Pre-test) ให้เสร็จก่อนเข้าชมวิดีโอ', requires_pretest: true, module_id: video.module_id });
       }
 
