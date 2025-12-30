@@ -220,7 +220,20 @@ const VideoPlayer = () => {
               let errorMessage = 'ไม่สามารถโหลดวิดีโอได้';
               
               if (headResponse.status === 404) {
-                errorMessage = 'ไม่พบไฟล์วิดีโอบนเซิร์ฟเวอร์ กรุณาตรวจสอบว่าไฟล์วิดีโอถูก deploy แล้ว (Git LFS pull อาจล้มเหลว)';
+                // Try to parse error response for more details
+                let errorDetails = '';
+                try {
+                  const errorJson = JSON.parse(errorText);
+                  if (errorJson.troubleshooting) {
+                    errorDetails = `\n\nสาเหตุที่เป็นไปได้:\n- ${errorJson.troubleshooting.checkGitLFS}\n- ${errorJson.troubleshooting.checkPath}\n- ${errorJson.troubleshooting.checkRailwayVolume}`;
+                  }
+                  if (errorJson.filename) {
+                    errorDetails += `\n\nไฟล์ที่ต้องการ: ${errorJson.filename}`;
+                  }
+                } catch (e) {
+                  // Not JSON, ignore
+                }
+                errorMessage = `ไม่พบไฟล์วิดีโอบนเซิร์ฟเวอร์${errorDetails}\n\nกรุณาตรวจสอบ:\n1. Railway build logs (Git LFS pull status)\n2. /api/health endpoint (videoFiles.hasFiles)\n3. ใช้ Railway Volumes หรือ external storage แทน Git LFS`;
               } else if (headResponse.status === 401 || headResponse.status === 403) {
                 errorMessage = 'การยืนยันตัวตนล้มเหลว กรุณาเข้าสู่ระบบใหม่';
               } else {
