@@ -30,9 +30,6 @@ console.log('[VideoPlayer] Environment Variables:', {
 const VideoPlayer = () => {
   const { videoId } = useParams();
   const navigate = useNavigate();
-  // #region agent log
-  try{fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:11',message:'VideoPlayer component mount',data:{videoId,hasVideoId:!!videoId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});}catch(e){}
-  // #endregion
   const [video, setVideo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -50,22 +47,13 @@ const VideoPlayer = () => {
 
   // Helper function to get full video URL
   const getVideoUrl = (url) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:52',message:'getVideoUrl entry',data:{url,urlType:typeof url,urlLength:url?.length,hasUrl:!!url,apiUrl:API_URL,serverUrl:SERVER_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,D'})}).catch(()=>{});
-    // #endregion
     if (!url) {
       console.error('[VideoPlayer] No video URL provided');
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:54',message:'getVideoUrl no url',data:{url},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       return null;
     }
     // If already a full URL (http:// or https://), return as is
     if (url.startsWith('http://') || url.startsWith('https://')) {
       console.log('[VideoPlayer] Using full URL:', url);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:59',message:'getVideoUrl full url',data:{url},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-      // #endregion
       return url;
     }
     
@@ -100,10 +88,6 @@ const VideoPlayer = () => {
     };
     console.log('[VideoPlayer] Constructed URL:', debugInfo);
     
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:77',message:'getVideoUrl constructed',data:debugInfo,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,D'})}).catch(()=>{});
-    // #endregion
-    
     // Alert if API_URL is missing (for debugging)
     if (!API_URL || API_URL === 'http://localhost:5000/api') {
       console.warn('[VideoPlayer] ⚠️ API_URL is missing or using default!', {
@@ -111,9 +95,6 @@ const VideoPlayer = () => {
         REACT_APP_API_URL: process.env.REACT_APP_API_URL,
         REACT_APP_SERVER_URL: process.env.REACT_APP_SERVER_URL
       });
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:93',message:'getVideoUrl api url missing',data:{apiUrl:API_URL,envApiUrl:process.env.REACT_APP_API_URL,envServerUrl:process.env.REACT_APP_SERVER_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-      // #endregion
     }
     
     return fullUrl;
@@ -124,10 +105,6 @@ const VideoPlayer = () => {
   };
 
   useEffect(() => {
-    // #region agent log
-    try{fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:44',message:'useEffect triggered',data:{videoId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});}catch(e){}
-    // #endregion
-    
     // Validate videoId
     if (!videoId) {
       setError('ไม่พบ ID วิดีโอ');
@@ -157,9 +134,6 @@ const VideoPlayer = () => {
   const fetchVideo = async () => {
     try {
       console.log('[DEBUG] fetchVideo called', { videoId, hasToken: !!localStorage.getItem('token') });
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:54',message:'fetchVideo entry',data:{videoId,hasToken:!!localStorage.getItem('token'),authHeader:axios.defaults.headers.common['Authorization']?.substring(0,20)+'...',apiUrl:API_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       setError(null);
       setErrorData(null);
       
@@ -180,18 +154,9 @@ const VideoPlayer = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       console.log('[DEBUG] Making request', { url: `${API_URL}/videos/${videoId}`, hasToken: !!token });
       
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:58',message:'Before axios request',data:{url:`${API_URL}/videos/${videoId}`,hasToken:!!token,hasConfig:!!config.headers,authHeader:axios.defaults.headers.common['Authorization']?.substring(0,30)+'...'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       const response = await axios.get(`${API_URL}/videos/${videoId}`, config);
       console.log('[DEBUG] Request successful', { status: response.status });
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:59',message:'fetchVideo success',data:{status:response.status,hasVideo:!!response.data},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       setVideo(response.data);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:173',message:'Video data received',data:{videoId:response.data.video_id,url:response.data.url,urlType:typeof response.data.url,urlLength:response.data.url?.length,hasUrl:!!response.data.url},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-      // #endregion
       
       // Validate video URL exists before setting video
       if (response.data.url) {
@@ -204,10 +169,6 @@ const VideoPlayer = () => {
               method: 'HEAD',
               headers: token ? { 'Authorization': `Bearer ${token}` } : {}
             });
-            
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:180',message:'Pre-flight video URL check',data:{videoSrc,status:headResponse.status,statusText:headResponse.statusText,contentType:headResponse.headers.get('content-type')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B,C'})}).catch(()=>{});
-            // #endregion
             
             if (!headResponse.ok) {
               let errorText = '';
@@ -251,10 +212,6 @@ const VideoPlayer = () => {
               
               console.error('[VideoPlayer] Pre-flight check failed:', errorDetails);
               
-              // #region agent log
-              fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:212',message:'Pre-flight check failed',data:errorDetails,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B,C'})}).catch(()=>{});
-              // #endregion
-              
               setError(errorMessage);
               setLoading(false);
               showToast(errorMessage, 'error');
@@ -272,9 +229,6 @@ const VideoPlayer = () => {
             }
           } catch (err) {
             console.error('[VideoPlayer] Pre-flight check error:', err);
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:246',message:'Pre-flight check exception',data:{error:err.message,stack:err.stack,videoSrc},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D,E'})}).catch(()=>{});
-            // #endregion
             
             // If it's a network error (CORS, connection refused, etc.), show specific error
             if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('CORS')) {
@@ -308,9 +262,6 @@ const VideoPlayer = () => {
         errorMessage: error.message,
         requestMade: !!error.request 
       });
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:69',message:'fetchVideo error',data:{hasResponse:!!error.response,status:error.response?.status,statusText:error.response?.statusText,errorMsg:error.response?.data?.error,errorMessage:error.message,requestMade:!!error.request},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});
-      // #endregion
       
       let errorMessage = 'ไม่สามารถโหลดวิดีโอได้';
       const status = error.response?.status;
@@ -579,11 +530,6 @@ const VideoPlayer = () => {
     const moduleId = errorData?.module_id;
     const requiresPretest = errorData?.requires_pretest;
     
-    // #region agent log
-    console.log('[DEBUG] Rendering error page', { error, errorData, moduleId, requiresPretest });
-    try{fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:330',message:'Rendering error page',data:{error,errorData,moduleId,requiresPretest},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});}catch(e){}
-    // #endregion
-    
     return (
       <div style={{ marginTop: 0, paddingTop: '1.5rem' }}>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
@@ -671,9 +617,6 @@ const VideoPlayer = () => {
         <div className="aspect-video bg-gradient-to-br from-gray-900 to-black relative">
           {video.url ? (() => {
             const videoSrc = getVideoUrl(video.url);
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:571',message:'Rendering video element',data:{originalUrl:video.url,videoSrc,hasVideoSrc:!!videoSrc,apiUrl:API_URL},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,D'})}).catch(()=>{});
-            // #endregion
             
             // Validate video URL before setting it
             if (!videoSrc) {
@@ -744,16 +687,9 @@ const VideoPlayer = () => {
                 
                 console.error('[VideoPlayer] Video load error:', errorData);
                 
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:586',message:'Video onError triggered',data:errorData,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A,B,C,D,E'})}).catch(()=>{});
-                // #endregion
-                
                 // Try to fetch the video URL to check if it exists
                 if (videoUrl) {
                   const token = localStorage.getItem('token');
-                  // #region agent log
-                  fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:617',message:'Checking video URL accessibility',data:{videoUrl,hasToken:!!token,tokenLength:token?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B,C'})}).catch(()=>{});
-                  // #endregion
                   fetch(videoUrl, { 
                     method: 'HEAD',
                     headers: token ? {
@@ -772,10 +708,6 @@ const VideoPlayer = () => {
                       };
                       console.log('[VideoPlayer] Video URL check:', checkData);
                       
-                      // #region agent log
-                      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:624',message:'Video URL HEAD response',data:checkData,timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B,C'})}).catch(()=>{});
-                      // #endregion
-                      
                       // If 401 or 403, token might be invalid
                       if (response.status === 401 || response.status === 403) {
                         console.error('[VideoPlayer] Authentication failed:', {
@@ -784,9 +716,6 @@ const VideoPlayer = () => {
                           hasToken: !!token,
                           tokenLength: token?.length
                         });
-                        // #region agent log
-                        fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:635',message:'Authentication failed in HEAD check',data:{status:response.status,hasToken:!!token},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-                        // #endregion
                       }
                       
                       // If 404, video file might not exist
@@ -796,9 +725,6 @@ const VideoPlayer = () => {
                           originalUrl: video.url,
                           filename: videoUrl.split('/').pop()
                         });
-                        // #region agent log
-                        fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:644',message:'Video file 404 in HEAD check',data:{url:videoUrl,originalUrl:video.url,filename:videoUrl.split('/').pop()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                        // #endregion
                       }
                     })
                     .catch(err => {
@@ -807,23 +733,13 @@ const VideoPlayer = () => {
                         error: err.message,
                         stack: err.stack
                       });
-                      // #region agent log
-                      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:653',message:'Video URL fetch error',data:{url:videoUrl,error:err.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D,E'})}).catch(()=>{});
-                      // #endregion
                     });
                 } else {
                   console.error('[VideoPlayer] No video URL generated!', {
                     originalUrl: video.url,
                     video: video
                   });
-                  // #region agent log
-                  fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:660',message:'No video URL generated',data:{originalUrl:video.url,hasVideo:!!video},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                  // #endregion
                 }
-                
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:702',message:'Setting error message',data:{errorCode:error?.code,errorMessage:error?.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-                // #endregion
                 
                 let errorMessage = 'ไม่สามารถโหลดวิดีโอได้';
                 if (error) {

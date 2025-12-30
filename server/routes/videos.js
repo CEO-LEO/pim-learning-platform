@@ -268,15 +268,6 @@ router.get('/:videoId', authenticateToken, (req, res) => {
               hasUrl: !!video.url
             });
             
-            // #region agent log
-            const fs = require('fs');
-            const path = require('path');
-            const logPath = path.join(process.cwd(), '.cursor', 'debug.log');
-            const logData = {location:'videos.js:263',message:'Returning video data',data:{video_id:video.video_id,url:video.url,urlType:typeof video.url,urlLength:video.url?.length,hasUrl:!!video.url},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'};
-            console.log('[DEBUG]', JSON.stringify(logData));
-            try{const logDir = path.dirname(logPath); if(!fs.existsSync(logDir))fs.mkdirSync(logDir,{recursive:true}); fs.appendFileSync(logPath,JSON.stringify(logData)+'\n');}catch(e){console.error('[DEBUG] Log write error:',e.message);}
-            // #endregion
-            
             res.json({
               ...video,
               watch_time: watchTime,
