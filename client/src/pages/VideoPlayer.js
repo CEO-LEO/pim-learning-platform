@@ -142,17 +142,6 @@ const VideoPlayer = () => {
       });
       
       if (!token) {
-        console.error('[VideoPlayer] No token found, redirecting to login');
-        navigate('/login');
-        return;
-      }
-      
-      setError(null);
-      setErrorData(null);
-      
-      // Ensure token is always fresh and set for this request
-      const token = localStorage.getItem('token');
-      if (!token) {
         const errorMsg = 'กรุณาเข้าสู่ระบบก่อนดูวิดีโอ';
         setError(errorMsg);
         showToast(errorMsg, 'error');
@@ -161,6 +150,9 @@ const VideoPlayer = () => {
         }, 2000);
         return;
       }
+      
+      setError(null);
+      setErrorData(null);
       
       // Update axios defaults and also include in request config for safety
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
