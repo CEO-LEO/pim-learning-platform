@@ -146,13 +146,15 @@ const Announcements = () => {
 
         {/* Error State */}
         {error && announcements.length === 0 && (
-          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 text-center mb-4">
-            <FiAlertCircle className="mx-auto text-red-500 mb-3" size={32} />
-            <h3 className="text-lg font-bold text-red-800 mb-2">เกิดข้อผิดพลาด</h3>
-            <p className="text-sm text-red-600 mb-4">{error}</p>
+          <div className="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200 rounded-2xl p-8 text-center mb-6 shadow-xl">
+            <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <FiAlertCircle className="text-white" size={40} />
+            </div>
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-3">เกิดข้อผิดพลาด</h3>
+            <p className="text-lg text-red-700 mb-6 font-medium">{error}</p>
             <button
               onClick={() => fetchAnnouncements(false)}
-              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+              className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:scale-105"
             >
               ลองใหม่อีกครั้ง
             </button>
@@ -161,23 +163,25 @@ const Announcements = () => {
 
         {/* Empty State */}
         {announcements.length === 0 && !error && (
-          <div className="bg-white rounded-lg shadow-md p-6 text-center border-2 border-dashed border-gray-300">
-            <FiBell className="mx-auto text-gray-400 mb-3" size={40} />
-            <h3 className="text-lg font-bold text-gray-700 mb-2">ยังไม่มีประกาศ</h3>
-            <p className="text-sm text-gray-500">ประกาศจะแสดงที่นี่เมื่อมีข้อมูล</p>
+          <div className="bg-gradient-to-br from-white to-orange-50 rounded-2xl shadow-xl p-12 text-center border-2 border-dashed border-orange-300">
+            <div className="w-24 h-24 bg-gradient-to-br from-orange-100 to-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <FiBell className="text-orange-400" size={48} />
+            </div>
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent mb-3">ยังไม่มีประกาศ</h3>
+            <p className="text-lg text-gray-600 font-medium">ประกาศจะแสดงที่นี่เมื่อมีข้อมูล</p>
           </div>
         )}
 
         {/* Important Announcements */}
         {groupedAnnouncements.important.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <FiAlertCircle className="text-red-600" size={18} />
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center space-x-3">
+              <div className="p-3 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl shadow-lg">
+                <FiAlertCircle className="text-white" size={24} />
               </div>
-              <span>ประกาศสำคัญ ({groupedAnnouncements.important.length})</span>
+              <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">ประกาศสำคัญ ({groupedAnnouncements.important.length})</span>
             </h2>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {groupedAnnouncements.important.map((announcement) => (
                 <AnnouncementCard key={announcement.announcement_id} announcement={announcement} />
               ))}
@@ -189,14 +193,14 @@ const Announcements = () => {
         {groupedAnnouncements.normal.length > 0 && (
           <div>
             {groupedAnnouncements.important.length > 0 && (
-              <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center space-x-2">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <FiBell className="text-blue-600" size={18} />
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center space-x-3">
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl shadow-lg">
+                  <FiBell className="text-white" size={24} />
                 </div>
-                <span>ประกาศทั่วไป ({groupedAnnouncements.normal.length})</span>
+                <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">ประกาศทั่วไป ({groupedAnnouncements.normal.length})</span>
               </h2>
             )}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {groupedAnnouncements.normal.map((announcement) => (
                 <AnnouncementCard key={announcement.announcement_id} announcement={announcement} />
               ))}
@@ -206,10 +210,10 @@ const Announcements = () => {
 
         {/* Create Modal */}
         {showModal && isAdminOrInstructor && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-4 sm:p-6 transform transition-all animate-in fade-in zoom-in">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-800">สร้างประกาศ</h2>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-gradient-to-br from-white to-orange-50 rounded-2xl shadow-2xl max-w-2xl w-full p-8 border-2 border-orange-200 transform transition-all">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">สร้างประกาศ</h2>
                 <button
                   onClick={() => {
                     setShowModal(false);
@@ -222,9 +226,9 @@ const Announcements = () => {
                       is_important: false
                     });
                   }}
-                  className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-red-100 rounded-xl transition-all hover:scale-110"
                 >
-                  <FiX size={20} className="text-gray-500" />
+                  <FiX size={24} className="text-red-500" />
                 </button>
               </div>
               
@@ -284,7 +288,7 @@ const Announcements = () => {
                   <label className="ml-3 text-sm font-semibold text-gray-700">ประกาศสำคัญ</label>
                 </div>
 
-                <div className="flex items-center justify-end space-x-4 pt-4">
+                <div className="flex items-center justify-end space-x-4 pt-6">
                   <button
                     type="button"
                     onClick={() => {
@@ -298,23 +302,23 @@ const Announcements = () => {
                         is_important: false
                       });
                     }}
-                    className="px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-colors font-semibold text-gray-700"
+                    className="px-8 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-bold text-lg hover:scale-105 shadow-md"
                   >
                     ยกเลิก
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-3 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white rounded-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-lg hover:shadow-xl"
+                    className="px-8 py-3 bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white rounded-xl transition-all font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 shadow-xl hover:shadow-2xl hover:scale-105"
                   >
                     {submitting ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
                         <span>กำลังสร้าง...</span>
                       </>
                     ) : (
                       <>
-                        <FiPlus size={18} />
+                        <FiPlus size={20} />
                         <span>สร้างประกาศ</span>
                       </>
                     )}
@@ -345,40 +349,52 @@ const AnnouncementCard = ({ announcement }) => {
   const isExpired = announcement.expires_at && new Date(announcement.expires_at) < new Date();
 
   return (
-    <div className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden border-l-4 ${
-      isImportant ? 'border-red-500 bg-gradient-to-r from-red-50 to-white' : 'border-blue-500'
+    <div className={`bg-gradient-to-br rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border-l-[6px] hover:scale-[1.01] ${
+      isImportant 
+        ? 'border-red-500 from-red-50 via-orange-50 to-white' 
+        : 'border-blue-500 from-blue-50 via-cyan-50 to-white'
     }`}>
-      <div className="p-4">
+      <div className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
-            <div className="flex items-center space-x-2 mb-3">
+            <div className="flex items-center flex-wrap gap-3 mb-4">
               {isImportant && (
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <FiAlertCircle className="text-red-600" size={18} />
+                <div className="p-2.5 bg-gradient-to-br from-red-500 to-orange-500 rounded-xl shadow-lg">
+                  <FiAlertCircle className="text-white" size={20} />
                 </div>
               )}
-              <h2 className="text-base sm:text-lg font-bold text-gray-800">{announcement.title}</h2>
+              <h2 className={`text-xl font-bold ${
+                isImportant 
+                  ? 'bg-gradient-to-r from-red-700 to-orange-700 bg-clip-text text-transparent'
+                  : 'bg-gradient-to-r from-blue-700 to-cyan-700 bg-clip-text text-transparent'
+              }`}>{announcement.title}</h2>
               {isExpired && (
-                <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
+                <span className="px-3 py-1.5 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full text-xs font-bold shadow-md">
                   หมดอายุแล้ว
                 </span>
               )}
             </div>
-            <p className="text-gray-700 mb-4 whitespace-pre-wrap leading-relaxed text-sm">{announcement.content}</p>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-              <span className="flex items-center space-x-1">
-                <span className="font-semibold">โดย:</span>
-                <span className="font-semibold">{announcement.created_by_name}</span>
+            <p className="text-gray-700 mb-6 whitespace-pre-wrap leading-relaxed text-base font-medium">{announcement.content}</p>
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <span className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold shadow-md ${
+                isImportant
+                  ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white'
+                  : 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white'
+              }`}>
+                <span>โดย:</span>
+                <span>{announcement.created_by_name}</span>
               </span>
-              <span>•</span>
-              <span className="font-semibold">{new Date(announcement.created_at).toLocaleString('th-TH')}</span>
+              <span className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-semibold shadow-md">
+                {new Date(announcement.created_at).toLocaleString('th-TH')}
+              </span>
               {announcement.expires_at && (
-                <>
-                  <span>•</span>
-                  <span className={isExpired ? 'text-red-600 font-semibold' : 'font-semibold'}>
-                    หมดอายุ: {new Date(announcement.expires_at).toLocaleDateString('th-TH')}
-                  </span>
-                </>
+                <span className={`px-4 py-2 rounded-xl font-semibold shadow-md ${
+                  isExpired 
+                    ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white' 
+                    : 'bg-gradient-to-r from-green-500 to-emerald-500 text-white'
+                }`}>
+                  หมดอายุ: {new Date(announcement.expires_at).toLocaleDateString('th-TH')}
+                </span>
               )}
             </div>
           </div>

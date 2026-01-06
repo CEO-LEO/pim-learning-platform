@@ -289,10 +289,12 @@ const Quiz = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
+        <div className="max-w-4xl mx-auto px-4 space-y-6">
+          <CardSkeleton />
+          <CardSkeleton />
+          <CardSkeleton />
+        </div>
       </div>
     );
   }
@@ -302,33 +304,37 @@ const Quiz = () => {
     const moduleId = errorData?.module_id || (quiz && quiz.module_id);
     
     return (
-      <div className="space-y-6" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-          <FiAlertCircle className="mx-auto text-red-500 mb-3" size={32} />
-          <h2 className="text-lg font-bold text-red-800 mb-2">เกิดข้อผิดพลาด</h2>
-          <p className="text-sm text-red-600 mb-4">{error}</p>
-          <div className="flex items-center justify-center space-x-4">
-            <button
-              onClick={fetchQuiz}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              ลองใหม่อีกครั้ง
-            </button>
-            {moduleId ? (
-              <Link
-                to={`/module/${moduleId}`}
-                className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center px-4" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
+        <div className="max-w-2xl w-full">
+          <div className="bg-white/80 backdrop-blur-sm border-2 border-red-200 rounded-2xl shadow-2xl p-12 text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <FiAlertCircle className="text-white" size={40} />
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-4">เกิดข้อผิดพลาด</h2>
+            <p className="text-red-700 text-lg mb-8 font-medium">{error}</p>
+            <div className="flex items-center justify-center space-x-4 flex-wrap gap-3">
+              <button
+                onClick={fetchQuiz}
+                className="px-8 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl font-semibold hover:from-red-700 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
               >
-                กลับไปหน้าหลักสูตร
-              </Link>
-            ) : (
-              <Link
-                to="/modules"
-                className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                กลับไปหน้าหลักสูตร
-              </Link>
-            )}
+                ลองใหม่อีกครั้ง
+              </button>
+              {moduleId ? (
+                <Link
+                  to={`/module/${moduleId}`}
+                  className="px-8 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl font-semibold hover:from-gray-700 hover:to-gray-800 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  กลับไปหน้าหลักสูตร
+                </Link>
+              ) : (
+                <Link
+                  to="/modules"
+                  className="px-8 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl font-semibold hover:from-gray-700 hover:to-gray-800 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  กลับไปหน้าหลักสูตร
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -337,11 +343,13 @@ const Quiz = () => {
 
   if (!quiz) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-600">ไม่พบแบบทดสอบ</p>
-        <Link to="/modules" className="text-blue-600 hover:underline mt-4 inline-block">
-          กลับไปหน้าหลักสูตร
-        </Link>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-gray-600 text-lg mb-6">ไม่พบแบบทดสอบ</p>
+          <Link to="/modules" className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl inline-block hover:scale-105">
+            กลับไปหน้าหลักสูตร
+          </Link>
+        </div>
       </div>
     );
   }
@@ -349,27 +357,31 @@ const Quiz = () => {
   // Check if quiz has questions
   if (!quiz.questions || quiz.questions.length === 0) {
     return (
-      <div className="space-y-6" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
-          <FiAlertCircle className="mx-auto text-yellow-500 mb-3" size={32} />
-          <h2 className="text-lg font-bold text-yellow-800 mb-2">ไม่พบคำถาม</h2>
-          <p className="text-sm text-yellow-600 mb-4">แบบทดสอบนี้ยังไม่มีคำถาม กรุณาติดต่อผู้ดูแลระบบ</p>
-          <div className="flex items-center justify-center space-x-4">
-            {quiz.module_id ? (
-              <Link
-                to={`/module/${quiz.module_id}`}
-                className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                กลับไปหน้าหลักสูตร
-              </Link>
-            ) : (
-              <Link
-                to="/modules"
-                className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                กลับไปหน้าหลักสูตร
-              </Link>
-            )}
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-orange-50 flex items-center justify-center px-4" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
+        <div className="max-w-2xl w-full">
+          <div className="bg-white/80 backdrop-blur-sm border-2 border-yellow-200 rounded-2xl shadow-2xl p-12 text-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <FiAlertCircle className="text-white" size={40} />
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-4">ไม่พบคำถาม</h2>
+            <p className="text-yellow-700 text-lg mb-8 font-medium">แบบทดสอบนี้ยังไม่มีคำถาม กรุณาติดต่อผู้ดูแลระบบ</p>
+            <div className="flex items-center justify-center space-x-4">
+              {quiz.module_id ? (
+                <Link
+                  to={`/module/${quiz.module_id}`}
+                  className="px-8 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl font-semibold hover:from-gray-700 hover:to-gray-800 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  กลับไปหน้าหลักสูตร
+                </Link>
+              ) : (
+                <Link
+                  to="/modules"
+                  className="px-8 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl font-semibold hover:from-gray-700 hover:to-gray-800 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  กลับไปหน้าหลักสูตร
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -378,67 +390,75 @@ const Quiz = () => {
 
   if (submitted && result) {
     return (
-      <div className="space-y-6" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-        <Link
-          to={`/module/${quiz.module_id}`}
-          className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 mb-4"
-        >
-          <FiArrowLeft size={20} />
-          <span>กลับไปหน้าหลักสูตร</span>
-        </Link>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 py-12 px-4" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
+        <div className="max-w-3xl mx-auto">
+          <Link
+            to={`/module/${quiz.module_id}`}
+            className="inline-flex items-center space-x-2 text-purple-600 hover:text-purple-700 mb-8 font-semibold transition-all hover:translate-x-1 group"
+          >
+            <FiArrowLeft size={20} className="transform group-hover:-translate-x-1 transition-transform" />
+            <span>กลับไปหน้าหลักสูตร</span>
+          </Link>
 
-        <div className="bg-white rounded-lg shadow-md p-4 text-center">
-          <div className={`w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center ${
-            result.passed ? 'bg-green-100' : 'bg-red-100'
-          }`}>
-            {result.passed ? (
-              <FiCheckCircle className="text-green-600" size={32} />
-            ) : (
-              <FiXCircle className="text-red-600" size={32} />
-            )}
-          </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">
-            {result.passed ? 'ผ่าน!' : 'ไม่ผ่าน'}
-          </h2>
-          <p className="text-lg font-semibold text-blue-600 mb-3">
-            คะแนน: {result.score}%
-          </p>
-          <p className="text-gray-600 mb-4">
-            {result.passed
-              ? 'ยินดีด้วย! คุณผ่านเกณฑ์การทดสอบแล้ว'
-              : `คุณต้องได้คะแนนอย่างน้อย ${quiz.passing_score || 70}% เพื่อผ่านการทดสอบ กรุณาทำใหม่อีกครั้ง`}
-          </p>
-          {result.attempt_number && (
-            <p className="text-sm text-gray-500 mb-6">
-              ครั้งที่ {result.attempt_number} / 20
-              {result.remaining_attempts !== undefined && result.remaining_attempts > 0 && (
-                <span className="ml-2">(เหลือ {result.remaining_attempts} ครั้ง)</span>
+          <div className={`bg-gradient-to-br ${result.passed ? 'from-green-50 to-emerald-50' : 'from-red-50 to-orange-50'} backdrop-blur-sm border-2 ${result.passed ? 'border-green-200' : 'border-red-200'} rounded-3xl shadow-2xl p-12 text-center`}>
+            <div className={`w-32 h-32 rounded-full mx-auto mb-8 flex items-center justify-center shadow-2xl bg-gradient-to-br ${
+              result.passed ? 'from-green-500 to-emerald-500' : 'from-red-500 to-orange-500'
+            } animate-bounce`}>
+              {result.passed ? (
+                <FiCheckCircle className="text-white" size={64} />
+              ) : (
+                <FiXCircle className="text-white" size={64} />
               )}
+            </div>
+            <h2 className={`text-5xl font-bold mb-6 bg-gradient-to-r ${result.passed ? 'from-green-600 to-emerald-600' : 'from-red-600 to-orange-600'} bg-clip-text text-transparent`}>
+              {result.passed ? 'ผ่าน!' : 'ไม่ผ่าน'}
+            </h2>
+            <div className="mb-6">
+              <div className={`inline-block px-8 py-4 rounded-2xl shadow-xl bg-gradient-to-r ${result.passed ? 'from-green-600 to-emerald-600' : 'from-red-600 to-orange-600'}`}>
+                <p className="text-3xl font-bold text-white">
+                  คะแนน: {result.score}%
+                </p>
+              </div>
+            </div>
+            <p className={`text-xl mb-8 font-medium ${result.passed ? 'text-green-700' : 'text-red-700'}`}>
+              {result.passed
+                ? 'ยินดีด้วย! คุณผ่านเกณฑ์การทดสอบแล้ว'
+                : `คุณต้องได้คะแนนอย่างน้อย ${quiz.passing_score || 70}% เพื่อผ่านการทดสอบ กรุณาทำใหม่อีกครั้ง`}
             </p>
-          )}
-          <div className="flex items-center justify-center space-x-4">
-            <Link
-              to={`/module/${quiz.module_id}`}
-              className="inline-flex items-center space-x-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold"
-            >
-              <FiArrowLeft size={20} />
-              <span>กลับหน้าหลักสูตร</span>
-            </Link>
-            <button
-              onClick={() => {
-                setSubmitted(false);
-                setAnswers({});
-                setResult(null);
-                if (quiz.time_limit) {
-                  setTimeLeft(quiz.time_limit * 60);
-                }
-                fetchAttemptInfo();
-              }}
-              disabled={attemptInfo && !attemptInfo.can_attempt}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {attemptInfo && !attemptInfo.can_attempt ? 'ทำครบ 20 ครั้งแล้ว' : 'ทำใหม่'}
-            </button>
+            {result.attempt_number && (
+              <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 mb-8 inline-block">
+                <p className="text-lg text-gray-700 font-semibold">
+                  ครั้งที่ {result.attempt_number} / 20
+                  {result.remaining_attempts !== undefined && result.remaining_attempts > 0 && (
+                    <span className="ml-2 text-blue-600">(เหลือ {result.remaining_attempts} ครั้ง)</span>
+                  )}
+                </p>
+              </div>
+            )}
+            <div className="flex items-center justify-center space-x-4 flex-wrap gap-4">
+              <Link
+                to={`/module/${quiz.module_id}`}
+                className="inline-flex items-center space-x-2 px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl hover:from-gray-700 hover:to-gray-800 transition-all font-bold shadow-lg hover:shadow-xl text-lg hover:scale-105"
+              >
+                <FiArrowLeft size={24} />
+                <span>กลับหน้าหลักสูตร</span>
+              </Link>
+              <button
+                onClick={() => {
+                  setSubmitted(false);
+                  setAnswers({});
+                  setResult(null);
+                  if (quiz.time_limit) {
+                    setTimeLeft(quiz.time_limit * 60);
+                  }
+                  fetchAttemptInfo();
+                }}
+                disabled={attemptInfo && !attemptInfo.can_attempt}
+                className={`px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-bold shadow-lg hover:shadow-xl text-lg disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105`}
+              >
+                {attemptInfo && !attemptInfo.can_attempt ? 'ทำครบ 20 ครั้งแล้ว' : 'ทำใหม่'}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -446,142 +466,147 @@ const Quiz = () => {
   }
 
   return (
-    <div className="space-y-6" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-      <Link
-        to={`/module/${quiz.module_id}`}
-        className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 mb-4"
-      >
-        <FiArrowLeft size={20} />
-        <span>กลับไปหน้าหลักสูตร</span>
-      </Link>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50 pb-12" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
+      <div className="max-w-4xl mx-auto px-4 space-y-6">
+        <Link
+          to={`/module/${quiz.module_id}`}
+          className="inline-flex items-center space-x-2 text-purple-600 hover:text-purple-700 font-semibold transition-all hover:translate-x-1 group"
+        >
+          <FiArrowLeft size={20} className="transform group-hover:-translate-x-1 transition-transform" />
+          <span>กลับไปหน้าหลักสูตร</span>
+        </Link>
 
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-4 text-white shadow-md">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-bold mb-1">{quiz.title}</h1>
-            <p className="text-sm text-purple-100">
-              {quiz.questions?.length || 0} คำถาม
-            </p>
-          </div>
-          {timeLeft !== null && (
-            <div className="flex items-center space-x-2 bg-white bg-opacity-20 rounded-lg px-3 py-1.5">
-              <FiClock size={16} />
-              <span className="text-base font-bold">{formatTime(timeLeft)}</span>
+        {/* Header */}
+        <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+          <div className="relative flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="text-3xl font-bold mb-2 drop-shadow-lg">{quiz.title}</h1>
+              <p className="text-lg text-purple-100 font-semibold">
+                {quiz.questions?.length || 0} คำถาม
+              </p>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Questions */}
-      <div className="space-y-4">
-        {quiz.questions?.map((question, index) => (
-          <div 
-            key={question.question_id} 
-            className={`bg-white rounded-lg shadow-md p-4 transition-all ${
-              answers[question.question_id] 
-                ? 'border-2 border-purple-200' 
-                : 'border-2 border-transparent'
-            }`}
-          >
-            <div className="flex items-start space-x-3">
-              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white font-bold text-sm ${
-                answers[question.question_id]
-                  ? 'bg-purple-600'
-                  : 'bg-gray-300'
-              }`}>
-                {index + 1}
+            {timeLeft !== null && (
+              <div className="flex items-center space-x-3 bg-white/20 backdrop-blur-sm rounded-xl px-6 py-3 shadow-lg">
+                <FiClock size={24} />
+                <span className="text-2xl font-bold">{formatTime(timeLeft)}</span>
               </div>
-              <div className="flex-1">
-                <h3 className="text-base font-semibold text-gray-800 mb-3">
-                  {question.question}
-                </h3>
-                <div className="space-y-2">
-                  {question.options?.map((option, optIndex) => (
-                    <label
-                      key={optIndex}
-                      className={`flex items-center space-x-3 p-3 rounded-lg border-2 cursor-pointer transition-all ${
-                        answers[question.question_id] === option
-                          ? 'border-purple-600 bg-purple-50 shadow-sm'
-                          : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name={question.question_id}
-                        value={option}
-                        checked={answers[question.question_id] === option}
-                        onChange={(e) => handleAnswerChange(question.question_id, e.target.value)}
-                        disabled={submitted || submitting}
-                        className="w-5 h-5 text-purple-600 focus:ring-purple-500 cursor-pointer"
-                      />
-                      <span className="text-gray-700 flex-1">{option}</span>
-                      {answers[question.question_id] === option && (
-                        <FiCheckCircle className="text-purple-600" size={20} />
-                      )}
-                    </label>
-                  ))}
+            )}
+          </div>
+        </div>
+
+        {/* Questions */}
+        <div className="space-y-6">
+          {quiz.questions?.map((question, index) => (
+            <div 
+              key={question.question_id} 
+              className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 transition-all duration-300 border-2 ${
+                answers[question.question_id] 
+                  ? 'border-purple-400 shadow-2xl scale-[1.02]' 
+                  : 'border-white/50 hover:border-purple-200 hover:shadow-2xl'
+              }`}
+            >
+              <div className="flex items-start space-x-4">
+                <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg transition-all duration-300 ${
+                  answers[question.question_id]
+                    ? 'bg-gradient-to-br from-purple-600 to-indigo-600 scale-110'
+                    : 'bg-gradient-to-br from-gray-400 to-gray-500'
+                }`}>
+                  {index + 1}
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4 leading-relaxed">
+                    {question.question}
+                  </h3>
+                  <div className="space-y-3">
+                    {question.options?.map((option, optIndex) => (
+                      <label
+                        key={optIndex}
+                        className={`flex items-center space-x-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                          answers[question.question_id] === option
+                            ? 'border-purple-500 bg-gradient-to-r from-purple-50 to-indigo-50 shadow-lg scale-[1.02]'
+                            : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50 hover:shadow-md'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name={question.question_id}
+                          value={option}
+                          checked={answers[question.question_id] === option}
+                          onChange={(e) => handleAnswerChange(question.question_id, e.target.value)}
+                          disabled={submitted || submitting}
+                          className="w-5 h-5 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                        />
+                        <span className="text-gray-700 flex-1 font-medium">{option}</span>
+                        {answers[question.question_id] === option && (
+                          <FiCheckCircle className="text-purple-600 animate-bounce" size={24} />
+                        )}
+                      </label>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Submit Button */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <div className="mb-4 text-sm text-gray-600">
-          <p>ตอบแล้ว: {Object.keys(answers).length} / {quiz.questions?.length || 0} คำถาม</p>
-          {attemptInfo && (
-            <p className="mt-1">
-              ครั้งที่ทำแล้ว: {attemptInfo.attempt_count} / {attemptInfo.max_attempts} ครั้ง
-              {attemptInfo.remaining_attempts > 0 && (
-                <span className="text-blue-600 font-semibold"> (เหลือ {attemptInfo.remaining_attempts} ครั้ง)</span>
-              )}
-            </p>
-          )}
+          ))}
         </div>
-        <button
-          onClick={() => handleSubmit(false)}
-          disabled={submitted || submitting || Object.keys(answers).length === 0 || (attemptInfo && !attemptInfo.can_attempt)}
-          className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center space-x-2"
-        >
-          {submitting ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              <span>กำลังส่ง...</span>
-            </>
-          ) : attemptInfo && !attemptInfo.can_attempt ? (
-            <span>ทำครบ {attemptInfo.max_attempts} ครั้งแล้ว</span>
-          ) : (
-            <span>ส่งคำตอบ</span>
-          )}
-        </button>
+
+        {/* Submit Button */}
+        <div className="bg-gradient-to-br from-white to-purple-50/30 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/50">
+          <div className="mb-6 space-y-2">
+            <p className="text-lg font-bold text-gray-700">ตอบแล้ว: <span className="text-purple-600">{Object.keys(answers).length}</span> / {quiz.questions?.length || 0} คำถาม</p>
+            {attemptInfo && (
+              <p className="text-base text-gray-600 font-semibold">
+                ครั้งที่ทำแล้ว: {attemptInfo.attempt_count} / {attemptInfo.max_attempts} ครั้ง
+                {attemptInfo.remaining_attempts > 0 && (
+                  <span className="ml-2 text-blue-600 font-bold"> (เหลือ {attemptInfo.remaining_attempts} ครั้ง)</span>
+                )}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={() => handleSubmit(false)}
+            disabled={submitted || submitting || Object.keys(answers).length === 0 || (attemptInfo && !attemptInfo.can_attempt)}
+            className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 text-white py-5 rounded-xl hover:from-purple-700 hover:via-indigo-700 hover:to-purple-700 transition-all duration-300 font-bold text-xl disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center space-x-3 shadow-2xl hover:shadow-purple-500/50 hover:scale-[1.02] relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer"></div>
+            {submitting ? (
+              <>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                <span>กำลังส่ง...</span>
+              </>
+            ) : attemptInfo && !attemptInfo.can_attempt ? (
+              <span>ทำครบ {attemptInfo.max_attempts} ครั้งแล้ว</span>
+            ) : (
+              <span>ส่งคำตอบ</span>
+            )}
+          </button>
+        </div>
       </div>
       
-      {/* Confirm Dialog */}
-      {showConfirmDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">ยืนยันการส่งคำตอบ</h3>
-            <p className="text-gray-600 mb-6 whitespace-pre-line">{confirmMessage}</p>
-            <div className="flex space-x-4">
-              <button
-                onClick={() => setShowConfirmDialog(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                ยกเลิก
-              </button>
-              <button
-                onClick={() => handleSubmit(true)}
-                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-              >
-                ยืนยัน
-              </button>
+        {/* Confirm Dialog */}
+        {showConfirmDialog && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+            <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl border-2 border-purple-200 animate-bounce">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">ยืนยันการส่งคำตอบ</h3>
+              <p className="text-gray-700 text-lg mb-8 whitespace-pre-line font-medium">{confirmMessage}</p>
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => setShowConfirmDialog(false)}
+                  className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-semibold text-lg hover:scale-105 hover:shadow-lg"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  onClick={() => handleSubmit(true)}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-semibold text-lg hover:scale-105 shadow-lg hover:shadow-xl"
+                >
+                  ยืนยัน
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
       
       {/* Toast Notification */}
       {toast && (

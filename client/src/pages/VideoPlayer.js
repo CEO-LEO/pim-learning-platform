@@ -600,10 +600,12 @@ const VideoPlayer = () => {
 
   if (loading) {
     return (
-      <div style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-        <CardSkeleton />
-        <div className="mt-6">
-          <div className="h-64 bg-gray-200 rounded-lg animate-pulse"></div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
+        <div className="max-w-6xl mx-auto px-4">
+          <CardSkeleton />
+          <div className="mt-6">
+            <div className="h-96 bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 rounded-2xl animate-pulse shadow-xl"></div>
+          </div>
         </div>
       </div>
     );
@@ -614,38 +616,44 @@ const VideoPlayer = () => {
     const requiresPretest = errorData?.requires_pretest;
     
     return (
-      <div style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-          <FiAlertCircle className="mx-auto text-red-500 mb-4" size={48} />
-          <h2 className="text-xl font-bold text-red-800 mb-2">เกิดข้อผิดพลาด</h2>
-          <p className="text-red-600 mb-4">{error}</p>
-          {requiresPretest && (
-            <p className="text-orange-600 mb-4 font-semibold">
-              กรุณาทำแบบทดสอบก่อนเรียน (Pre-test) ให้เสร็จก่อนเข้าชมวิดีโอ
-            </p>
-          )}
-          <div className="flex items-center justify-center space-x-4 flex-wrap gap-2">
-            {moduleId ? (
-              <Link
-                to={`/module/${moduleId}`}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                กลับไปหน้าโมดูล
-              </Link>
-            ) : (
-              <Link
-                to="/modules"
-                className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                กลับไปหน้าหลักสูตร
-              </Link>
+      <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center px-4" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
+        <div className="max-w-2xl w-full">
+          <div className="bg-white/80 backdrop-blur-sm border-2 border-red-200 rounded-2xl shadow-2xl p-12 text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <FiAlertCircle className="text-white" size={48} />
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-4">เกิดข้อผิดพลาด</h2>
+            <p className="text-red-700 text-lg mb-6 font-medium">{error}</p>
+            {requiresPretest && (
+              <div className="bg-orange-100 border-2 border-orange-300 rounded-xl p-4 mb-6">
+                <p className="text-orange-700 font-bold text-lg">
+                  กรุณาทำแบบทดสอบก่อนเรียน (Pre-test) ให้เสร็จก่อนเข้าชมวิดีโอ
+                </p>
+              </div>
             )}
-            <button
-              onClick={fetchVideo}
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-            >
-              ลองใหม่อีกครั้ง
-            </button>
+            <div className="flex items-center justify-center space-x-4 flex-wrap gap-3">
+              {moduleId ? (
+                <Link
+                  to={`/module/${moduleId}`}
+                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  กลับไปหน้าโมดูล
+                </Link>
+              ) : (
+                <Link
+                  to="/modules"
+                  className="px-8 py-3 bg-gradient-to-r from-gray-600 to-gray-700 text-white rounded-xl font-semibold hover:from-gray-700 hover:to-gray-800 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                >
+                  กลับไปหน้าหลักสูตร
+                </Link>
+              )}
+              <button
+                onClick={fetchVideo}
+                className="px-8 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded-xl font-semibold hover:from-red-700 hover:to-orange-700 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              >
+                ลองใหม่อีกครั้ง
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -654,27 +662,27 @@ const VideoPlayer = () => {
 
   if (!video) {
     return (
-      <div style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-        <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-          <div className="max-w-md mx-auto">
-            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <FiAlertCircle className="text-gray-400" size={48} />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 flex items-center justify-center px-4" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
+        <div className="max-w-2xl w-full">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl p-12 text-center border border-white/50">
+            <div className="w-32 h-32 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
+              <FiAlertCircle className="text-gray-400" size={64} />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-3">ไม่พบข้อมูลวิดีโอ</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent mb-4">ไม่พบข้อมูลวิดีโอ</h2>
+            <p className="text-gray-600 text-lg mb-8">
               วิดีโอที่คุณกำลังมองหาอาจถูกลบหรือไม่พร้อมใช้งานในขณะนี้
             </p>
-            <div className="flex items-center justify-center space-x-4">
+            <div className="flex items-center justify-center space-x-4 flex-wrap gap-3">
               <Link
                 to="/modules"
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold inline-flex items-center space-x-2"
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-cyan-700 transition-all shadow-lg hover:shadow-xl inline-flex items-center space-x-2 hover:scale-105"
               >
                 <FiArrowLeft size={20} />
                 <span>กลับไปหน้าหลักสูตร</span>
               </Link>
               <button
                 onClick={fetchVideo}
-                className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-semibold"
+                className="px-8 py-3 bg-gradient-to-r from-gray-200 to-gray-300 text-gray-700 rounded-xl font-semibold hover:from-gray-300 hover:to-gray-400 transition-all shadow-md hover:shadow-lg hover:scale-105"
               >
                 ลองใหม่อีกครั้ง
               </button>
@@ -686,18 +694,19 @@ const VideoPlayer = () => {
   }
 
   return (
-    <div className="space-y-6" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
-      <Link
-        to={`/module/${video.module_id}`}
-        className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 mb-4"
-      >
-        <FiArrowLeft size={20} />
-        <span>กลับไปหน้าหลักสูตร</span>
-      </Link>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 pb-12" style={{ marginTop: 0, paddingTop: '1.5rem' }}>
+      <div className="max-w-6xl mx-auto px-4 space-y-6">
+        <Link
+          to={`/module/${video.module_id}`}
+          className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-semibold transition-all hover:translate-x-1 group"
+        >
+          <FiArrowLeft size={20} className="transform group-hover:-translate-x-1 transition-transform" />
+          <span>กลับไปหน้าหลักสูตร</span>
+        </Link>
 
-      {/* Video Player */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="aspect-video bg-gradient-to-br from-gray-900 to-black relative">
+        {/* Video Player */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl overflow-hidden border border-white/50 hover:shadow-3xl transition-all duration-300">
+          <div className="aspect-video bg-gradient-to-br from-gray-900 via-gray-800 to-black relative">
           {video.url ? (() => {
             const videoSrc = getVideoUrl(video.url);
             
@@ -926,53 +935,56 @@ const VideoPlayer = () => {
         </div>
       </div>
 
-      {/* Video Info */}
-      <div className="bg-white rounded-xl shadow-md p-6">
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-800 mb-3">{video.title}</h1>
-            <div className="flex items-center space-x-6 text-sm text-gray-600">
-              <span className="flex items-center space-x-2 bg-gray-100 px-3 py-1.5 rounded-lg">
-                <FiClock size={16} className="text-blue-600" />
-                <span className="font-medium">ระยะเวลา: {Math.floor((video.duration || 0) / 60)} นาที</span>
-              </span>
-              {video.module_title && (
-                <span className="flex items-center space-x-2 bg-blue-50 px-3 py-1.5 rounded-lg">
-                  <FiBook size={16} className="text-blue-600" />
-                  <span className="font-medium text-blue-700">{video.module_title}</span>
+        {/* Video Info */}
+        <div className="bg-gradient-to-br from-white to-blue-50/30 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-white/50 hover:shadow-2xl transition-all duration-300">
+          <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
+            <div className="flex-1 min-w-[300px]">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-700 to-cyan-600 bg-clip-text text-transparent mb-4">{video.title}</h1>
+              <div className="flex items-center flex-wrap gap-3 text-sm">
+                <span className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-2 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105">
+                  <FiClock size={16} />
+                  <span className="font-semibold">ระยะเวลา: {Math.floor((video.duration || 0) / 60)} นาที</span>
                 </span>
-              )}
+                {video.module_title && (
+                  <span className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-xl shadow-md hover:shadow-lg transition-all hover:scale-105">
+                    <FiBook size={16} />
+                    <span className="font-semibold">{video.module_title}</span>
+                  </span>
+                )}
+              </div>
+            </div>
+            {isComplete && (
+              <div className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105">
+                <FiCheckCircle size={24} />
+                <span className="font-bold text-lg">ดูครบแล้ว</span>
+              </div>
+            )}
+          </div>
+
+          {/* Progress Bar */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-bold text-gray-700">ความคืบหน้าการดู</span>
+              <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">{Math.floor(progress)}%</span>
+            </div>
+            <div className="relative w-full bg-gradient-to-r from-gray-200 to-gray-100 rounded-full h-4 overflow-hidden shadow-inner">
+              <div
+                className="bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 h-4 rounded-full transition-all duration-500 shadow-lg relative overflow-hidden"
+                style={{ width: `${progress}%` }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+              </div>
             </div>
           </div>
-          {isComplete && (
-            <div className="flex items-center space-x-2 bg-green-50 px-4 py-2 rounded-lg border border-green-200">
-              <FiCheckCircle size={24} className="text-green-600" />
-              <span className="font-semibold text-green-700">ดูครบแล้ว</span>
+
+          {/* Description */}
+          {video.description && (
+            <div className="mt-8 pt-6 border-t border-gradient-to-r from-blue-200 to-cyan-200">
+              <h3 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-4">รายละเอียด</h3>
+              <p className="text-gray-700 leading-relaxed whitespace-pre-line">{video.description}</p>
             </div>
           )}
         </div>
-
-        {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-semibold text-gray-700">ความคืบหน้าการดู</span>
-            <span className="text-sm font-bold text-blue-600">{Math.floor(progress)}%</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-            <div
-              className="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all duration-300 shadow-sm"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </div>
-
-        {/* Description */}
-        {video.description && (
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">รายละเอียด</h3>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{video.description}</p>
-          </div>
-        )}
       </div>
       
       {/* Toast Notification */}
