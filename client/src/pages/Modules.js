@@ -494,16 +494,18 @@ const Modules = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6">
+        <div className="mb-8">
           <div className="relative max-w-3xl mx-auto">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ค้นหาหลักสูตร..."
-              className="w-full px-4 py-2 pl-10 border-2 border-gray-300 rounded-lg text-base shadow-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 focus:outline-none transition-all"
-            />
-            <FiPlay className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <div className="relative">
+              <FiPlay className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="ค้นหาหลักสูตรที่คุณต้องการ..."
+                className="w-full px-4 py-3 pl-12 pr-4 border border-gray-300 rounded-xl text-base shadow-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all hover:shadow-xl"
+              />
+            </div>
           </div>
         </div>
 
@@ -515,35 +517,39 @@ const Modules = () => {
             <p className="text-base text-gray-500">ลองค้นหาด้วยคำอื่น</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
             {filteredModules.map((module) => (
               <Link
                 key={module.module_id}
                 to={`/module/${module.module_id}`}
-                className="relative bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all group border-2 border-transparent hover:border-blue-200"
+                className="relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group border border-gray-200 hover:border-blue-300 transform hover:-translate-y-1"
               >
                 {/* Shine effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 z-20"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 z-20"></div>
                 
-                <div className="relative h-32 bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center overflow-hidden">
-                  {/* Animated background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/50 to-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute top-0 left-0 w-full h-full opacity-20" style={{
+                <div className="relative h-40 bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-500 flex items-center justify-center overflow-hidden">
+                  {/* Animated background pattern */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/50 via-purple-500/50 to-cyan-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <div className="absolute top-0 left-0 w-full h-full opacity-10" style={{
                     backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
                   }}></div>
-                  <FiPlay className="relative z-10 text-white opacity-80 group-hover:opacity-100 transition-all transform group-hover:scale-110 duration-300" size={32} />
+                  <div className="relative z-10">
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-xl border border-white/30 group-hover:scale-110 transition-transform duration-300">
+                      <FiPlay className="text-white opacity-90 group-hover:opacity-100 transition-all transform group-hover:scale-110 duration-300" size={28} />
+                    </div>
+                  </div>
                   {module.category && (
-                    <span className="absolute top-2 right-2 bg-white/95 backdrop-blur-md text-blue-600 px-2 py-1 rounded-full text-xs font-semibold shadow-md border border-blue-200 z-10">
+                    <span className="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-blue-600 px-3 py-1 rounded-full text-xs font-bold shadow-lg border border-blue-200 z-10">
                       {module.category}
                     </span>
                   )}
                 </div>
-                <div className="p-4">
-                  <h2 className="text-base font-bold text-gray-800 mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">{module.title}</h2>
-                  <p className="text-gray-600 mb-3 line-clamp-2 text-sm leading-relaxed">{module.description || 'เรียนรู้เนื้อหาที่น่าสนใจ'}</p>
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                    <span className="text-blue-600 font-semibold text-sm group-hover:text-blue-700 transition-colors">เริ่มต้นบทเรียน</span>
-                    <FiArrowRight className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" size={18} />
+                <div className="p-5">
+                  <h2 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">{module.title}</h2>
+                  <p className="text-gray-600 mb-4 line-clamp-2 text-sm leading-relaxed">{module.description || 'เรียนรู้เนื้อหาที่น่าสนใจ'}</p>
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <span className="text-blue-600 font-bold text-sm group-hover:text-blue-700 transition-colors">เริ่มต้นบทเรียน</span>
+                    <FiArrowRight className="text-gray-400 group-hover:text-blue-600 group-hover:translate-x-2 transition-all duration-300" size={20} />
                   </div>
                 </div>
               </Link>
