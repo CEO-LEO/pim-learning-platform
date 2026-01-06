@@ -583,30 +583,29 @@ const Quiz = () => {
         </div>
       </div>
       
-        {/* Confirm Dialog */}
-        {showConfirmDialog && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
-            <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl border-2 border-purple-200 animate-bounce">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">ยืนยันการส่งคำตอบ</h3>
-              <p className="text-gray-700 text-lg mb-8 whitespace-pre-line font-medium">{confirmMessage}</p>
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => setShowConfirmDialog(false)}
-                  className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-semibold text-lg hover:scale-105 hover:shadow-lg"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  onClick={() => handleSubmit(true)}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-semibold text-lg hover:scale-105 shadow-lg hover:shadow-xl"
-                >
-                  ยืนยัน
-                </button>
-              </div>
+      {/* Confirm Dialog */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl border-2 border-purple-200 animate-bounce">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">ยืนยันการส่งคำตอบ</h3>
+            <p className="text-gray-700 text-lg mb-8 whitespace-pre-line font-medium">{confirmMessage}</p>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => setShowConfirmDialog(false)}
+                className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-semibold text-lg hover:scale-105 hover:shadow-lg"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={() => handleSubmit(true)}
+                className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl hover:from-purple-700 hover:to-indigo-700 transition-all font-semibold text-lg hover:scale-105 shadow-lg hover:shadow-xl"
+              >
+                ยืนยัน
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
       
       {/* Toast Notification */}
       {toast && (
