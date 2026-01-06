@@ -34,6 +34,7 @@ const practicalRoutes = require('./routes/practical');
 const adminExportRoutes = require('./routes/admin-export');
 const roomRoutes = require('./routes/rooms');
 const videoStreamRoutes = require('./routes/video-stream');
+const tempUploadRoutes = require('./routes/temp-upload');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -90,6 +91,7 @@ app.use('/api/grades', gradeRoutes);
 app.use('/api/practical', practicalRoutes);
 app.use('/api/admin/export', adminExportRoutes);
 app.use('/api/rooms', roomRoutes);
+app.use('/api/temp-upload', tempUploadRoutes);
 
 // Video streaming route (with authentication)
 app.use('/api/videos/stream', videoStreamRoutes);
