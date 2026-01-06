@@ -51,10 +51,6 @@ const VideoPlayer = () => {
 
   // Helper function to get full video URL
   const getVideoUrl = (url) => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:53',message:'getVideoUrl entry',data:{inputUrl:url,apiUrl:API_URL,serverUrl:SERVER_URL,envApiUrl:process.env.REACT_APP_API_URL},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'A,B'})}).catch(()=>{});
-    // #endregion
-    
     if (!url) {
       console.error('[VideoPlayer] No video URL provided');
       return null;
@@ -91,10 +87,6 @@ const VideoPlayer = () => {
     const fullUrl = token 
       ? `${API_URL}/videos/stream/${filename}?token=${encodeURIComponent(token)}`
       : `${API_URL}/videos/stream/${filename}`;
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:88',message:'getVideoUrl constructed',data:{filename,fullUrl,hasToken:!!token,isLocalhostUrl},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B'})}).catch(()=>{});
-    // #endregion
     
     // Enhanced debug logging
     const debugInfo = { 
@@ -187,9 +179,6 @@ const VideoPlayer = () => {
       console.log('[DEBUG] Making request', { url: `${API_URL}/videos/${videoId}`, hasToken: !!token });
       
       const response = await axios.get(`${API_URL}/videos/${videoId}`, config);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:189',message:'fetchVideo API response',data:{status:response.status,videoId:response.data.video_id,title:response.data.title,url:response.data.url,hasUrl:!!response.data.url},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
       console.log('[DEBUG] Request successful', { 
         status: response.status,
         videoData: {
@@ -242,9 +231,6 @@ const VideoPlayer = () => {
               url: headResponse.url,
               headers: Object.fromEntries(headResponse.headers.entries())
             });
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:237',message:'HEAD preflight response',data:{status:headResponse.status,ok:headResponse.ok,contentType:headResponse.headers.get('content-type'),url:headResponse.url},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,D'})}).catch(()=>{});
-            // #endregion
             
             if (!headResponse.ok) {
               let errorText = '';
@@ -797,9 +783,6 @@ const VideoPlayer = () => {
                 };
                 
                 console.error('[VideoPlayer] Video load error:', errorData);
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/d6554544-7153-48cc-853b-110e134d2f3b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'VideoPlayer.js:799',message:'Video element error',data:{errorCode:error?.code,errorMessage:error?.message,videoUrl,networkState:videoElement?.networkState,readyState:videoElement?.readyState},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'B,C'})}).catch(()=>{});
-                // #endregion
                 
                 // Set error state for UI
                 if (error?.code === 4) {
