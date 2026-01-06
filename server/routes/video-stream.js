@@ -92,6 +92,10 @@ function handleVideoRequest(req, res) {
   const { filename } = req.params;
   const videoPath = path.join(__dirname, '..', 'uploads', 'videos', filename);
   
+  // #region agent log
+  const fs2 = require('fs'); fs2.appendFileSync('c:\\PIMX\\.cursor\\debug.log', JSON.stringify({location:'video-stream.js:91',message:'handleVideoRequest entry',data:{filename,videoPath,method:req.method,hasUser:!!req.user},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'C,E'})+'\n');
+  // #endregion
+  
   console.log('[VideoStream] Processing video request:', {
     filename,
     videoPath,
@@ -107,6 +111,10 @@ function handleVideoRequest(req, res) {
   
   // Check if file exists
   const fileExists = fs.existsSync(videoPath);
+  
+  // #region agent log
+  const fs3 = require('fs'); fs3.appendFileSync('c:\\PIMX\\.cursor\\debug.log', JSON.stringify({location:'video-stream.js:109',message:'File existence check',data:{filename,videoPath,fileExists},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})+'\n');
+  // #endregion
   
   // Check if file is an LFS pointer (very small file with LFS pointer content)
   if (fileExists) {
@@ -211,6 +219,10 @@ function streamVideo(videoPath, req, res) {
   const range = req.headers.range;
   const contentType = getContentType(videoPath);
   const isHeadRequest = req.method === 'HEAD';
+  
+  // #region agent log
+  const fs4 = require('fs'); fs4.appendFileSync('c:\\PIMX\\.cursor\\debug.log', JSON.stringify({location:'video-stream.js:208',message:'streamVideo start',data:{filename:path.basename(videoPath),fileSize,method:req.method,hasRange:!!range,contentType},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'E'})+'\\n');
+  // #endregion
   
   console.log(`[VideoStream] Serving video: ${path.basename(videoPath)}, method: ${req.method}, size: ${fileSize}, range: ${range || 'none'}, content-type: ${contentType}`);
   
