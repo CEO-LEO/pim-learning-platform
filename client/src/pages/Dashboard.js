@@ -299,38 +299,45 @@ const Dashboard = () => {
                 <FiArrowRight size={18} />
               </Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
               {modules.slice(0, 10).map((module) => (
                 <Link
                   key={module.module_id}
                   to={`/module/${module.module_id}`}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all group border-2 border-transparent hover:border-blue-200"
+                  className="relative bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 group border border-gray-200 hover:border-blue-300 transform hover:-translate-y-1"
                 >
-                  <div className="relative h-32 bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center overflow-hidden">
-                    {/* Animated background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-400/50 to-cyan-400/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div className="absolute top-0 left-0 w-full h-full opacity-20" style={{
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 z-20"></div>
+                  
+                  <div className="relative h-40 bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-500 flex items-center justify-center overflow-hidden">
+                    {/* Animated background pattern */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/50 via-purple-500/50 to-cyan-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute top-0 left-0 w-full h-full opacity-10" style={{
                       backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
                     }}></div>
-                    <FiPlay className="relative z-10 text-white opacity-80 group-hover:opacity-100 transition-all transform group-hover:scale-110 duration-300" size={32} />
+                    <div className="relative z-10">
+                      <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center shadow-xl border border-white/30 group-hover:scale-110 transition-transform duration-300">
+                        <FiPlay className="text-white opacity-90 group-hover:opacity-100 transition-all transform group-hover:scale-110 duration-300" size={28} />
+                      </div>
+                    </div>
                     {module.category && (
-                      <span className="absolute top-2 right-2 bg-white/95 backdrop-blur-md text-blue-600 px-2 py-1 rounded-full text-xs font-semibold shadow-md border border-blue-200 z-10">
+                      <span className="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-blue-600 px-3 py-1 rounded-full text-xs font-bold shadow-lg border border-blue-200 z-10">
                         {module.category}
                       </span>
                     )}
                   </div>
-                  <div className="p-4">
-                    <h3 className="text-base font-bold text-gray-800 mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">{module.title}</h3>
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2 leading-tight group-hover:text-blue-600 transition-colors">{module.title}</h3>
                     {module.description && (
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2 leading-relaxed">{module.description}</p>
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">{module.description}</p>
                     )}
-                    <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-200">
-                      <span className="flex items-center space-x-2 font-semibold group-hover:text-blue-600 transition-colors">
+                    <div className="flex items-center justify-between text-xs text-gray-500 pt-4 border-t border-gray-100">
+                      <span className="flex items-center space-x-2 font-bold group-hover:text-blue-600 transition-colors">
                         <FiClock size={14} />
                         <span>{module.video_count || 0} วิดีโอ</span>
                       </span>
                       {module.total_minutes > 0 && (
-                        <span className="font-semibold group-hover:text-blue-600 transition-colors">{module.total_minutes} นาที</span>
+                        <span className="font-bold group-hover:text-blue-600 transition-colors">{module.total_minutes} นาที</span>
                       )}
                     </div>
                   </div>
@@ -341,32 +348,32 @@ const Dashboard = () => {
         )}
 
         {/* Category Navigation */}
-        <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">หมวดหมู่หลักสูตร</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border border-gray-200">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-6">หมวดหมู่หลักสูตร</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { name: 'การบริการ', path: '/modules?category=service', icon: FiUsers, color: 'blue' },
-              { name: 'การเตรียมสินค้าอุ่นร้อน', path: '/modules?category=hot', icon: FiTrendingUp, color: 'orange' },
-              { name: 'การจัดการอุปกรณ์และความสะอาด', path: '/modules?category=clean', icon: FiCheckCircle, color: 'green' },
-              { name: 'การจัดการและบริหารสินค้า', path: '/modules?category=inventory', icon: FiBook, color: 'purple' },
+              { name: 'การบริการ', path: '/modules?category=service', icon: FiUsers, color: 'blue', gradient: 'from-blue-500 to-blue-600' },
+              { name: 'การเตรียมสินค้าอุ่นร้อน', path: '/modules?category=hot', icon: FiTrendingUp, color: 'orange', gradient: 'from-orange-500 to-orange-600' },
+              { name: 'การจัดการอุปกรณ์และความสะอาด', path: '/modules?category=clean', icon: FiCheckCircle, color: 'green', gradient: 'from-green-500 to-green-600' },
+              { name: 'การจัดการและบริหารสินค้า', path: '/modules?category=inventory', icon: FiBook, color: 'purple', gradient: 'from-purple-500 to-purple-600' },
             ].map((category, index) => {
               const Icon = category.icon;
               const colorClasses = {
-                blue: 'bg-blue-100 text-blue-600 hover:bg-blue-200',
-                orange: 'bg-orange-100 text-orange-600 hover:bg-orange-200',
-                green: 'bg-green-100 text-green-600 hover:bg-green-200',
-                purple: 'bg-purple-100 text-purple-600 hover:bg-purple-200',
+                blue: 'bg-gradient-to-br from-blue-50 to-blue-100 text-blue-600 hover:from-blue-100 hover:to-blue-200',
+                orange: 'bg-gradient-to-br from-orange-50 to-orange-100 text-orange-600 hover:from-orange-100 hover:to-orange-200',
+                green: 'bg-gradient-to-br from-green-50 to-green-100 text-green-600 hover:from-green-100 hover:to-green-200',
+                purple: 'bg-gradient-to-br from-purple-50 to-purple-100 text-purple-600 hover:from-purple-100 hover:to-purple-200',
               };
               return (
                 <Link
                   key={index}
                   to={category.path}
-                  className="flex flex-col items-center p-4 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
+                  className="flex flex-col items-center p-5 rounded-xl border-2 border-gray-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group"
                 >
-                  <div className={`w-12 h-12 ${colorClasses[category.color]} rounded-full flex items-center justify-center mb-3 transition-colors shadow-md`}>
-                    <Icon size={24} />
+                  <div className={`w-16 h-16 ${colorClasses[category.color]} rounded-xl flex items-center justify-center mb-4 transition-all duration-300 shadow-lg group-hover:scale-110`}>
+                    <Icon size={28} />
                   </div>
-                  <span className="text-xs sm:text-sm font-semibold text-gray-800 text-center leading-tight">{category.name}</span>
+                  <span className="text-xs sm:text-sm font-bold text-gray-800 text-center leading-tight group-hover:text-blue-600 transition-colors">{category.name}</span>
                 </Link>
               );
             })}
