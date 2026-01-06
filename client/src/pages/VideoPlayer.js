@@ -51,20 +51,33 @@ const VideoPlayer = () => {
       console.error('[VideoPlayer] No video URL provided');
       return null;
     }
-    // If already a full URL (http:// or https://), return as is
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      console.log('[VideoPlayer] Using full URL:', url);
-      return url;
-    }
     
-    // Extract filename from path (e.g., /uploads/videos/video-module_1-1.mp4 -> video-module_1-1.mp4)
+    // Extract filename from URL (handle both full URLs and relative paths)
     let filename = url;
     if (url.includes('/')) {
       filename = url.split('/').pop();
     }
     
-    // Use video streaming route with authentication instead of static files
-    // This ensures video files are accessible even if Git LFS files aren't pulled
+    // Always use API_URL for video streaming (ignore URL from database if it's localhost)
+    // This ensures videos work in production when REACT_APP_API_URL is set
+    const dbUrl = url;
+    const isLocalhostUrl = dbUrl && (dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1'));
+    
+    // If database URL is localhost but we're in production (have REACT_APP_API_URL), use API_URL instead
+    if (isLocalhostUrl && process.env.REACT_APP_API_URL && process.env.REACT_APP_API_URL !== 'http://localhost:5000/api') {
+      console.log('[VideoPlayer] Database URL is localhost, but production API_URL is set. Using API_URL instead.');
+    }
+    
+    // If already a full production URL (not localhost), use it
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      if (!isLocalhostUrl) {
+        console.log('[VideoPlayer] Using full production URL from database:', url);
+        return url;
+      }
+      // If it's localhost URL but we have production API_URL, fall through to use API_URL
+    }
+    
+    // Use video streaming route with authentication
     // Add token to query parameter because video element can't send Authorization header
     const token = localStorage.getItem('token');
     const fullUrl = token 
@@ -84,7 +97,9 @@ const VideoPlayer = () => {
       envServerUrl: process.env.REACT_APP_SERVER_URL,
       allEnvVars: Object.keys(process.env).filter(k => k.startsWith('REACT_APP_')),
       hasToken: !!token,
-      tokenLength: token?.length
+      tokenLength: token?.length,
+      isLocalhostUrl,
+      usingApiUrl: true
     };
     console.log('[VideoPlayer] Constructed URL:', debugInfo);
     
