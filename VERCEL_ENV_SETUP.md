@@ -1,94 +1,100 @@
-# 🔧 ตั้งค่า Vercel Environment Variables สำหรับ Video
+# 🔧 Vercel Environment Variables Setup
 
-## ปัญหา
-วิดีโอไม่แสดงเพราะ:
-1. URL ในฐานข้อมูลเป็น localhost
-2. ไม่ได้ตั้งค่า `REACT_APP_API_URL` ใน Vercel
+## ⚠️ ปัญหา: วิดีโอไม่ขึ้น
 
-## วิธีแก้
+วิดีโอไม่ขึ้นเพราะ Vercel ไม่มี environment variables สำหรับเชื่อมต่อกับ Railway backend
 
-### ขั้นตอนที่ 1: หา Backend URL
+## ✅ วิธีแก้ไข
 
-ตรวจสอบว่า backend ของคุณอยู่ที่ไหน:
+### 1. ไปที่ Vercel Dashboard
 
-**Railway:**
-1. ไปที่ https://railway.app/dashboard
-2. เลือกโปรเจค
-3. Settings → Networking → Public Domain
-4. URL: `https://your-app.railway.app`
-
-**Render:**
-1. ไปที่ https://dashboard.render.com/
-2. เลือก service
-3. Settings → Public URL
-4. URL: `https://your-app.onrender.com`
-
-**Heroku:**
-1. ไปที่ https://dashboard.heroku.com/
-2. เลือก app
-3. Settings → Domains
-4. URL: `https://your-app.herokuapp.com`
-
-### ขั้นตอนที่ 2: ตั้งค่า Vercel Environment Variables
-
-1. ไปที่ [Vercel Dashboard](https://vercel.com/dashboard)
-2. เลือกโปรเจค `pim-learning-platform`
+1. เปิด: https://vercel.com/dashboard
+2. เลือกโปรเจ็กต์: **pim-learning-platform**
 3. ไปที่ **Settings** → **Environment Variables**
-4. เพิ่ม environment variable:
 
-   **Name:** `REACT_APP_API_URL`
-   
-   **Value:** `https://your-backend.railway.app/api`
-   
-   **Environment:** เลือก `Production`, `Preview`, และ `Development`
+### 2. เพิ่ม Environment Variables
 
-5. คลิก **Save**
+เพิ่มตัวแปรต่อไปนี้:
 
-### ขั้นตอนที่ 3: อัปเดต URL ในฐานข้อมูล
+#### สำหรับ Production:
+- **Name:** `REACT_APP_API_URL`
+- **Value:** `https://[YOUR_RAILWAY_URL]/api`
+  - ตัวอย่าง: `https://pim-learning-platform-production.up.railway.app/api`
+- **Environment:** Production ✅
 
-หลังจากตั้งค่า `REACT_APP_API_URL` แล้ว ให้อัปเดต URL ในฐานข้อมูล:
+#### สำหรับ Preview:
+- **Name:** `REACT_APP_API_URL`
+- **Value:** `https://[YOUR_RAILWAY_URL]/api`
+- **Environment:** Preview ✅
 
-```powershell
-# ตั้งค่า backend URL (ไม่ต้องมี /api)
-$env:BACKEND_URL="https://your-backend.railway.app"
+#### สำหรับ Development:
+- **Name:** `REACT_APP_API_URL`
+- **Value:** `http://localhost:5000/api`
+- **Environment:** Development ✅
 
-# อัปเดต URL ในฐานข้อมูล
-node server/scripts/fix-video-urls-production.js
-```
+### 3. (Optional) เพิ่ม SERVER_URL
 
-### ขั้นตอนที่ 4: Redeploy
+ถ้า Railway URL ต่างจาก API URL:
 
-1. ไปที่ Vercel Dashboard
-2. เลือกโปรเจค
-3. ไปที่ **Deployments**
-4. คลิก **Redeploy** บน deployment ล่าสุด
+- **Name:** `REACT_APP_SERVER_URL`
+- **Value:** `https://[YOUR_RAILWAY_URL]`
+  - ตัวอย่าง: `https://pim-learning-platform-production.up.railway.app`
+- **Environment:** Production, Preview ✅
 
-หรือ push code ใหม่:
-```bash
-git commit --allow-empty -m "Trigger redeploy after env var update"
-git push
-```
+### 4. Redeploy
 
-## ตรวจสอบ
+หลังจากเพิ่ม environment variables แล้ว:
 
-1. เปิดเบราว์เซอร์ไปที่หน้า video
-2. กด F12 เปิด Developer Tools
-3. ดู **Console** tab - ควรเห็น `REACT_APP_API_URL` ที่ถูกต้อง
-4. ดู **Network** tab - ตรวจสอบว่า video request ไปที่ URL ถูกต้อง
+1. ไปที่ **Deployments**
+2. คลิก **3 dots (...)** บน deployment ล่าสุด
+3. เลือก **Redeploy**
+4. รอ 2-3 นาที
+5. Refresh หน้าเว็บ (Ctrl+F5)
 
-## ⚠️ สิ่งสำคัญ
+## 🔍 วิธีหา Railway URL
 
-### ตรวจสอบว่า Backend มีไฟล์วิดีโอ
+1. ไปที่ Railway Dashboard: https://railway.app/dashboard
+2. เลือกโปรเจ็กต์ backend
+3. ไปที่ **Settings** → **Domains**
+4. Copy **Default Domain** หรือ **Custom Domain**
 
-**สำคัญ:** ตรวจสอบว่า backend server มีไฟล์วิดีโอใน `server/uploads/videos/` หรือไม่
+## ✅ ตรวจสอบ
 
-**ถ้าไม่มี:**
-1. อัปโหลดไฟล์วิดีโอไปยัง backend server
-2. หรือใช้ External Storage (Cloudflare R2, AWS S3)
+หลังจาก redeploy แล้ว:
 
-## สรุป
+1. เปิด Developer Tools (F12)
+2. ไปที่ Console tab
+3. ดู log: `[VideoPlayer] Constructed URL:`
+4. ตรวจสอบว่า URL ถูกต้องหรือไม่
 
-1. ✅ ตั้งค่า `REACT_APP_API_URL` ใน Vercel
-2. ✅ อัปเดต URL ในฐานข้อมูล
-3. ✅ Redeploy
-4. ✅ ตรวจสอบว่า backend มีไฟล์วิดีโอ
+## 🐛 Troubleshooting
+
+### วิดีโอยังไม่ขึ้น
+
+1. **ตรวจสอบ Console:**
+   - เปิด F12 → Console
+   - ดู error messages
+   - ตรวจสอบว่า API URL ถูกต้องหรือไม่
+
+2. **ตรวจสอบ Network:**
+   - เปิด F12 → Network
+   - ลองเปิดวิดีโอ
+   - ดู request ไปที่ `/api/videos/[videoId]`
+   - ตรวจสอบ status code (ควรเป็น 200)
+
+3. **ตรวจสอบ CORS:**
+   - ดู error: `CORS policy: No 'Access-Control-Allow-Origin'`
+   - ไปที่ Railway → Settings → Environment Variables
+   - เพิ่ม `ALLOWED_ORIGINS` = `https://pim-learning-platform.vercel.app`
+
+4. **ตรวจสอบ Railway:**
+   - ดู Railway logs
+   - ตรวจสอบว่า server รันอยู่หรือไม่
+   - ตรวจสอบว่า Git LFS files ถูก pull แล้วหรือไม่
+
+## 📝 หมายเหตุ
+
+- Environment variables จะถูก inject ใน build time
+- ต้อง redeploy หลังจากเพิ่ม/แก้ไข environment variables
+- ใช้ `REACT_APP_` prefix สำหรับ React environment variables
+
