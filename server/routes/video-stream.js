@@ -35,6 +35,15 @@ function authenticateVideoRequest(req, res, next) {
   const authHeader = req.headers.authorization;
   const tokenFromQuery = req.query.token;
   
+  // Enhanced logging
+  console.log('[VideoStream] Request received:', {
+    filename: req.params.filename,
+    method: req.method,
+    hasAuthHeader: !!authHeader,
+    hasTokenQuery: !!tokenFromQuery,
+    range: req.headers.range
+  });
+  
   // If token is in query parameter, add it to Authorization header
   if (tokenFromQuery && !authHeader) {
     req.headers.authorization = `Bearer ${tokenFromQuery}`;
@@ -46,6 +55,14 @@ function authenticateVideoRequest(req, res, next) {
   
   if (!token) {
     console.error('[VideoStream] No token provided');
+    console.error('[VideoStream] Request details:', {
+      url: req.url,
+      query: req.query,
+      headers: {
+        authorization: req.headers.authorization ? 'present' : 'missing',
+        range: req.headers.range
+      }
+    });
     return res.status(401).json({ error: 'Access token required' });
   }
   
