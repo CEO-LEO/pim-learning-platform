@@ -267,62 +267,62 @@ const Booking = () => {
       <div className="w-full max-w-full mx-auto px-8 lg:px-12 xl:px-16">
         {/* Hero Header */}
         <div className="mb-6">
-          <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 rounded-xl p-6 text-white shadow-lg">
+          <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 rounded-xl p-4 md:p-6 text-white shadow-lg">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex-1">
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">จองรอบฝึกปฏิบัติ (Practical Training)</h1>
-                <p className="text-sm md:text-base text-purple-50 mb-2">เลือกวันและเวลาที่สะดวกเพื่อเข้าฝึกปฏิบัติที่ร้าน 7-Eleven Demonstration Store (จำกัด 100 ท่าน/รอบ)</p>
+                <h1 className="text-xl sm:text-2xl font-bold mb-2">จองรอบฝึกปฏิบัติ (Practical Training)</h1>
+                <p className="text-sm text-purple-50 mb-2">เลือกวันและเวลาที่สะดวกเพื่อเข้าฝึกปฏิบัติที่ร้าน 7-Eleven Demonstration Store (จำกัด 100 ท่าน/รอบ)</p>
                 {lastUpdate && (
-                  <p className="text-sm text-purple-200 mt-4 flex items-center space-x-2">
-                    <FiRefreshCw size={16} className="animate-spin" />
+                  <p className="text-xs text-purple-200 mt-2 flex items-center space-x-2">
+                    <FiRefreshCw size={14} className="animate-spin" />
                     <span>อัพเดทล่าสุด: {lastUpdate.toLocaleTimeString('th-TH')}</span>
                   </p>
                 )}
-            </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Booked Slot Display */}
         {registration && bookedSlot ? (
-          <div className="mb-8">
-            <div className="bg-gradient-to-br from-green-50 via-white to-emerald-50 rounded-2xl shadow-xl border-2 border-green-400 p-8">
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                  <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-2xl shadow-lg">
-                    <FiCheckCircle size={32} />
-            </div>
-            <div>
-                    <h2 className="text-2xl font-bold text-green-800 mb-2">คุณได้จองรอบฝึกปฏิบัติแล้ว</h2>
-                    <p className="text-lg text-green-600">กรุณาเตรียมบัตรนักศึกษาและมาให้ตรงเวลา</p>
+          <div className="mb-6">
+            <div className="bg-gradient-to-br from-green-50 via-white to-emerald-50 rounded-xl shadow-xl border-2 border-green-400 p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-xl shadow-lg">
+                    <FiCheckCircle size={24} />
                   </div>
-            </div>
-          </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-green-800 mb-1">คุณได้จองรอบฝึกปฏิบัติแล้ว</h2>
+                    <p className="text-sm text-green-600">กรุณาเตรียมบัตรนักศึกษาและมาให้ตรงเวลา</p>
+                  </div>
+                </div>
+              </div>
           
-              <div className="bg-white rounded-xl p-6 border-2 border-green-200 shadow-md mb-6">
-                <div className="space-y-4">
-                  <div className="flex items-center text-lg space-x-3">
-                    <FiCalendar className="text-green-600 flex-shrink-0" size={20} />
+              <div className="bg-white rounded-xl p-4 border-2 border-green-200 shadow-md mb-4">
+                <div className="space-y-3">
+                  <div className="flex items-center text-sm space-x-2">
+                    <FiCalendar className="text-green-600 flex-shrink-0" size={16} />
                     <span className="font-bold text-gray-800">วันที่: {bookedSlot.date}</span>
                   </div>
-                  <div className="flex items-center text-lg space-x-3">
-                    <FiClock className="text-green-600 flex-shrink-0" size={20} />
+                  <div className="flex items-center text-sm space-x-2">
+                    <FiClock className="text-green-600 flex-shrink-0" size={16} />
                     <span className="font-bold text-gray-800">เวลา: {bookedSlot.start_time} - {bookedSlot.end_time} น.</span>
-            </div>
-                  <div className="flex items-center text-lg space-x-3">
-                    <FiMapPin className="text-green-600 flex-shrink-0" size={20} />
+                  </div>
+                  <div className="flex items-center text-sm space-x-2">
+                    <FiMapPin className="text-green-600 flex-shrink-0" size={16} />
                     <span className="font-bold text-gray-800">สถานที่: 7-Eleven Demonstration Store ชั้น 2</span>
-            </div>
-            </div>
-          </div>
+                  </div>
+                </div>
+              </div>
 
-          <button
+              <button
                 onClick={handleCancelClick}
-                className="flex items-center space-x-2 text-red-600 hover:text-red-700 font-bold text-lg transition-colors"
-          >
-                <FiTrash2 size={20} />
-            <span>ยกเลิกการจอง</span>
-          </button>
+                className="flex items-center space-x-2 text-red-600 hover:text-red-700 font-semibold text-sm transition-colors"
+              >
+                <FiTrash2 size={16} />
+                <span>ยกเลิกการจอง</span>
+              </button>
             </div>
         </div>
         ) : (
@@ -338,36 +338,36 @@ const Booking = () => {
                     {monthName}
                   </span>
                 </h2>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
                   <button
                     onClick={() => navigateMonth(-1)}
-                    className="p-2 bg-gradient-to-br from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 rounded-lg transition-all transform hover:scale-110 shadow-sm"
+                    className="p-1.5 bg-gradient-to-br from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 rounded-lg transition-all transform hover:scale-110 shadow-sm"
                   >
-                    <FiChevronLeft size={18} className="text-purple-600" />
+                    <FiChevronLeft size={16} className="text-purple-600" />
                   </button>
                   <button
                     onClick={() => setCurrentMonth(new Date())}
-                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg font-semibold text-sm transition-all transform hover:scale-105 shadow-md"
+                    className="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg font-semibold text-xs transition-all transform hover:scale-105 shadow-md"
                   >
                     วันนี้
                   </button>
                   <button
                     onClick={() => navigateMonth(1)}
-                    className="p-2 bg-gradient-to-br from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 rounded-lg transition-all transform hover:scale-110 shadow-sm"
+                    className="p-1.5 bg-gradient-to-br from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 rounded-lg transition-all transform hover:scale-110 shadow-sm"
                   >
-                    <FiChevronRight size={18} className="text-purple-600" />
+                    <FiChevronRight size={16} className="text-purple-600" />
                   </button>
                 </div>
                 </div>
                 
               {/* Instructions */}
               {!selectedDate && slots.length > 0 && (
-                <div className="bg-gradient-to-r from-purple-100 via-indigo-100 to-pink-100 rounded-2xl p-5 mb-6 border-2 border-purple-200 shadow-md">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-white rounded-xl shadow-sm">
-                      <FiAlertCircle className="text-purple-600 flex-shrink-0" size={24} />
+                <div className="bg-gradient-to-r from-purple-100 via-indigo-100 to-pink-100 rounded-xl p-3 mb-3 border border-purple-200 shadow-sm">
+                  <div className="flex items-center space-x-2">
+                    <div className="p-1.5 bg-white rounded-lg shadow-sm">
+                      <FiAlertCircle className="text-purple-600 flex-shrink-0" size={16} />
                     </div>
-                    <p className="text-base md:text-lg text-purple-800 font-bold">
+                    <p className="text-xs md:text-sm text-purple-800 font-semibold">
                       💡 คลิกที่วันที่ที่มีรอบการจอง (สีเขียว) เพื่อดูรายละเอียดและจองรอบ
                     </p>
                   </div>
@@ -375,11 +375,11 @@ const Booking = () => {
               )}
 
               {/* Calendar Grid */}
-              <div className="grid grid-cols-7 gap-3 md:gap-4">
+              <div className="grid grid-cols-7 gap-2">
                 {/* Day headers */}
                 {['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'].map((day, idx) => (
-                  <div key={idx} className="text-center py-3">
-                    <span className="text-base md:text-lg font-bold text-gray-700 bg-gray-50 px-3 py-2 rounded-xl inline-block">{day}</span>
+                  <div key={idx} className="text-center py-2">
+                    <span className="text-xs md:text-sm font-bold text-gray-700 bg-gray-50 px-2 py-1 rounded-lg inline-block">{day}</span>
                   </div>
                 ))}
 
@@ -399,7 +399,7 @@ const Booking = () => {
                   return (
                     <div
                       key={dateKey}
-                      className={`aspect-square border-2 rounded-xl p-3 md:p-4 transition-all duration-300 ${
+                      className={`aspect-square border-2 rounded-lg p-2 transition-all duration-300 ${
                         dayIsPast
                           ? 'bg-gray-50 border-gray-200 opacity-40 cursor-not-allowed'
                           : dayIsToday
@@ -418,20 +418,20 @@ const Booking = () => {
                       title={hasSlots && !dayIsPast ? `คลิกเพื่อดูรอบการจองในวันที่ ${day.getDate()}` : ''}
                     >
                       <div className="flex flex-col h-full">
-                        <div className={`text-xl md:text-2xl font-bold mb-2 ${
+                        <div className={`text-base md:text-lg font-bold mb-1 ${
                           dayIsToday ? 'text-purple-700' : 'text-gray-800'
                         }`}>
                           {day.getDate()}
                         </div>
                         {hasSlots && (
-                          <div className="flex-1 flex flex-col gap-1.5 justify-end">
+                          <div className="flex-1 flex flex-col gap-1 justify-end">
                             {daySlots.slice(0, 2).map((slot) => {
                               const isFull = slot.remaining_count <= 0;
                               const endHour = slot.end_time ? slot.end_time.split(':')[0] : '';
                               return (
                                 <div
                                   key={slot.exam_id}
-                                  className={`text-[10px] md:text-xs px-2 py-1 rounded-lg font-bold leading-tight shadow-sm ${
+                                  className={`text-[9px] px-1.5 py-0.5 rounded font-bold leading-tight shadow-sm ${
                                     isFull
                                       ? 'bg-red-300 text-red-800 border border-red-400'
                                       : slot.remaining_count < 10
@@ -445,13 +445,13 @@ const Booking = () => {
                               );
                             })}
                             {daySlots.length > 2 && (
-                              <div className="text-[10px] md:text-xs text-purple-600 font-bold bg-purple-100 px-2 py-1 rounded-lg">
-                                +{daySlots.length - 2} รอบ
+                              <div className="text-[9px] text-purple-600 font-bold bg-purple-100 px-1.5 py-0.5 rounded">
+                                +{daySlots.length - 2}
                               </div>
                             )}
                             {!dayIsPast && hasSlots && (
-                              <div className="text-[10px] md:text-xs text-purple-700 font-bold mt-1 bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-200">
-                                👆 คลิก
+                              <div className="text-[8px] text-purple-700 font-bold mt-0.5 bg-purple-50 px-1 py-0.5 rounded border border-purple-200">
+                                👆
                               </div>
                             )}
                           </div>
@@ -465,16 +465,16 @@ const Booking = () => {
 
             {/* Selected Date Slots */}
             {selectedDate && slotsByDate[formatDateKey(selectedDate)] && (
-              <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 border-2 border-purple-300 relative overflow-hidden">
+              <div className="bg-white rounded-xl shadow-xl p-4 md:p-6 border border-purple-200 relative overflow-hidden">
                 {/* Decorative background */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full blur-3xl opacity-50 -mr-32 -mt-32"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full blur-2xl opacity-40 -mr-16 -mt-16"></div>
                 
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center space-x-2 mb-2">
-                        <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-lg shadow-md">
-                          <FiCalendar size={18} />
+                      <h3 className="text-base md:text-lg font-bold text-gray-800 flex items-center space-x-2 mb-1">
+                        <div className="p-1.5 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-lg shadow-md">
+                          <FiCalendar size={14} />
                         </div>
                         <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                           {selectedDate.toLocaleDateString('th-TH', {
@@ -485,18 +485,18 @@ const Booking = () => {
                           })}
                         </span>
                       </h3>
-                      <p className="text-sm text-gray-600 ml-10 font-medium">เลือกรอบที่ต้องการจอง</p>
+                      <p className="text-xs text-gray-600 ml-7 font-medium">เลือกรอบที่ต้องการจอง</p>
                     </div>
                     <button
                       onClick={() => setSelectedDate(null)}
-                      className="p-3 hover:bg-gray-100 rounded-xl transition-all transform hover:scale-110 shadow-md"
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-all transform hover:scale-110 shadow-sm"
                       title="ปิด"
                     >
-                      <FiX size={24} className="text-gray-500" />
+                      <FiX size={20} className="text-gray-500" />
                     </button>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {slotsByDate[formatDateKey(selectedDate)].map((slot) => {
                     if (!slot || !slot.exam_id) {
                       console.error('Invalid slot:', slot);
@@ -513,11 +513,11 @@ const Booking = () => {
                           isFull
                             ? 'from-gray-50 to-gray-100'
                             : 'from-purple-50 via-indigo-50 to-pink-50'
-                        } rounded-2xl shadow-lg border-2 ${
+                        } rounded-xl shadow-lg border-2 ${
                           isFull
                             ? 'border-gray-300 opacity-60'
                             : 'border-purple-300 hover:border-purple-500'
-                        } p-6 md:p-7 transition-all transform hover:scale-105 hover:shadow-2xl overflow-hidden`}
+                        } p-4 transition-all transform hover:scale-105 hover:shadow-xl overflow-hidden`}
                         style={{ pointerEvents: 'auto' }}
                       >
                         {/* Shine effect */}
@@ -525,24 +525,24 @@ const Booking = () => {
                           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                         )}
                         
-                        <div className="space-y-5 relative z-10" style={{ pointerEvents: 'none' }}>
+                        <div className="space-y-3 relative z-10" style={{ pointerEvents: 'none' }}>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-2">
-                              <div className="p-2 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-lg shadow-md">
-                                <FiClock size={16} />
+                              <div className="p-1.5 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-lg shadow-md">
+                                <FiClock size={14} />
                               </div>
-                <div>
-                                <span className="text-base font-semibold text-gray-800 block">
+                              <div>
+                                <span className="text-sm font-semibold text-gray-800 block">
                                   {slot.start_time} - {slot.end_time} น.
                                 </span>
-                                <span className="text-xs text-gray-600">รอบฝึกปฏิบัติ</span>
+                                <span className="text-[10px] text-gray-600">รอบฝึกปฏิบัติ</span>
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between bg-white rounded-lg p-3 border-2 border-gray-200 shadow-sm">
-                            <span className="text-sm font-semibold text-gray-700">ที่นั่งว่าง</span>
-                            <span className={`px-3 py-1.5 rounded-full font-semibold text-sm shadow-sm ${
+                          <div className="flex items-center justify-between bg-white rounded-lg p-2 border border-gray-200 shadow-sm">
+                            <span className="text-xs font-semibold text-gray-700">ที่นั่งว่าง</span>
+                            <span className={`px-2 py-1 rounded-full font-semibold text-xs shadow-sm ${
                               isFull
                                 ? 'bg-red-200 text-red-700 border-2 border-red-300'
                                 : slot.remaining_count < 10
@@ -592,7 +592,7 @@ const Booking = () => {
                               handleBook(slot.exam_id, e);
                             }}
                             disabled={isFull || isBooking || !!registration}
-                            className={`w-full py-3 rounded-lg font-semibold text-base shadow-md transition-all relative z-50 transform hover:scale-105 active:scale-95 ${
+                            className={`w-full py-2.5 rounded-lg font-semibold text-sm shadow-md transition-all relative z-50 transform hover:scale-105 active:scale-95 ${
                               isFull || registration
                                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
                                 : isBooking
@@ -607,23 +607,23 @@ const Booking = () => {
                             }}
                           >
                             {isBooking ? (
-                              <span className="flex items-center justify-center space-x-3">
-                                <div className="animate-spin rounded-full h-6 w-6 border-3 border-white border-t-transparent"></div>
+                              <span className="flex items-center justify-center space-x-2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
                                 <span>กำลังจอง...</span>
                               </span>
                             ) : isFull ? (
-                              <span className="flex items-center justify-center space-x-3">
-                                <FiAlertCircle size={24} />
+                              <span className="flex items-center justify-center space-x-2">
+                                <FiAlertCircle size={16} />
                                 <span>รอบเต็มแล้ว</span>
                               </span>
                             ) : registration ? (
-                              <span className="flex items-center justify-center space-x-3">
-                                <FiCheckCircle size={24} />
+                              <span className="flex items-center justify-center space-x-2">
+                                <FiCheckCircle size={16} />
                                 <span>จองแล้ว</span>
                               </span>
                             ) : (
-                              <span className="flex items-center justify-center space-x-3">
-                                <FiCheckCircle size={24} />
+                              <span className="flex items-center justify-center space-x-2">
+                                <FiCheckCircle size={16} />
                                 <span>จองรอบนี้</span>
                               </span>
                             )}
@@ -656,23 +656,23 @@ const Booking = () => {
         )}
 
         {/* Requirements Section */}
-        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 rounded-xl p-6 shadow-md mb-8">
-          <div className="flex items-start space-x-4">
-            <div className="p-3 bg-blue-100 rounded-xl flex-shrink-0">
-              <FiAlertCircle size={24} className="text-blue-600" />
+        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-4 shadow-md mb-6">
+          <div className="flex items-start space-x-3">
+            <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+              <FiAlertCircle size={18} className="text-blue-600" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-bold text-blue-800 mb-3">ข้อกำหนดการฝึกปฏิบัติ</h3>
-              <ul className="text-sm text-blue-700 space-y-2">
-                <li className="flex items-start space-x-2">
+              <h3 className="text-base font-bold text-blue-800 mb-2">ข้อกำหนดการฝึกปฏิบัติ</h3>
+              <ul className="text-xs text-blue-700 space-y-1.5">
+                <li className="flex items-start space-x-1.5">
                   <span className="text-blue-500 font-bold">•</span>
                   <span>กรุณาแต่งกายชุดนักศึกษาให้เรียบร้อย</span>
                 </li>
-                <li className="flex items-start space-x-2">
+                <li className="flex items-start space-x-1.5">
                   <span className="text-blue-500 font-bold">•</span>
                   <span>นำสมุดจดบันทึกและอุปกรณ์การเขียนมาให้พร้อม</span>
                 </li>
-                <li className="flex items-start space-x-2">
+                <li className="flex items-start space-x-1.5">
                   <span className="text-blue-500 font-bold">•</span>
                   <span>สามารถยกเลิกและเปลี่ยนรอบได้ไม่เกิน 24 ชม. ก่อนเริ่ม</span>
                 </li>
@@ -683,70 +683,70 @@ const Booking = () => {
       </div>
 
       {showCancelConfirm && (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-12 border-4 border-red-200">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-4xl font-bold text-gray-800 flex items-center space-x-4">
-              <div className="p-4 bg-red-100 rounded-2xl">
-                <FiAlertCircle className="text-red-600" size={40} />
-              </div>
-              <span>ยืนยันการยกเลิก</span>
-            </h3>
-            <button
-              onClick={() => setShowCancelConfirm(false)}
-              className="p-3 hover:bg-gray-100 rounded-xl transition-colors"
-            >
-              <FiX size={32} className="text-gray-500" />
-            </button>
-          </div>
-        
-          <p className="text-2xl text-gray-700 mb-10">
-            คุณต้องการยกเลิกการจองรอบฝึกปฏิบัตินี้ใช่หรือไม่?
-          </p>
-        
-          {bookedSlot && (
-            <div className="bg-gray-50 rounded-2xl p-8 mb-10 border-2 border-gray-200">
-              <div className="space-y-4 text-xl">
-                <div className="flex items-center space-x-4">
-                  <FiCalendar className="text-gray-600" size={28} />
-                  <span className="font-bold">วันที่: {bookedSlot.date}</span>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border-2 border-red-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800 flex items-center space-x-2">
+                <div className="p-2 bg-red-100 rounded-xl">
+                  <FiAlertCircle className="text-red-600" size={24} />
                 </div>
-                <div className="flex items-center space-x-4">
-                  <FiClock className="text-gray-600" size={28} />
-                  <span className="font-bold">เวลา: {bookedSlot.start_time} - {bookedSlot.end_time} น.</span>
-                </div>
-              </div>
+                <span>ยืนยันการยกเลิก</span>
+              </h3>
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <FiX size={20} className="text-gray-500" />
+              </button>
             </div>
-          )}
-        
-          <div className="flex items-center justify-end space-x-4">
-            <button
-              onClick={() => setShowCancelConfirm(false)}
-              className="px-8 py-4 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-bold text-xl transition-colors"
-            >
-              ยกเลิก
-            </button>
-            <button
-              onClick={confirmCancel}
-              disabled={cancelling}
-              className="px-8 py-4 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold text-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-3"
-            >
-              {cancelling ? (
-                <>
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent"></div>
-                  <span>กำลังยกเลิก...</span>
-                </>
-              ) : (
-                <>
-                  <FiTrash2 size={24} />
-                  <span>ยืนยันยกเลิก</span>
-                </>
-              )}
-            </button>
+          
+            <p className="text-base text-gray-700 mb-6">
+              คุณต้องการยกเลิกการจองรอบฝึกปฏิบัตินี้ใช่หรือไม่?
+            </p>
+          
+            {bookedSlot && (
+              <div className="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-200">
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <FiCalendar className="text-gray-600" size={16} />
+                    <span className="font-bold">วันที่: {bookedSlot.date}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <FiClock className="text-gray-600" size={16} />
+                    <span className="font-bold">เวลา: {bookedSlot.start_time} - {bookedSlot.end_time} น.</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          
+            <div className="flex items-center justify-end space-x-3">
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold text-sm transition-colors"
+              >
+                ยกเลิก
+              </button>
+              <button
+                onClick={confirmCancel}
+                disabled={cancelling}
+                className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {cancelling ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    <span>กำลังยกเลิก...</span>
+                  </>
+                ) : (
+                  <>
+                    <FiTrash2 size={16} />
+                    <span>ยืนยันยกเลิก</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
