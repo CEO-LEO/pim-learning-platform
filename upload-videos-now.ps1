@@ -1,61 +1,128 @@
-# Upload videos to Railway Volume - Complete automation
-Write-Host "Uploading Videos to Railway Volume" -ForegroundColor Cyan
+# Upload Videos to Railway Volume
+$ErrorActionPreference = "Stop"
+
+Write-Host "=== Uploading Videos to Railway Volume ===" -ForegroundColor Cyan
 Write-Host ""
 
-# Check Railway CLI
-$hasRailway = Get-Command railway -ErrorAction SilentlyContinue
-if (-not $hasRailway) {
-    Write-Host "Installing Railway CLI..." -ForegroundColor Yellow
-    npm install -g @railway/cli
-}
-
-# Check login
-Write-Host "Checking Railway login..." -ForegroundColor Yellow
-railway whoami 2>&1 | Out-Null
+# Check if railway is linked
+Write-Host "Checking Railway project status..." -ForegroundColor Yellow
+$projectInfo = railway status 2>&1
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "Please login first: railway login" -ForegroundColor Red
+    Write-Host "Error: Not linked to Railway project" -ForegroundColor Red
     exit 1
 }
 
-# Check project
-Write-Host "Checking Railway project..." -ForegroundColor Yellow
-railway status 2>&1 | Out-Null
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Please link project first: railway link" -ForegroundColor Red
+Write-Host "Railway project linked successfully" -ForegroundColor Green
+
+# Get Railway backend URL - use direct approach
+Write-Host "`nGetting Railway backend URL..." -ForegroundColor Yellow
+$backendUrl = "https://pim-learning-platform-production.up.railway.app"
+Write-Host "Backend URL: $backendUrl" -ForegroundColor Green
+
+# Video files
+$videosDir = "server/uploads/videos"
+if (-not (Test-Path $videosDir)) {
+    Write-Host "Error: Videos directory not found: $videosDir" -ForegroundColor Red
     exit 1
 }
 
-Write-Host ""
-Write-Host "IMPORTANT: Create Railway Volume first!" -ForegroundColor Yellow
-Write-Host "  1. Go to Railway Dashboard -> Volumes" -ForegroundColor White
-Write-Host "  2. Create Volume with mount path: /app/server/uploads/videos" -ForegroundColor White
-Write-Host ""
-
-$continue = Read-Host "Volume created? (y/n)"
-if ($continue -ne "y" -and $continue -ne "Y") {
-    Write-Host "Please create volume first" -ForegroundColor Yellow
-    exit 0
+$videoFiles = Get-ChildItem -Path $videosDir -Filter "*.mp4"
+Write-Host "`nFound $($videoFiles.Count) video files:" -ForegroundColor Cyan
+foreach ($file in $videoFiles) {
+    $sizeMB = [math]::Round($file.Length / 1MB, 2)
+    Write-Host "  - $($file.Name) ($sizeMB MB)" -ForegroundColor Gray
 }
 
-Write-Host ""
-Write-Host "Method 1: Using Railway Dashboard (Easiest)" -ForegroundColor Cyan
-Write-Host "  1. Go to Railway Dashboard -> Volumes" -ForegroundColor White
-Write-Host "  2. Click on your volume" -ForegroundColor White
-Write-Host "  3. Use File Manager to upload files from: server/uploads/videos/" -ForegroundColor White
-Write-Host ""
-
-Write-Host "Method 2: Using Railway CLI" -ForegroundColor Cyan
-Write-Host "  Run: railway volume mount" -ForegroundColor White
-Write-Host "  Then copy files to the mount path shown" -ForegroundColor White
-Write-Host ""
-
-Write-Host "Files to upload (11 files):" -ForegroundColor Yellow
-Get-ChildItem -Path "server/uploads/videos" -Filter "*.mp4" | ForEach-Object {
-    Write-Host "  - $($_.Name) ($([math]::Round($_.Length/1MB, 2)) MB)" -ForegroundColor Gray
+# Check if upload endpoint is ready
+Write-Host "`nChecking upload endpoint..." -ForegroundColor Yellow
+try {
+    $response = Invoke-WebRequest -Uri "$backendUrl/api/temp-upload/status" -Method Get -TimeoutSec 10
+    $status = $response.Content | ConvertFrom-Json
+    Write-Host "Upload endpoint is ready" -ForegroundColor Green
+    Write-Host "  Current files in volume: $($status.filesInVolume)" -ForegroundColor Gray
+} catch {
+    Write-Host "Warning: Upload endpoint not accessible yet" -ForegroundColor Yellow
+    Write-Host "  Error: $($_.Exception.Message)" -ForegroundColor Gray
+    Write-Host "`nWaiting 30 more seconds for deployment..." -ForegroundColor Yellow
+    Start-Sleep -Seconds 30
+    
+    # Try again
+    try {
+        $response = Invoke-WebRequest -Uri "$backendUrl/api/temp-upload/status" -Method Get -TimeoutSec 10
+        Write-Host "Upload endpoint is now ready" -ForegroundColor Green
+    } catch {
+        Write-Host "Error: Upload endpoint still not accessible" -ForegroundColor Red
+        Write-Host "Please wait a few more minutes and run this script again" -ForegroundColor Yellow
+        exit 1
+    }
 }
 
-Write-Host ""
-Write-Host "After uploading, verify with:" -ForegroundColor Cyan
-Write-Host "  node server/scripts/check-backend-videos.js" -ForegroundColor White
-Write-Host ""
+# Upload each video file
+Write-Host "`n=== Uploading Video Files ===" -ForegroundColor Cyan
+$uploadedCount = 0
+$totalSize = 0
 
+foreach ($file in $videoFiles) {
+    $sizeMB = [math]::Round($file.Length / 1MB, 2)
+    $fileName = $file.Name
+    Write-Host "`nUploading: $fileName (${sizeMB} MB)..." -ForegroundColor Cyan
+    
+    try {
+        # Use Invoke-WebRequest with multipart form
+        $formData = @{
+            video = Get-Item -Path $file.FullName
+        }
+        
+        $response = Invoke-WebRequest -Uri "$backendUrl/api/temp-upload/upload" `
+            -Method Post `
+            -Form $formData `
+            -TimeoutSec 300 `
+            -ContentType "multipart/form-data"
+        
+        $result = $response.Content | ConvertFrom-Json
+        
+        if ($result.success) {
+            $uploadedCount++
+            $totalSize += $file.Length
+            Write-Host "  Upload successful!" -ForegroundColor Green
+            Write-Host "    Server confirmed: $($result.filename) ($($result.sizeInMB) MB)" -ForegroundColor Gray
+        } else {
+            Write-Host "  Upload failed" -ForegroundColor Red
+        }
+    } catch {
+        Write-Host "  Upload error: $($_.Exception.Message)" -ForegroundColor Red
+    }
+    
+    # Small delay between uploads
+    Start-Sleep -Seconds 2
+}
+
+# Summary
+Write-Host "`n=== Upload Summary ===" -ForegroundColor Cyan
+if ($uploadedCount -eq $videoFiles.Count) {
+    Write-Host "Uploaded: $uploadedCount / $($videoFiles.Count) files" -ForegroundColor Green
+} else {
+    Write-Host "Uploaded: $uploadedCount / $($videoFiles.Count) files" -ForegroundColor Yellow
+}
+$totalSizeMB = [math]::Round($totalSize / 1MB, 2)
+Write-Host "Total size: $totalSizeMB MB" -ForegroundColor Gray
+
+# Verify upload
+Write-Host "`n=== Verifying Upload ===" -ForegroundColor Cyan
+try {
+    $response = Invoke-WebRequest -Uri "$backendUrl/api/temp-upload/status" -Method Get
+    $status = $response.Content | ConvertFrom-Json
+    Write-Host "Files in Railway Volume: $($status.filesInVolume)" -ForegroundColor Green
+    
+    if ($status.files) {
+        Write-Host "`nFiles on server:" -ForegroundColor Gray
+        foreach ($f in $status.files) {
+            Write-Host "  - $($f.name) ($($f.sizeInMB) MB)" -ForegroundColor Gray
+        }
+    }
+} catch {
+    Write-Host "Warning: Could not verify upload: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
+Write-Host "`nUpload process complete!" -ForegroundColor Green
+Write-Host "`nNext step: Test videos on website: https://pim-learning-platform.vercel.app" -ForegroundColor Cyan

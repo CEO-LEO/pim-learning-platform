@@ -11,11 +11,17 @@
     "build": "cd client && npm install && npm run build",
     "vercel-build": "cd client && npm install && npm run build"
   },
-  "keywords": ["education", "learning", "pim"],
+  "keywords": [
+    "education",
+    "learning",
+    "pim"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "form-data": "^4.0.5"
   }
 }
-

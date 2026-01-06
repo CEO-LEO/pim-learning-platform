@@ -278,7 +278,7 @@ const Booking = () => {
                     <span>อัพเดทล่าสุด: {lastUpdate.toLocaleTimeString('th-TH')}</span>
                   </p>
                 )}
-              </div>
+            </div>
             </div>
           </div>
         </div>
@@ -291,13 +291,13 @@ const Booking = () => {
                 <div className="flex items-center space-x-3">
                   <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-xl shadow-lg">
                     <FiCheckCircle size={24} />
-                  </div>
-                  <div>
+            </div>
+            <div>
                     <h2 className="text-lg font-bold text-green-800 mb-1">คุณได้จองรอบฝึกปฏิบัติแล้ว</h2>
                     <p className="text-sm text-green-600">กรุณาเตรียมบัตรนักศึกษาและมาให้ตรงเวลา</p>
                   </div>
-                </div>
-              </div>
+            </div>
+          </div>
           
               <div className="bg-white rounded-xl p-4 border-2 border-green-200 shadow-md mb-4">
                 <div className="space-y-3">
@@ -308,21 +308,21 @@ const Booking = () => {
                   <div className="flex items-center text-sm space-x-2">
                     <FiClock className="text-green-600 flex-shrink-0" size={16} />
                     <span className="font-bold text-gray-800">เวลา: {bookedSlot.start_time} - {bookedSlot.end_time} น.</span>
-                  </div>
+            </div>
                   <div className="flex items-center text-sm space-x-2">
                     <FiMapPin className="text-green-600 flex-shrink-0" size={16} />
                     <span className="font-bold text-gray-800">สถานที่: 7-Eleven Demonstration Store ชั้น 2</span>
-                  </div>
-                </div>
-              </div>
+            </div>
+            </div>
+          </div>
 
-              <button
+          <button
                 onClick={handleCancelClick}
                 className="flex items-center space-x-2 text-red-600 hover:text-red-700 font-semibold text-sm transition-colors"
-              >
+          >
                 <FiTrash2 size={16} />
-                <span>ยกเลิกการจอง</span>
-              </button>
+            <span>ยกเลิกการจอง</span>
+          </button>
             </div>
         </div>
         ) : (
@@ -531,7 +531,7 @@ const Booking = () => {
                               <div className="p-1.5 bg-gradient-to-br from-purple-500 to-indigo-500 text-white rounded-lg shadow-md">
                                 <FiClock size={14} />
                               </div>
-                              <div>
+                <div>
                                 <span className="text-sm font-semibold text-gray-800 block">
                                   {slot.start_time} - {slot.end_time} น.
                                 </span>
@@ -683,70 +683,70 @@ const Booking = () => {
       </div>
 
       {showCancelConfirm && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border-2 border-red-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800 flex items-center space-x-2">
                 <div className="p-2 bg-red-100 rounded-xl">
                   <FiAlertCircle className="text-red-600" size={24} />
-                </div>
-                <span>ยืนยันการยกเลิก</span>
-              </h3>
-              <button
-                onClick={() => setShowCancelConfirm(false)}
+              </div>
+              <span>ยืนยันการยกเลิก</span>
+            </h3>
+            <button
+              onClick={() => setShowCancelConfirm(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
+            >
                 <FiX size={20} className="text-gray-500" />
-              </button>
-            </div>
-          
+            </button>
+          </div>
+        
             <p className="text-base text-gray-700 mb-6">
-              คุณต้องการยกเลิกการจองรอบฝึกปฏิบัตินี้ใช่หรือไม่?
-            </p>
-          
-            {bookedSlot && (
+            คุณต้องการยกเลิกการจองรอบฝึกปฏิบัตินี้ใช่หรือไม่?
+          </p>
+        
+          {bookedSlot && (
               <div className="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-200">
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center space-x-2">
                     <FiCalendar className="text-gray-600" size={16} />
-                    <span className="font-bold">วันที่: {bookedSlot.date}</span>
-                  </div>
+                  <span className="font-bold">วันที่: {bookedSlot.date}</span>
+                </div>
                   <div className="flex items-center space-x-2">
                     <FiClock className="text-gray-600" size={16} />
-                    <span className="font-bold">เวลา: {bookedSlot.start_time} - {bookedSlot.end_time} น.</span>
-                  </div>
+                  <span className="font-bold">เวลา: {bookedSlot.start_time} - {bookedSlot.end_time} น.</span>
                 </div>
               </div>
-            )}
-          
-            <div className="flex items-center justify-end space-x-3">
-              <button
-                onClick={() => setShowCancelConfirm(false)}
-                className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold text-sm transition-colors"
-              >
-                ยกเลิก
-              </button>
-              <button
-                onClick={confirmCancel}
-                disabled={cancelling}
-                className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-              >
-                {cancelling ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    <span>กำลังยกเลิก...</span>
-                  </>
-                ) : (
-                  <>
-                    <FiTrash2 size={16} />
-                    <span>ยืนยันยกเลิก</span>
-                  </>
-                )}
-              </button>
             </div>
+          )}
+        
+            <div className="flex items-center justify-end space-x-3">
+            <button
+              onClick={() => setShowCancelConfirm(false)}
+                className="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-semibold text-sm transition-colors"
+            >
+              ยกเลิก
+            </button>
+            <button
+              onClick={confirmCancel}
+              disabled={cancelling}
+                className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-semibold text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              {cancelling ? (
+                <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  <span>กำลังยกเลิก...</span>
+                </>
+              ) : (
+                <>
+                    <FiTrash2 size={16} />
+                  <span>ยืนยันยกเลิก</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
