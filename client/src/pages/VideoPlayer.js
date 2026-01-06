@@ -5,7 +5,10 @@ import { FiCheckCircle, FiClock, FiArrowLeft, FiAlertCircle, FiBook } from 'reac
 import { CardSkeleton } from '../components/LoadingSkeleton';
 import Toast from '../components/Toast';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// Always use production Railway backend URL as fallback
+const PRODUCTION_API_URL = 'https://pim-learning-platform-production.up.railway.app/api';
+const API_URL = process.env.REACT_APP_API_URL || PRODUCTION_API_URL;
+
 // Use API_URL base for video URLs if SERVER_URL is not set
 const getServerUrl = () => {
   if (process.env.REACT_APP_SERVER_URL) {
@@ -15,7 +18,8 @@ const getServerUrl = () => {
   if (API_URL.includes('/api')) {
     return API_URL.replace('/api', '');
   }
-  return 'http://localhost:5000';
+  // Fallback to production server
+  return 'https://pim-learning-platform-production.up.railway.app';
 };
 const SERVER_URL = getServerUrl();
 
