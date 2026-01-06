@@ -152,16 +152,16 @@ const Calendar = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50" style={{ marginTop: 0, paddingTop: '3rem', paddingBottom: '4rem' }}>
       <div className="w-full max-w-full mx-auto px-8 lg:px-12 xl:px-16">
         {/* Header */}
-        <div className="mb-16">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 mb-6">
+        <div className="mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
             <div>
-              <h1 className="text-7xl sm:text-8xl lg:text-9xl font-bold text-gray-800 mb-8 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 ปฏิทินกิจกรรม
               </h1>
-              <p className="text-4xl text-gray-600">ดูและจัดการกิจกรรมทั้งหมด</p>
+              <p className="text-base text-gray-600">ดูและจัดการกิจกรรมทั้งหมด</p>
               {lastUpdate && (
-                <p className="text-xl text-gray-500 mt-4 flex items-center space-x-3">
-                  <FiRefreshCw size={24} className="animate-spin" />
+                <p className="text-xs text-gray-500 mt-2 flex items-center space-x-2">
+                  <FiRefreshCw size={14} className="animate-spin" />
                   <span>อัพเดทล่าสุด: {lastUpdate.toLocaleTimeString('th-TH')}</span>
                 </p>
               )}
@@ -169,38 +169,38 @@ const Calendar = () => {
             {isAdminOrInstructor && (
               <button
                 onClick={() => setShowModal(true)}
-                className="inline-flex items-center space-x-4 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white px-10 py-5 rounded-xl font-bold text-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
-                <FiPlus size={32} />
+                <FiPlus size={18} />
                 <span>เพิ่มกิจกรรม</span>
               </button>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar View */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4">
             {/* Date Selector */}
-            <div className="bg-white rounded-3xl shadow-xl p-10">
-              <div className="flex items-center justify-between mb-10">
-                <h2 className="text-4xl font-bold text-gray-800">
+            <div className="bg-white rounded-xl shadow-xl p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-800">
                   {selectedDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' })}
                 </h2>
                 <input
                   type="date"
                   value={selectedDate.toISOString().split('T')[0]}
                   onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                  className="px-8 py-4 border-2 border-gray-200 rounded-xl text-xl focus:ring-4 focus:ring-purple-100 focus:border-purple-500 focus:outline-none transition-all"
+                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-100 focus:border-purple-500 focus:outline-none transition-all"
                 />
               </div>
 
               {/* Events for Selected Date */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {todayEvents.length === 0 ? (
-                  <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl">
-                    <FiCalendar className="mx-auto text-gray-400 mb-4" size={48} />
-                    <p className="text-gray-500 text-lg">ไม่มีกิจกรรมในวันนี้</p>
+                  <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
+                    <FiCalendar className="mx-auto text-gray-400 mb-3" size={32} />
+                    <p className="text-gray-500 text-sm">ไม่มีกิจกรรมในวันนี้</p>
                   </div>
                 ) : (
                   todayEvents.map((event) => {
@@ -215,35 +215,35 @@ const Calendar = () => {
           </div>
 
           {/* Upcoming Events Sidebar */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-3xl shadow-xl p-10">
-              <h2 className="text-4xl font-bold text-gray-800 mb-10 flex items-center space-x-4">
-                <div className="p-4 bg-purple-100 rounded-2xl">
-                  <FiClock className="text-purple-600" size={36} />
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl shadow-xl p-6">
+              <h2 className="text-lg font-bold text-gray-800 mb-6 flex items-center space-x-2">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <FiClock className="text-purple-600" size={20} />
                 </div>
                 <span>กิจกรรมที่กำลังจะมาถึง</span>
               </h2>
               
               {upcomingEvents.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl">
-                  <p className="text-gray-500 text-lg">ไม่มีกิจกรรมที่กำลังจะมาถึง</p>
+                <div className="text-center py-8 border-2 border-dashed border-gray-300 rounded-xl">
+                  <p className="text-gray-500 text-sm">ไม่มีกิจกรรมที่กำลังจะมาถึง</p>
                 </div>
               ) : (
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {upcomingEvents.map((event) => {
                     const typeConfig = getEventTypeConfig(event.event_type);
                     return (
                       <div
                         key={event.event_id}
-                        className={`border-l-4 ${typeConfig.border} bg-gradient-to-r ${typeConfig.bg} to-white rounded-3xl p-8 hover:shadow-xl transition-all`}
+                        className={`border-l-4 ${typeConfig.border} bg-gradient-to-r ${typeConfig.bg} to-white rounded-xl p-4 hover:shadow-lg transition-all`}
                       >
-                        <h3 className="font-bold text-gray-800 text-lg mb-3">{event.title}</h3>
+                        <h3 className="font-bold text-gray-800 text-sm mb-2">{event.title}</h3>
                         {event.description && (
-                          <p className="text-base text-gray-600 mb-4 line-clamp-2">{event.description}</p>
+                          <p className="text-xs text-gray-600 mb-2 line-clamp-2">{event.description}</p>
                         )}
-                        <div className="flex items-center space-x-3 text-base text-gray-500">
-                          <FiClock size={20} />
-                          <span className="font-bold">
+                        <div className="flex items-center space-x-2 text-xs text-gray-500">
+                          <FiClock size={14} />
+                          <span className="font-semibold">
                             {new Date(event.event_date).toLocaleDateString('th-TH', { 
                               day: 'numeric', 
                               month: 'short', 
@@ -402,21 +402,21 @@ const Calendar = () => {
 // Event Card Component
 const EventCard = ({ event, typeConfig }) => {
   return (
-    <div className={`border-l-4 ${typeConfig.border} bg-white rounded-3xl p-12 hover:shadow-2xl transition-all duration-300`}>
+    <div className={`border-l-4 ${typeConfig.border} bg-white rounded-xl p-6 hover:shadow-xl transition-all duration-300`}>
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center space-x-5 mb-5">
-            <span className={`px-5 py-2.5 rounded-full text-base font-bold ${typeConfig.bg} ${typeConfig.text}`}>
+          <div className="flex items-center space-x-3 mb-3">
+            <span className={`px-3 py-1 rounded-full text-xs font-bold ${typeConfig.bg} ${typeConfig.text}`}>
               {typeConfig.label}
             </span>
-            <h3 className="text-3xl font-bold text-gray-800">{event.title}</h3>
+            <h3 className="text-lg font-bold text-gray-800">{event.title}</h3>
           </div>
           {event.description && (
-            <p className="text-gray-600 mb-8 leading-relaxed text-xl">{event.description}</p>
+            <p className="text-gray-600 mb-4 leading-relaxed text-sm">{event.description}</p>
           )}
-          <div className="flex items-center space-x-4 text-lg text-gray-500">
-            <FiClock size={24} />
-            <span className="font-bold">
+          <div className="flex items-center space-x-2 text-sm text-gray-500">
+            <FiClock size={16} />
+            <span className="font-semibold">
               {new Date(event.event_date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}
               {event.end_date && ` - ${new Date(event.end_date).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`}
             </span>
