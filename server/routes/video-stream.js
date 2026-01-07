@@ -215,7 +215,7 @@ function streamVideo(videoPath, req, res) {
   const contentType = getContentType(videoPath);
   const isHeadRequest = req.method === 'HEAD';
   
-2  console.log(`[VideoStream] Serving video: ${path.basename(videoPath)}, method: ${req.method}, size: ${fileSize}, range: ${range || 'none'}, content-type: ${contentType}`);
+  console.log(`[VideoStream] Serving video: ${path.basename(videoPath)}, method: ${req.method}, size: ${fileSize}, range: ${range || 'none'}, content-type: ${contentType}`);
   
   // Set CORS headers for video streaming
   res.setHeader('Access-Control-Allow-Origin', '*');
