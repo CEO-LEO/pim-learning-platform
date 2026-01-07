@@ -219,8 +219,7 @@ const VideoPlayer = () => {
                 'Accept': 'video/*'
               } : {
                 'Accept': 'video/*'
-              },
-              credentials: 'include'
+              }
             });
             
             console.log('[VideoPlayer] HEAD response:', {
