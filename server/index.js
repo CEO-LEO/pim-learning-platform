@@ -109,7 +109,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
 app.get('/api/health', (req, res) => {
   const fs = require('fs');
   const path = require('path');
-  const videosPath = path.join(__dirname, 'uploads', 'videos');
+  // Use Railway Volume mount path if available
+  const videosPath = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'uploads', 'videos');
   
   let videoFiles = [];
   let videoFilesExist = false;
@@ -206,7 +207,8 @@ app.get('/api/diagnose/video/:videoId', require('./routes/auth').authenticateTok
       filename = filename.split('/').pop();
     }
     
-    const videoPath = path.join(__dirname, 'uploads', 'videos', filename);
+    const videosDir = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'uploads', 'videos');
+    const videoPath = path.join(videosDir, filename);
     const fileExists = fs.existsSync(videoPath);
     
     res.json({
@@ -222,7 +224,7 @@ app.get('/api/diagnose/video/:videoId', require('./routes/auth').authenticateTok
       fileCheck: {
         expectedPath: videoPath,
         exists: fileExists,
-        directoryExists: fs.existsSync(path.join(__dirname, 'uploads', 'videos'))
+        directoryExists: fs.existsSync(videosDir)
       },
       constructedUrl: {
         base: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
@@ -243,7 +245,8 @@ app.get('/api/diagnose/videos/all', require('./routes/auth').authenticateToken, 
     return res.status(403).json({ error: 'Admin access required' });
   }
   
-  const videosPath = path.join(__dirname, 'uploads', 'videos');
+  // Use Railway Volume mount path if available
+  const videosPath = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'uploads', 'videos');
   const videosDirExists = fs.existsSync(videosPath);
   
   // Get all video files on server
@@ -273,7 +276,8 @@ app.get('/api/diagnose/videos/all', require('./routes/auth').authenticateToken, 
         filename = filename.split('/').pop();
       }
       
-      const videoPath = path.join(__dirname, 'uploads', 'videos', filename || '');
+      const videosDir = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'uploads', 'videos');
+      const videoPath = path.join(videosDir, filename || '');
       const fileExists = filename ? fs.existsSync(videoPath) : false;
       
       let fileSize = 0;
