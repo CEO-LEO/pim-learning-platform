@@ -90,7 +90,10 @@ router.head('/:filename', authenticateVideoRequest, handleVideoRequest);
 
 function handleVideoRequest(req, res) {
   const { filename } = req.params;
-  const videoPath = path.join(__dirname, '..', 'uploads', 'videos', filename);
+  // Use /app/server/uploads/videos for Railway Volume
+  const videoPath = process.env.RAILWAY_VOLUME_MOUNT_PATH 
+    ? path.join(process.env.RAILWAY_VOLUME_MOUNT_PATH, filename)
+    : path.join(__dirname, '..', 'uploads', 'videos', filename);
   
   console.log('[VideoStream] Processing video request:', {
     filename,
@@ -212,7 +215,7 @@ function streamVideo(videoPath, req, res) {
   const contentType = getContentType(videoPath);
   const isHeadRequest = req.method === 'HEAD';
   
-  console.log(`[VideoStream] Serving video: ${path.basename(videoPath)}, method: ${req.method}, size: ${fileSize}, range: ${range || 'none'}, content-type: ${contentType}`);
+2  console.log(`[VideoStream] Serving video: ${path.basename(videoPath)}, method: ${req.method}, size: ${fileSize}, range: ${range || 'none'}, content-type: ${contentType}`);
   
   // Set CORS headers for video streaming
   res.setHeader('Access-Control-Allow-Origin', '*');
