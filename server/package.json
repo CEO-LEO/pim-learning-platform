@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node --no-deprecation index.js"
+    "start": "node --no-deprecation index.js",
+    "setup:rooms": "node database/setup-rooms.js",
+    "check:system": "node database/check-system.js",
+    "seed": "node database/seed.js",
+    "create:admin": "node database/create-instructor.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.962.0",

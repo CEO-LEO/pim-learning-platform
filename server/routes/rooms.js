@@ -25,6 +25,38 @@ router.get('/bookings/:roomId/:date', authenticateToken, (req, res) => {
   );
 });
 
+// Helper function to notify admins about new booking
+function notifyAdminsAboutBooking(bookingData) {
+  // Get all admin users
+  db.all(
+    'SELECT user_id FROM users WHERE role IN ("admin", "instructor")',
+    [],
+    (err, admins) => {
+      if (err || !admins) return;
+      
+      // Create notification for each admin
+      admins.forEach(admin => {
+        const notificationId = uuidv4();
+        db.run(
+          `INSERT INTO notifications (notification_id, user_id, title, message, type, link) 
+           VALUES (?, ?, ?, ?, ?, ?)`,
+          [
+            notificationId,
+            admin.user_id,
+            '🔔 มีการจองห้องใหม่',
+            `${bookingData.userName} (${bookingData.studentId}) จองห้อง ${bookingData.roomName} วันที่ ${bookingData.date} เวลา ${bookingData.startTime}-${bookingData.endTime}`,
+            'room_booking',
+            `/admin/room-bookings`
+          ],
+          (notifyErr) => {
+            if (notifyErr) console.error('Failed to create notification:', notifyErr);
+          }
+        );
+      });
+    }
+  );
+}
+
 // Book a room
 router.post('/book', authenticateToken, (req, res) => {
   const { userId } = req.user;
@@ -54,6 +86,28 @@ router.post('/book', authenticateToken, (req, res) => {
       [bookingId, room_id, userId, booking_date, start_time, end_time],
       function(err) {
         if (err) return res.status(500).json({ error: 'Failed to book room' });
+        
+        // Get user and room details for notification
+        db.get(
+          `SELECT u.name as user_name, u.student_id, r.name as room_name
+           FROM users u, rooms r
+           WHERE u.user_id = ? AND r.room_id = ?`,
+          [userId, room_id],
+          (err, details) => {
+            if (!err && details) {
+              // Notify all admins about the new booking
+              notifyAdminsAboutBooking({
+                userName: details.user_name,
+                studentId: details.student_id,
+                roomName: details.room_name,
+                date: booking_date,
+                startTime: start_time,
+                endTime: end_time
+              });
+            }
+          }
+        );
+        
         res.json({ message: 'จองห้องสำเร็จ', booking_id: bookingId });
       }
     );

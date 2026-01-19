@@ -170,6 +170,29 @@ async function seed() {
   
   console.log(`✅ Created ${slots.length} practical exam slots for the next 12 weeks (Mon-Fri)`);
 
+  // Create sample rooms (will be skipped if already exists from init.js)
+  const sampleRooms = [
+    {
+      id: uuidv4(),
+      name: 'ห้องปฏิบัติการแคชเชียร์ (Cashier Lab)',
+      description: 'สำหรับฝึกทักษะการใช้เครื่อง POS และการบริการฐานเงิน',
+      capacity: 20
+    },
+    {
+      id: uuidv4(),
+      name: 'ห้องเตรียมสินค้าอุ่นร้อน (Food Prep Room)',
+      description: 'สำหรับฝึกการใช้อุปกรณ์อุ่นร้อนและสุขอนามัยอาหาร',
+      capacity: 15
+    }
+  ];
+
+  sampleRooms.forEach(room => {
+    db.run(
+      'INSERT OR IGNORE INTO rooms (room_id, name, description, capacity, status) VALUES (?, ?, ?, ?, ?)',
+      [room.id, room.name, room.description, room.capacity, 'available']
+    );
+  });
+
   console.log('✅ Database seeded successfully!');
 }
 

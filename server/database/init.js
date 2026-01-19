@@ -448,6 +448,8 @@ function generateWeeklyPracticalSlots() {
 }
 
 function insertDefaultData() {
+  const { v4: uuidv4 } = require('uuid');
+  
   const modules = [
     { id: 'module_1', title: 'การบริการ', description: 'ทักษะงานบริการ, ขั้นตอนงานแคชเชียร์, การสื่อสารกับลูกค้า', year: 1, order: 1 },
     { id: 'module_2', title: 'การเตรียมสินค้าอุ่นร้อน', description: 'วิธีใช้ตู้ร้อน, ขั้นตอนเตรียมสินค้า', year: 2, order: 2 },
@@ -467,6 +469,72 @@ function insertDefaultData() {
   db.run(`INSERT OR IGNORE INTO users (user_id, student_id, name, year_level, role, email, password_hash)
           VALUES (?, ?, ?, ?, ?, ?, ?)`,
     ['admin_1', 'ADMIN001', 'Admin User', null, 'admin', 'admin@pim.ac.th', adminPassword]);
+  
+  // Insert default rooms for 7-Eleven Demo Store training
+  const defaultRooms = [
+    {
+      id: uuidv4(),
+      name: 'ห้องปฏิบัติการแคชเชียร์ (Cashier Lab)',
+      description: 'สำหรับฝึกทักษะการใช้เครื่อง POS และการบริการฐานเงิน',
+      capacity: 20
+    },
+    {
+      id: uuidv4(),
+      name: 'ห้องเตรียมสินค้าอุ่นร้อน (Food Prep Room)',
+      description: 'สำหรับฝึกการใช้อุปกรณ์อุ่นร้อนและสุขอนามัยอาหาร',
+      capacity: 15
+    },
+    {
+      id: uuidv4(),
+      name: 'ห้องจัดเรียงสินค้า (Merchandise Room)',
+      description: 'สำหรับฝึกการจัดเรียงสินค้าและการตรวจสอบคุณภาพ',
+      capacity: 25
+    },
+    {
+      id: uuidv4(),
+      name: 'ห้องคลังสินค้า (Storage Room)',
+      description: 'สำหรับฝึกการรับสินค้า FIFO/FEFO และการนับสต๊อก',
+      capacity: 15
+    },
+    {
+      id: uuidv4(),
+      name: 'ห้องบรรยาย A (Lecture Room A)',
+      description: 'ห้องบรรยายพร้อมอุปกรณ์ AV ครบครัน',
+      capacity: 50
+    },
+    {
+      id: uuidv4(),
+      name: 'ห้องบรรยาย B (Lecture Room B)',
+      description: 'ห้องบรรยายขนาดกลางสำหรับกลุ่มย่อย',
+      capacity: 30
+    },
+    {
+      id: uuidv4(),
+      name: 'ห้องประชุมกลุ่มย่อย (Group Discussion Room)',
+      description: 'ห้องสำหรับกิจกรรมกลุ่มและแลกเปลี่ยนความคิดเห็น',
+      capacity: 12
+    },
+    {
+      id: uuidv4(),
+      name: 'Demo Store (ร้านสาธิต)',
+      description: 'ร้าน 7-Eleven จำลองสมจริงสำหรับฝึกปฏิบัติ',
+      capacity: 10
+    }
+  ];
+
+  defaultRooms.forEach(room => {
+    db.run(`INSERT OR IGNORE INTO rooms (room_id, name, description, capacity, status) 
+            VALUES (?, ?, ?, ?, ?)`,
+      [room.id, room.name, room.description, room.capacity, 'available'],
+      (err) => {
+        if (err) {
+          console.error(`Error inserting room ${room.name}:`, err.message);
+        }
+      }
+    );
+  });
+  
+  console.log(`✅ Initialized ${defaultRooms.length} default training rooms`);
 }
 
 module.exports = db;

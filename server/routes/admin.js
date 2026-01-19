@@ -522,5 +522,470 @@ router.get('/video/:videoId', authenticateToken, requireAdmin, (req, res) => {
   );
 });
 
+// ==================== ROOM MANAGEMENT ====================
+
+// Get all rooms
+router.get('/rooms', authenticateToken, requireAdmin, (req, res) => {
+  db.all('SELECT * FROM rooms ORDER BY name ASC', (err, rooms) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(rooms);
+  });
+});
+
+// Create room
+router.post('/rooms', authenticateToken, requireAdmin, (req, res) => {
+  const { name, description, capacity } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Room name is required' });
+  }
+
+  const roomId = uuidv4();
+  db.run(
+    'INSERT INTO rooms (room_id, name, description, capacity, status) VALUES (?, ?, ?, ?, ?)',
+    [roomId, name, description || '', capacity || 20, 'available'],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to create room' });
+      }
+      res.json({ 
+        room_id: roomId, 
+        message: 'สร้างห้องสำเร็จ',
+        room: { room_id: roomId, name, description, capacity, status: 'available' }
+      });
+    }
+  );
+});
+
+// Update room
+router.put('/rooms/:roomId', authenticateToken, requireAdmin, (req, res) => {
+  const { roomId } = req.params;
+  const { name, description, capacity, status } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: 'Room name is required' });
+  }
+
+  db.run(
+    'UPDATE rooms SET name = ?, description = ?, capacity = ?, status = ? WHERE room_id = ?',
+    [name, description || '', capacity || 20, status || 'available', roomId],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to update room' });
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Room not found' });
+      }
+      res.json({ message: 'อัพเดตข้อมูลห้องสำเร็จ' });
+    }
+  );
+});
+
+// Delete room
+router.delete('/rooms/:roomId', authenticateToken, requireAdmin, (req, res) => {
+  const { roomId } = req.params;
+
+  // Check if room has bookings
+  db.get(
+    'SELECT COUNT(*) as count FROM room_bookings WHERE room_id = ? AND status != "cancelled"',
+    [roomId],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+      
+      if (result.count > 0) {
+        return res.status(400).json({ 
+          error: 'ไม่สามารถลบห้องที่มีการจองอยู่ได้',
+          message: `มีการจอง ${result.count} รายการ กรุณายกเลิกการจองก่อน`
+        });
+      }
+
+      db.run('DELETE FROM rooms WHERE room_id = ?', [roomId], function(err) {
+        if (err) {
+          return res.status(500).json({ error: 'Failed to delete room' });
+        }
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'Room not found' });
+        }
+        res.json({ message: 'ลบห้องสำเร็จ' });
+      });
+    }
+  );
+});
+
+// ==================== ROOM BOOKINGS MANAGEMENT ====================
+
+// Get all room bookings with filters
+router.get('/room-bookings', authenticateToken, requireAdmin, (req, res) => {
+  const { room_id, status, date, user_id } = req.query;
+  
+  let query = `
+    SELECT 
+      rb.*,
+      r.name as room_name,
+      r.capacity,
+      u.name as user_name,
+      u.student_id
+    FROM room_bookings rb
+    JOIN rooms r ON rb.room_id = r.room_id
+    JOIN users u ON rb.user_id = u.user_id
+    WHERE 1=1
+  `;
+  
+  const params = [];
+  
+  if (room_id) {
+    query += ' AND rb.room_id = ?';
+    params.push(room_id);
+  }
+  
+  if (status) {
+    query += ' AND rb.status = ?';
+    params.push(status);
+  }
+  
+  if (date) {
+    query += ' AND rb.booking_date = ?';
+    params.push(date);
+  }
+  
+  if (user_id) {
+    query += ' AND rb.user_id = ?';
+    params.push(user_id);
+  }
+  
+  query += ' ORDER BY rb.booking_date DESC, rb.start_time ASC';
+  
+  db.all(query, params, (err, bookings) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(bookings);
+  });
+});
+
+// Get room booking statistics
+router.get('/room-bookings/statistics', authenticateToken, requireAdmin, (req, res) => {
+  const statsQuery = `
+    SELECT 
+      COUNT(*) as total_bookings,
+      SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_count,
+      SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_count,
+      SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) as cancelled_count,
+      SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_count
+    FROM room_bookings
+  `;
+  
+  db.get(statsQuery, [], (err, stats) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(stats);
+  });
+});
+
+// Get bookings for a specific room
+router.get('/room-bookings/room/:roomId', authenticateToken, requireAdmin, (req, res) => {
+  const { roomId } = req.params;
+  const { date } = req.query;
+  
+  let query = `
+    SELECT 
+      rb.*,
+      u.name as user_name,
+      u.student_id
+    FROM room_bookings rb
+    JOIN users u ON rb.user_id = u.user_id
+    WHERE rb.room_id = ?
+  `;
+  
+  const params = [roomId];
+  
+  if (date) {
+    query += ' AND rb.booking_date = ?';
+    params.push(date);
+  }
+  
+  query += ' ORDER BY rb.booking_date ASC, rb.start_time ASC';
+  
+  db.all(query, params, (err, bookings) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(bookings);
+  });
+});
+
+// Update room booking status
+router.put('/room-bookings/:bookingId/status', authenticateToken, requireAdmin, (req, res) => {
+  const { bookingId } = req.params;
+  const { status } = req.body;
+  
+  const validStatuses = ['pending', 'approved', 'cancelled', 'completed'];
+  
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ 
+      error: 'สถานะไม่ถูกต้อง',
+      message: 'สถานะต้องเป็น: pending, approved, cancelled, หรือ completed'
+    });
+  }
+  
+  db.run(
+    'UPDATE room_bookings SET status = ? WHERE booking_id = ?',
+    [status, bookingId],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to update booking status' });
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Booking not found' });
+      }
+      
+      const statusMessages = {
+        'pending': 'เปลี่ยนสถานะเป็นรอดำเนินการ',
+        'approved': 'อนุมัติการจองสำเร็จ',
+        'cancelled': 'ยกเลิกการจองสำเร็จ',
+        'completed': 'เปลี่ยนสถานะเป็นเสร็จสิ้น'
+      };
+      
+      res.json({ message: statusMessages[status] });
+    }
+  );
+});
+
+// Delete room booking
+router.delete('/room-bookings/:bookingId', authenticateToken, requireAdmin, (req, res) => {
+  const { bookingId } = req.params;
+  
+  db.run('DELETE FROM room_bookings WHERE booking_id = ?', [bookingId], function(err) {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to delete booking' });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Booking not found' });
+    }
+    res.json({ message: 'ลบการจองสำเร็จ' });
+  });
+});
+
+// Create room booking (by admin)
+router.post('/room-bookings', authenticateToken, requireAdmin, (req, res) => {
+  const { room_id, user_id, booking_date, start_time, end_time, status } = req.body;
+
+  if (!room_id || !user_id || !booking_date || !start_time || !end_time) {
+    return res.status(400).json({ error: 'กรุณากรอกข้อมูลให้ครบถ้วน' });
+  }
+
+  // Check for overlap
+  const checkQuery = `
+    SELECT * FROM room_bookings 
+    WHERE room_id = ? AND booking_date = ? AND status != "cancelled"
+    AND (
+      (start_time < ? AND end_time > ?) OR
+      (start_time < ? AND end_time > ?) OR
+      (start_time >= ? AND end_time <= ?)
+    )
+  `;
+
+  db.get(checkQuery, [room_id, booking_date, end_time, start_time, end_time, start_time, start_time, end_time], (err, overlap) => {
+    if (overlap) {
+      return res.status(400).json({ error: 'ช่วงเวลานี้ถูกจองแล้ว' });
+    }
+
+    const bookingId = uuidv4();
+    db.run(
+      'INSERT INTO room_bookings (booking_id, room_id, user_id, booking_date, start_time, end_time, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [bookingId, room_id, user_id, booking_date, start_time, end_time, status || 'approved'],
+      function(err) {
+        if (err) {
+          return res.status(500).json({ error: 'Failed to create booking' });
+        }
+        res.json({ 
+          message: 'สร้างการจองสำเร็จ', 
+          booking_id: bookingId 
+        });
+      }
+    );
+  });
+});
+
+// ==================== ADMIN DASHBOARD & ALERTS ====================
+
+// Get pending room bookings (รอการอนุมัติ) - สำหรับแสดงแจ้งเตือนในแผงควบคุม
+router.get('/room-bookings/pending', authenticateToken, requireAdmin, (req, res) => {
+  const query = `
+    SELECT 
+      rb.*,
+      r.name as room_name,
+      r.capacity,
+      u.name as user_name,
+      u.student_id,
+      u.phone
+    FROM room_bookings rb
+    JOIN rooms r ON rb.room_id = r.room_id
+    JOIN users u ON rb.user_id = u.user_id
+    WHERE rb.status = 'pending'
+    ORDER BY rb.created_at DESC
+  `;
+  
+  db.all(query, [], (err, bookings) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json({
+      count: bookings.length,
+      bookings: bookings
+    });
+  });
+});
+
+// Get recent room bookings (การจองล่าสุด) - สำหรับแดชบอร์ด
+router.get('/room-bookings/recent', authenticateToken, requireAdmin, (req, res) => {
+  const limit = req.query.limit || 10;
+  
+  const query = `
+    SELECT 
+      rb.*,
+      r.name as room_name,
+      u.name as user_name,
+      u.student_id
+    FROM room_bookings rb
+    JOIN rooms r ON rb.room_id = r.room_id
+    JOIN users u ON rb.user_id = u.user_id
+    ORDER BY rb.created_at DESC
+    LIMIT ?
+  `;
+  
+  db.all(query, [limit], (err, bookings) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(bookings);
+  });
+});
+
+// Get today's room bookings - ดูการจองวันนี้
+router.get('/room-bookings/today', authenticateToken, requireAdmin, (req, res) => {
+  const today = new Date().toISOString().split('T')[0];
+  
+  const query = `
+    SELECT 
+      rb.*,
+      r.name as room_name,
+      r.capacity,
+      u.name as user_name,
+      u.student_id,
+      u.phone
+    FROM room_bookings rb
+    JOIN rooms r ON rb.room_id = r.room_id
+    JOIN users u ON rb.user_id = u.user_id
+    WHERE rb.booking_date = ? AND rb.status != 'cancelled'
+    ORDER BY rb.start_time ASC
+  `;
+  
+  db.all(query, [today], (err, bookings) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json({
+      date: today,
+      count: bookings.length,
+      bookings: bookings
+    });
+  });
+});
+
+// Get room bookings dashboard summary - สรุปภาพรวมสำหรับแดชบอร์ด
+router.get('/dashboard/room-bookings', authenticateToken, requireAdmin, (req, res) => {
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Get various statistics
+  const queries = {
+    pending: 'SELECT COUNT(*) as count FROM room_bookings WHERE status = "pending"',
+    today: 'SELECT COUNT(*) as count FROM room_bookings WHERE booking_date = ? AND status != "cancelled"',
+    thisWeek: `
+      SELECT COUNT(*) as count FROM room_bookings 
+      WHERE booking_date >= date('now', 'weekday 0', '-7 days') 
+      AND booking_date <= date('now', 'weekday 0')
+      AND status != 'cancelled'
+    `,
+    thisMonth: `
+      SELECT COUNT(*) as count FROM room_bookings 
+      WHERE strftime('%Y-%m', booking_date) = strftime('%Y-%m', 'now')
+      AND status != 'cancelled'
+    `,
+    totalRooms: 'SELECT COUNT(*) as count FROM rooms WHERE status = "available"',
+    recentBookings: `
+      SELECT 
+        rb.booking_id,
+        rb.booking_date,
+        rb.start_time,
+        rb.end_time,
+        rb.status,
+        rb.created_at,
+        r.name as room_name,
+        u.name as user_name,
+        u.student_id
+      FROM room_bookings rb
+      JOIN rooms r ON rb.room_id = r.room_id
+      JOIN users u ON rb.user_id = u.user_id
+      ORDER BY rb.created_at DESC
+      LIMIT 5
+    `
+  };
+  
+  const results = {};
+  let completed = 0;
+  const totalQueries = Object.keys(queries).length;
+  
+  // Execute all queries
+  db.get(queries.pending, [], (err, result) => {
+    if (!err) results.pendingCount = result.count;
+    if (++completed === totalQueries) sendResponse();
+  });
+  
+  db.get(queries.today, [today], (err, result) => {
+    if (!err) results.todayCount = result.count;
+    if (++completed === totalQueries) sendResponse();
+  });
+  
+  db.get(queries.thisWeek, [], (err, result) => {
+    if (!err) results.weekCount = result.count;
+    if (++completed === totalQueries) sendResponse();
+  });
+  
+  db.get(queries.thisMonth, [], (err, result) => {
+    if (!err) results.monthCount = result.count;
+    if (++completed === totalQueries) sendResponse();
+  });
+  
+  db.get(queries.totalRooms, [], (err, result) => {
+    if (!err) results.totalRooms = result.count;
+    if (++completed === totalQueries) sendResponse();
+  });
+  
+  db.all(queries.recentBookings, [], (err, bookings) => {
+    if (!err) results.recentBookings = bookings;
+    if (++completed === totalQueries) sendResponse();
+  });
+  
+  function sendResponse() {
+    res.json({
+      summary: {
+        pendingBookings: results.pendingCount || 0,
+        todayBookings: results.todayCount || 0,
+        weekBookings: results.weekCount || 0,
+        monthBookings: results.monthCount || 0,
+        totalRooms: results.totalRooms || 0
+      },
+      recentBookings: results.recentBookings || [],
+      lastUpdated: new Date().toISOString()
+    });
+  }
+});
+
 module.exports = router;
 

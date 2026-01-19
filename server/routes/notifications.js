@@ -84,5 +84,49 @@ router.delete('/:notificationId', authenticateToken, (req, res) => {
   );
 });
 
+// Get notifications by type (e.g., room_booking, assignment, etc.)
+router.get('/type/:type', authenticateToken, (req, res) => {
+  const { type } = req.params;
+  const { unread_only } = req.query;
+  
+  let query = `SELECT * FROM notifications WHERE user_id = ? AND type = ?`;
+  const params = [req.user.userId, type];
+
+  if (unread_only === 'true') {
+    query += ' AND is_read = 0';
+  }
+
+  query += ' ORDER BY created_at DESC LIMIT 50';
+
+  db.all(query, params, (err, notifications) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(notifications);
+  });
+});
+
+// Get room booking notifications specifically
+router.get('/room-bookings/latest', authenticateToken, (req, res) => {
+  // Only for admin/instructor
+  if (req.user.role !== 'admin' && req.user.role !== 'instructor') {
+    return res.status(403).json({ error: 'Admin or Instructor access required' });
+  }
+
+  const query = `
+    SELECT * FROM notifications 
+    WHERE user_id = ? AND type = 'room_booking'
+    ORDER BY created_at DESC 
+    LIMIT 20
+  `;
+
+  db.all(query, [req.user.userId], (err, notifications) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(notifications);
+  });
+});
+
 module.exports = router;
 
