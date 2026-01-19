@@ -191,6 +191,49 @@ router.post('/quizzes', authenticateToken, requireAdmin, (req, res) => {
   );
 });
 
+// Update quiz
+router.put('/quizzes/:quizId', authenticateToken, requireAdmin, (req, res) => {
+  const { quizId } = req.params;
+  const { title, time_limit, passing_score, order_index } = req.body;
+
+  db.run(
+    'UPDATE quizzes SET title = ?, time_limit = ?, passing_score = ?, order_index = ? WHERE quiz_id = ?',
+    [title, time_limit || 30, passing_score || 70, order_index || 0, quizId],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to update quiz' });
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Quiz not found' });
+      }
+      res.json({ message: 'Quiz updated successfully' });
+    }
+  );
+});
+
+// Delete quiz
+router.delete('/quizzes/:quizId', authenticateToken, requireAdmin, (req, res) => {
+  const { quizId } = req.params;
+
+  // Delete quiz questions first
+  db.run('DELETE FROM quiz_questions WHERE quiz_id = ?', [quizId], (err) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to delete quiz questions' });
+    }
+    
+    // Then delete quiz
+    db.run('DELETE FROM quizzes WHERE quiz_id = ?', [quizId], function(err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to delete quiz' });
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Quiz not found' });
+      }
+      res.json({ message: 'Quiz deleted successfully' });
+    });
+  });
+});
+
 // Create practical exam
 router.post('/exams', authenticateToken, requireAdmin, (req, res) => {
   const { date, start_time, end_time, limit_count } = req.body;

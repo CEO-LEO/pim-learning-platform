@@ -47,6 +47,19 @@ const AdminPanel = () => {
     duration: '',
     order_index: ''
   });
+  
+  // Quiz management states
+  const [showQuizModal, setShowQuizModal] = useState(false);
+  const [editingQuiz, setEditingQuiz] = useState(null);
+  const [quizzes, setQuizzes] = useState([]);
+  const [quizForm, setQuizForm] = useState({
+    module_id: '',
+    title: '',
+    time_limit: 30,
+    passing_score: 70,
+    order_index: '',
+    questions: []
+  });
 
   useEffect(() => {
     if (user?.role !== 'admin' && user?.role !== 'instructor') {
@@ -236,6 +249,86 @@ const AdminPanel = () => {
       alert(error.response?.data?.error || 'บันทึกข้อมูลไม่สำเร็จ');
     }
   };
+  
+  // Quiz management handlers
+  const fetchQuizzes = async () => {
+    try {
+      const allQuizzes = await Promise.all(
+        modules.map(async (module) => {
+          const response = await axios.get(`${API_URL}/quizzes/module/${module.module_id}/all`);
+          return (response.data || []).map(q => ({ ...q, module_title: module.title }));
+        })
+      );
+      setQuizzes(allQuizzes.flat());
+    } catch (error) {
+      console.error('Failed to fetch quizzes:', error);
+    }
+  };
+  
+  const handleAddQuiz = () => {
+    setEditingQuiz(null);
+    setQuizForm({ module_id: modules[0]?.module_id || '', title: '', time_limit: 30, passing_score: 70, order_index: '', questions: [] });
+    setShowQuizModal(true);
+  };
+  
+  const handleEditQuiz = (quiz) => {
+    setEditingQuiz(quiz);
+    setQuizForm({
+      module_id: quiz.module_id || '',
+      title: quiz.title || '',
+      time_limit: quiz.time_limit || 30,
+      passing_score: quiz.passing_score || 70,
+      order_index: quiz.order_index || '',
+      questions: []
+    });
+    setShowQuizModal(true);
+  };
+  
+  const handleDeleteQuiz = async (quizId) => {
+    if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบแบบทดสอบนี้?')) return;
+    
+    try {
+      await axios.delete(`${API_URL}/admin/quizzes/${quizId}`);
+      alert('ลบแบบทดสอบสำเร็จ');
+      fetchQuizzes();
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert(error.response?.data?.error || 'ลบแบบทดสอบไม่สำเร็จ');
+    }
+  };
+  
+  const handleSaveQuiz = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const data = {
+        ...quizForm,
+        time_limit: parseInt(quizForm.time_limit) || 30,
+        passing_score: parseInt(quizForm.passing_score) || 70,
+        order_index: parseInt(quizForm.order_index) || 0
+      };
+      
+      if (editingQuiz) {
+        await axios.put(`${API_URL}/admin/quizzes/${editingQuiz.quiz_id}`, data);
+        alert('แก้ไขแบบทดสอบสำเร็จ');
+      } else {
+        await axios.post(`${API_URL}/admin/quizzes`, data);
+        alert('เพิ่มแบบทดสอบสำเร็จ');
+      }
+      setShowQuizModal(false);
+      fetchQuizzes();
+    } catch (error) {
+      console.error('Save error:', error);
+      alert(error.response?.data?.error || 'บันทึกข้อมูลไม่สำเร็จ');
+    }
+  };
+  
+  useEffect(() => {
+    if (modules.length > 0) {
+      fetchQuizzes();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [modules]);
 
   if (loading) {
     return (
@@ -579,6 +672,97 @@ const AdminPanel = () => {
         </div>
       )}
 
+      {/* Quiz Modal */}
+      {showQuizModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              {editingQuiz ? 'แก้ไขแบบทดสอบ' : 'เพิ่มแบบทดสอบใหม่'}
+            </h2>
+            
+            <form onSubmit={handleSaveQuiz} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">หลักสูตร *</label>
+                <select
+                  value={quizForm.module_id}
+                  onChange={(e) => setQuizForm({ ...quizForm, module_id: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  required
+                >
+                  <option value="">เลือกหลักสูตร</option>
+                  {modules.map(m => (
+                    <option key={m.module_id} value={m.module_id}>{m.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">ชื่อแบบทดสอบ *</label>
+                <input
+                  type="text"
+                  value={quizForm.title}
+                  onChange={(e) => setQuizForm({ ...quizForm, title: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  required
+                  placeholder="เช่น: แบบทดสอบท้ายบท - การบริการ"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">เวลา (นาที)</label>
+                  <input
+                    type="number"
+                    value={quizForm.time_limit}
+                    onChange={(e) => setQuizForm({ ...quizForm, time_limit: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    placeholder="30"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">คะแนนผ่าน (%)</label>
+                  <input
+                    type="number"
+                    value={quizForm.passing_score}
+                    onChange={(e) => setQuizForm({ ...quizForm, passing_score: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    placeholder="70"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">ลำดับ</label>
+                  <input
+                    type="number"
+                    value={quizForm.order_index}
+                    onChange={(e) => setQuizForm({ ...quizForm, order_index: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    placeholder="1"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowQuizModal(false)}
+                  className="px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-semibold"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl transition-all font-semibold shadow-lg"
+                >
+                  {editingQuiz ? 'บันทึกการแก้ไข' : 'เพิ่มแบบทดสอบ'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Content Tab */}
       {activeTab === 'content' && (
         <div className="space-y-6">
@@ -634,14 +818,54 @@ const AdminPanel = () => {
           </div>
 
           <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-800">จัดการแบบทดสอบ</h2>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+              <button 
+                onClick={handleAddQuiz}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2 transition-all"
+              >
                 <FiPlus size={18} />
                 <span>เพิ่มแบบทดสอบ</span>
               </button>
             </div>
-            <p className="text-gray-600">ใช้ API endpoint: POST /api/admin/quizzes</p>
+            
+            <div className="space-y-3">
+              {quizzes.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">ยังไม่มีแบบทดสอบ</p>
+              ) : (
+                quizzes.map((quiz) => (
+                  <div key={quiz.quiz_id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800">{quiz.title}</h3>
+                        <p className="text-sm text-gray-600 mt-1">Module: {quiz.module_title || quiz.module_id}</p>
+                        <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                          <span>ลำดับ: {quiz.order_index}</span>
+                          <span>เวลา: {quiz.time_limit} นาที</span>
+                          <span>คะแนนผ่าน: {quiz.passing_score}%</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          onClick={() => handleEditQuiz(quiz)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                          title="แก้ไข"
+                        >
+                          <FiEdit size={18} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteQuiz(quiz.quiz_id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          title="ลบ"
+                        >
+                          <FiTrash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-md p-6">
