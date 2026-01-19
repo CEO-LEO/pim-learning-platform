@@ -115,6 +115,41 @@ router.post('/videos', authenticateToken, requireAdmin, (req, res) => {
   );
 });
 
+// Update video
+router.put('/videos/:videoId', authenticateToken, requireAdmin, (req, res) => {
+  const { videoId } = req.params;
+  const { title, url, duration, order_index } = req.body;
+
+  db.run(
+    'UPDATE videos SET title = ?, url = ?, duration = ?, order_index = ? WHERE video_id = ?',
+    [title, url, duration || 0, order_index || 0, videoId],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to update video' });
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Video not found' });
+      }
+      res.json({ message: 'Video updated successfully' });
+    }
+  );
+});
+
+// Delete video
+router.delete('/videos/:videoId', authenticateToken, requireAdmin, (req, res) => {
+  const { videoId } = req.params;
+
+  db.run('DELETE FROM videos WHERE video_id = ?', [videoId], function(err) {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to delete video' });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Video not found' });
+    }
+    res.json({ message: 'Video deleted successfully' });
+  });
+});
+
 // Create quiz
 router.post('/quizzes', authenticateToken, requireAdmin, (req, res) => {
   const { module_id, title, time_limit, passing_score, allow_retake, questions } = req.body;
