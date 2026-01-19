@@ -123,7 +123,7 @@ const ExamRegistration = () => {
       return (
         <div
           key={exam.exam_id}
-          className={`group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border-2 transform hover:-translate-y-1 ${
+          className={`group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border-2 transform hover:-translate-y-1 h-full flex flex-col ${
             isRegistered 
               ? 'border-green-400 bg-gradient-to-br from-green-50 via-white to-green-50/50' 
               : isFull 
@@ -149,9 +149,9 @@ const ExamRegistration = () => {
             </div>
           )}
 
-            <div className="relative z-10 p-6">
+            <div className="relative z-10 p-6 flex-1 flex flex-col">
               {/* Header */}
-              <div className="mb-4">
+              <div className="mb-4 flex-1">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center space-x-3">
                   <div className={`p-2 rounded-lg shadow-md transform group-hover:rotate-12 transition-transform duration-300 ${isRegistered ? 'bg-gradient-to-br from-green-100 to-emerald-100 text-green-600 border-2 border-green-200' : 'bg-gradient-to-br from-blue-100 to-cyan-100 text-blue-600 border-2 border-blue-200'}`}>
                     <FiCalendar size={20} />
