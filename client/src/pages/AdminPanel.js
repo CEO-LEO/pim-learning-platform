@@ -25,6 +25,16 @@ const AdminPanel = () => {
   const [, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
+  
+  // Module management states
+  const [showModuleModal, setShowModuleModal] = useState(false);
+  const [editingModule, setEditingModule] = useState(null);
+  const [moduleForm, setModuleForm] = useState({
+    title: '',
+    description: '',
+    year_level: '',
+    order_index: ''
+  });
 
   useEffect(() => {
     if (user?.role !== 'admin' && user?.role !== 'instructor') {
@@ -87,6 +97,58 @@ const AdminPanel = () => {
       setUsers([]);
     } catch (error) {
       console.error('Failed to fetch users:', error);
+    }
+  };
+  
+  // Module management handlers
+  const handleAddModule = () => {
+    setEditingModule(null);
+    setModuleForm({ title: '', description: '', year_level: '', order_index: '' });
+    setShowModuleModal(true);
+  };
+  
+  const handleEditModule = (module) => {
+    setEditingModule(module);
+    setModuleForm({
+      title: module.title || '',
+      description: module.description || '',
+      year_level: module.year_level || '',
+      order_index: module.order_index || ''
+    });
+    setShowModuleModal(true);
+  };
+  
+  const handleDeleteModule = async (moduleId) => {
+    if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบหลักสูตรนี้?')) return;
+    
+    try {
+      await axios.delete(`${API_URL}/admin/modules/${moduleId}`);
+      alert('ลบหลักสูตรสำเร็จ');
+      fetchModules();
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert(error.response?.data?.error || 'ลบหลักสูตรไม่สำเร็จ');
+    }
+  };
+  
+  const handleSaveModule = async (e) => {
+    e.preventDefault();
+    
+    try {
+      if (editingModule) {
+        // Update existing module
+        await axios.put(`${API_URL}/admin/modules/${editingModule.module_id}`, moduleForm);
+        alert('แก้ไขหลักสูตรสำเร็จ');
+      } else {
+        // Create new module
+        await axios.post(`${API_URL}/admin/modules`, moduleForm);
+        alert('เพิ่มหลักสูตรสำเร็จ');
+      }
+      setShowModuleModal(false);
+      fetchModules();
+    } catch (error) {
+      console.error('Save error:', error);
+      alert(error.response?.data?.error || 'บันทึกข้อมูลไม่สำเร็จ');
     }
   };
 
@@ -206,7 +268,10 @@ const AdminPanel = () => {
         <div className="bg-white rounded-xl shadow-md p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-800">จัดการหลักสูตร</h2>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+            <button 
+              onClick={handleAddModule}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2 transition-all"
+            >
               <FiPlus size={18} />
               <span>เพิ่มหลักสูตร</span>
             </button>
@@ -222,10 +287,18 @@ const AdminPanel = () => {
                     <p className="text-xs text-gray-500 mt-1">ชั้นปี: {module.year_level || 'ทั้งหมด'}</p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
+                    <button 
+                      onClick={() => handleEditModule(module)}
+                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                      title="แก้ไข"
+                    >
                       <FiEdit size={18} />
                     </button>
-                    <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                    <button 
+                      onClick={() => handleDeleteModule(module.module_id)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                      title="ลบ"
+                    >
                       <FiTrash2 size={18} />
                     </button>
                   </div>
@@ -250,6 +323,82 @@ const AdminPanel = () => {
           <div className="text-center py-8 text-gray-500">
             <p>ฟีเจอร์นี้กำลังพัฒนา</p>
             <p className="text-sm mt-2">สามารถจัดการผู้ใช้ผ่านฐานข้อมูลได้</p>
+          </div>
+        </div>
+      )}
+
+      {/* Module Modal */}
+      {showModuleModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              {editingModule ? 'แก้ไขหลักสูตร' : 'เพิ่มหลักสูตรใหม่'}
+            </h2>
+            
+            <form onSubmit={handleSaveModule} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">ชื่อหลักสูตร *</label>
+                <input
+                  type="text"
+                  value={moduleForm.title}
+                  onChange={(e) => setModuleForm({ ...moduleForm, title: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  required
+                  placeholder="เช่น: การบริการ"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">คำอธิบาย</label>
+                <textarea
+                  value={moduleForm.description}
+                  onChange={(e) => setModuleForm({ ...moduleForm, description: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  rows={3}
+                  placeholder="คำอธิบายหลักสูตร..."
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">ชั้นปี</label>
+                  <input
+                    type="number"
+                    value={moduleForm.year_level}
+                    onChange={(e) => setModuleForm({ ...moduleForm, year_level: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    placeholder="1-4"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">ลำดับ</label>
+                  <input
+                    type="number"
+                    value={moduleForm.order_index}
+                    onChange={(e) => setModuleForm({ ...moduleForm, order_index: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    placeholder="1, 2, 3..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowModuleModal(false)}
+                  className="px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-semibold"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl transition-all font-semibold shadow-lg"
+                >
+                  {editingModule ? 'บันทึกการแก้ไข' : 'เพิ่มหลักสูตร'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
