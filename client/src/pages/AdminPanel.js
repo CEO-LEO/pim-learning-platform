@@ -112,6 +112,27 @@ const AdminPanel = () => {
     }
   };
   
+  const fetchVideos = async () => {
+    try {
+      // Fetch all videos across all modules
+      const modulesWithVideos = await Promise.all(
+        modules.map(async (module) => {
+          const response = await axios.get(`${API_URL}/videos/module/${module.module_id}`);
+          return response.data || [];
+        })
+      );
+      setVideos(modulesWithVideos.flat());
+    } catch (error) {
+      console.error('Failed to fetch videos:', error);
+    }
+  };
+  
+  useEffect(() => {
+    if (modules.length > 0) {
+      fetchVideos();
+    }
+  }, [modules]);
+  
   // Module management handlers
   const handleAddModule = () => {
     setEditingModule(null);
@@ -158,6 +179,57 @@ const AdminPanel = () => {
       }
       setShowModuleModal(false);
       fetchModules();
+    } catch (error) {
+      console.error('Save error:', error);
+      alert(error.response?.data?.error || 'บันทึกข้อมูลไม่สำเร็จ');
+    }
+  };
+  
+  // Video management handlers
+  const handleAddVideo = () => {
+    setEditingVideo(null);
+    setVideoForm({ module_id: modules[0]?.module_id || '', title: '', url: '', duration: '', order_index: '' });
+    setShowVideoModal(true);
+  };
+  
+  const handleEditVideo = (video) => {
+    setEditingVideo(video);
+    setVideoForm({
+      module_id: video.module_id || '',
+      title: video.title || '',
+      url: video.url || '',
+      duration: video.duration || '',
+      order_index: video.order_index || ''
+    });
+    setShowVideoModal(true);
+  };
+  
+  const handleDeleteVideo = async (videoId) => {
+    if (!window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบวิดีโอนี้?')) return;
+    
+    try {
+      await axios.delete(`${API_URL}/admin/videos/${videoId}`);
+      alert('ลบวิดีโอสำเร็จ');
+      fetchVideos();
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert(error.response?.data?.error || 'ลบวิดีโอไม่สำเร็จ');
+    }
+  };
+  
+  const handleSaveVideo = async (e) => {
+    e.preventDefault();
+    
+    try {
+      if (editingVideo) {
+        await axios.put(`${API_URL}/admin/videos/${editingVideo.video_id}`, videoForm);
+        alert('แก้ไขวิดีโอสำเร็จ');
+      } else {
+        await axios.post(`${API_URL}/admin/videos`, videoForm);
+        alert('เพิ่มวิดีโอสำเร็จ');
+      }
+      setShowVideoModal(false);
+      fetchVideos();
     } catch (error) {
       console.error('Save error:', error);
       alert(error.response?.data?.error || 'บันทึกข้อมูลไม่สำเร็จ');
@@ -414,19 +486,150 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
+      
+      {/* Video Modal */}
+      {showVideoModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              {editingVideo ? 'แก้ไขวิดีโอ' : 'เพิ่มวิดีโอใหม่'}
+            </h2>
+            
+            <form onSubmit={handleSaveVideo} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">หลักสูตร *</label>
+                <select
+                  value={videoForm.module_id}
+                  onChange={(e) => setVideoForm({ ...videoForm, module_id: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  required
+                >
+                  <option value="">เลือกหลักสูตร</option>
+                  {modules.map(m => (
+                    <option key={m.module_id} value={m.module_id}>{m.title}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">ชื่อวิดีโอ *</label>
+                <input
+                  type="text"
+                  value={videoForm.title}
+                  onChange={(e) => setVideoForm({ ...videoForm, title: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  required
+                  placeholder="เช่น: การบริการ - วิดีโอที่ 1"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">URL วิดีโอ</label>
+                <input
+                  type="text"
+                  value={videoForm.url}
+                  onChange={(e) => setVideoForm({ ...videoForm, url: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="/uploads/videos/video-name.mp4"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">ระยะเวลา (วินาที)</label>
+                  <input
+                    type="number"
+                    value={videoForm.duration}
+                    onChange={(e) => setVideoForm({ ...videoForm, duration: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    placeholder="1800"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">ลำดับ</label>
+                  <input
+                    type="number"
+                    value={videoForm.order_index}
+                    onChange={(e) => setVideoForm({ ...videoForm, order_index: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                    placeholder="1, 2, 3..."
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end space-x-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowVideoModal(false)}
+                  className="px-6 py-3 border-2 border-gray-300 rounded-xl hover:bg-gray-50 transition-all font-semibold"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white rounded-xl transition-all font-semibold shadow-lg"
+                >
+                  {editingVideo ? 'บันทึกการแก้ไข' : 'เพิ่มวิดีโอ'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Content Tab */}
       {activeTab === 'content' && (
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-bold text-gray-800">จัดการวิดีโอ</h2>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+              <button 
+                onClick={handleAddVideo}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2 transition-all"
+              >
                 <FiPlus size={18} />
                 <span>เพิ่มวิดีโอ</span>
               </button>
             </div>
-            <p className="text-gray-600">ใช้ API endpoint: POST /api/admin/videos</p>
+            
+            <div className="space-y-3">
+              {videos.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">ยังไม่มีวิดีโอ</p>
+              ) : (
+                videos.map((video) => (
+                  <div key={video.video_id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-800">{video.title}</h3>
+                        <p className="text-sm text-gray-600 mt-1">Module: {video.module_title || video.module_id}</p>
+                        <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                          <span>ลำดับ: {video.order_index}</span>
+                          <span>ระยะเวลา: {Math.floor((video.duration || 0) / 60)} นาที</span>
+                          {video.url && <span className="text-green-600">✓ มี URL</span>}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <button 
+                          onClick={() => handleEditVideo(video)}
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                          title="แก้ไข"
+                        >
+                          <FiEdit size={18} />
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteVideo(video.video_id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          title="ลบ"
+                        >
+                          <FiTrash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-md p-6">
