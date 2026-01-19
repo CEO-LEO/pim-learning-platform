@@ -35,6 +35,18 @@ const AdminPanel = () => {
     year_level: '',
     order_index: ''
   });
+  
+  // Video management states
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [editingVideo, setEditingVideo] = useState(null);
+  const [videos, setVideos] = useState([]);
+  const [videoForm, setVideoForm] = useState({
+    module_id: '',
+    title: '',
+    url: '',
+    duration: '',
+    order_index: ''
+  });
 
   useEffect(() => {
     if (user?.role !== 'admin' && user?.role !== 'instructor') {
