@@ -131,6 +131,7 @@ const AdminPanel = () => {
     if (modules.length > 0) {
       fetchVideos();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modules]);
   
   // Module management handlers
