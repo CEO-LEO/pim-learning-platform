@@ -41,9 +41,26 @@ function initializeTables() {
     module_id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     description TEXT,
+    objectives TEXT,
     year_level INTEGER,
     order_index INTEGER
   )`);
+  
+  // Add objectives column if it doesn't exist (for existing databases)
+  db.all(`PRAGMA table_info(modules)`, (err, columns) => {
+    if (!err && columns) {
+      const hasObjectives = columns.some(col => col.name === 'objectives');
+      if (!hasObjectives) {
+        db.run(`ALTER TABLE modules ADD COLUMN objectives TEXT`, (alterErr) => {
+          if (alterErr && !alterErr.message.includes('duplicate column')) {
+            console.log('Note: Could not add objectives column:', alterErr.message);
+          } else {
+            console.log('✅ Added objectives column to modules table');
+          }
+        });
+      }
+    }
+  });
 
   // Videos table
   db.run(`CREATE TABLE IF NOT EXISTS videos (

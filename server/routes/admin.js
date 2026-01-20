@@ -46,7 +46,7 @@ router.get('/modules', authenticateToken, requireAdmin, (req, res) => {
 
 // Create module
 router.post('/modules', authenticateToken, requireAdmin, (req, res) => {
-  const { title, description, year_level, order_index } = req.body;
+  const { title, description, objectives, year_level, order_index } = req.body;
 
   // Validation
   if (!title || title.trim() === '') {
@@ -87,8 +87,8 @@ router.post('/modules', authenticateToken, requireAdmin, (req, res) => {
 
     const moduleId = uuidv4();
     db.run(
-      'INSERT INTO modules (module_id, title, description, year_level, order_index) VALUES (?, ?, ?, ?, ?)',
-      [moduleId, title.trim(), description ? description.trim() : '', year_level || null, order_index || 0],
+      'INSERT INTO modules (module_id, title, description, objectives, year_level, order_index) VALUES (?, ?, ?, ?, ?, ?)',
+      [moduleId, title.trim(), description ? description.trim() : '', objectives ? objectives.trim() : '', year_level || null, order_index || 0],
       function(err) {
         if (err) {
           console.error('Error creating module:', err);
@@ -108,7 +108,7 @@ router.post('/modules', authenticateToken, requireAdmin, (req, res) => {
 // Update module
 router.put('/modules/:moduleId', authenticateToken, requireAdmin, (req, res) => {
   const { moduleId } = req.params;
-  const { title, description, year_level, order_index } = req.body;
+  const { title, description, objectives, year_level, order_index } = req.body;
 
   // Validation
   if (!title || title.trim() === '') {
@@ -149,8 +149,8 @@ router.put('/modules/:moduleId', authenticateToken, requireAdmin, (req, res) => 
 
     // Update module
     db.run(
-      'UPDATE modules SET title = ?, description = ?, year_level = ?, order_index = ? WHERE module_id = ?',
-      [title.trim(), description ? description.trim() : '', year_level || null, order_index || 0, moduleId],
+      'UPDATE modules SET title = ?, description = ?, objectives = ?, year_level = ?, order_index = ? WHERE module_id = ?',
+      [title.trim(), description ? description.trim() : '', objectives ? objectives.trim() : '', year_level || null, order_index || 0, moduleId],
       function(err) {
         if (err) {
           console.error('Error updating module:', err);
