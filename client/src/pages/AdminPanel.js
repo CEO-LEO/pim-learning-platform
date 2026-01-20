@@ -32,6 +32,7 @@ const AdminPanel = () => {
   const [moduleForm, setModuleForm] = useState({
     title: '',
     description: '',
+    objectives: '',
     year_level: '',
     order_index: ''
   });
@@ -150,7 +151,7 @@ const AdminPanel = () => {
   // Module management handlers
   const handleAddModule = () => {
     setEditingModule(null);
-    setModuleForm({ title: '', description: '', year_level: '', order_index: '' });
+    setModuleForm({ title: '', description: '', objectives: '', year_level: '', order_index: '' });
     setShowModuleModal(true);
   };
   
@@ -159,6 +160,7 @@ const AdminPanel = () => {
     setModuleForm({
       title: module.title || '',
       description: module.description || '',
+      objectives: module.objectives || '',
       year_level: module.year_level || '',
       order_index: module.order_index || ''
     });
@@ -534,6 +536,20 @@ const AdminPanel = () => {
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   rows={3}
                   placeholder="คำอธิบายหลักสูตร..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">วัตถุประสงค์</label>
+                <textarea
+                  value={moduleForm.objectives || ''}
+                  onChange={(e) => setModuleForm({ ...moduleForm, objectives: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  rows={4}
+                  placeholder="เช่น: 
+- เพื่อให้นักศึกษาเข้าใจหลักการบริการลูกค้า
+- เพื่อสามารถใช้เครื่อง POS ได้อย่างถูกต้อง
+- เพื่อพัฒนาทักษะการสื่อสารที่มีประสิทธิภาพ"
                 />
               </div>
 
