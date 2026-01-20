@@ -48,21 +48,61 @@ router.get('/modules', authenticateToken, requireAdmin, (req, res) => {
 router.post('/modules', authenticateToken, requireAdmin, (req, res) => {
   const { title, description, year_level, order_index } = req.body;
 
-  if (!title) {
-    return res.status(400).json({ error: 'Title required' });
+  // Validation
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ error: 'กรุณาระบุชื่อหลักสูตร' });
   }
 
-  const moduleId = uuidv4();
-  db.run(
-    'INSERT INTO modules (module_id, title, description, year_level, order_index) VALUES (?, ?, ?, ?, ?)',
-    [moduleId, title, description || '', year_level || null, order_index || 0],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to create module' });
-      }
-      res.json({ module_id: moduleId, message: 'Module created successfully' });
+  if (title.length > 200) {
+    return res.status(400).json({ error: 'ชื่อหลักสูตรต้องไม่เกิน 200 ตัวอักษร' });
+  }
+
+  if (description && description.length > 1000) {
+    return res.status(400).json({ error: 'คำอธิบายต้องไม่เกิน 1,000 ตัวอักษร' });
+  }
+
+  if (year_level !== null && year_level !== undefined) {
+    const year = parseInt(year_level);
+    if (isNaN(year) || year < 1 || year > 4) {
+      return res.status(400).json({ error: 'ชั้นปีต้องอยู่ระหว่าง 1-4' });
     }
-  );
+  }
+
+  if (order_index !== null && order_index !== undefined) {
+    const order = parseInt(order_index);
+    if (isNaN(order) || order < 0) {
+      return res.status(400).json({ error: 'ลำดับต้องเป็นตัวเลขที่มากกว่าหรือเท่ากับ 0' });
+    }
+  }
+
+  // Check for duplicate title
+  db.get('SELECT module_id FROM modules WHERE title = ?', [title.trim()], (err, existing) => {
+    if (err) {
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
+    }
+    
+    if (existing) {
+      return res.status(400).json({ error: 'มีหลักสูตรชื่อนี้อยู่แล้ว กรุณาใช้ชื่ออื่น' });
+    }
+
+    const moduleId = uuidv4();
+    db.run(
+      'INSERT INTO modules (module_id, title, description, year_level, order_index) VALUES (?, ?, ?, ?, ?)',
+      [moduleId, title.trim(), description ? description.trim() : '', year_level || null, order_index || 0],
+      function(err) {
+        if (err) {
+          console.error('Error creating module:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการสร้างหลักสูตร' });
+        }
+        
+        res.json({ 
+          module_id: moduleId, 
+          message: 'สร้างหลักสูตรสำเร็จ',
+          success: true
+        });
+      }
+    );
+  });
 });
 
 // Update module
@@ -70,27 +110,112 @@ router.put('/modules/:moduleId', authenticateToken, requireAdmin, (req, res) => 
   const { moduleId } = req.params;
   const { title, description, year_level, order_index } = req.body;
 
-  db.run(
-    'UPDATE modules SET title = ?, description = ?, year_level = ?, order_index = ? WHERE module_id = ?',
-    [title, description || '', year_level || null, order_index || 0, moduleId],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to update module' });
-      }
-      res.json({ message: 'Module updated successfully' });
+  // Validation
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ error: 'กรุณาระบุชื่อหลักสูตร' });
+  }
+
+  if (title.length > 200) {
+    return res.status(400).json({ error: 'ชื่อหลักสูตรต้องไม่เกิน 200 ตัวอักษร' });
+  }
+
+  if (description && description.length > 1000) {
+    return res.status(400).json({ error: 'คำอธิบายต้องไม่เกิน 1,000 ตัวอักษร' });
+  }
+
+  if (year_level !== null && year_level !== undefined) {
+    const year = parseInt(year_level);
+    if (isNaN(year) || year < 1 || year > 4) {
+      return res.status(400).json({ error: 'ชั้นปีต้องอยู่ระหว่าง 1-4' });
     }
-  );
+  }
+
+  if (order_index !== null && order_index !== undefined) {
+    const order = parseInt(order_index);
+    if (isNaN(order) || order < 0) {
+      return res.status(400).json({ error: 'ลำดับต้องเป็นตัวเลขที่มากกว่าหรือเท่ากับ 0' });
+    }
+  }
+
+  // Check if module exists
+  db.get('SELECT module_id FROM modules WHERE module_id = ?', [moduleId], (err, module) => {
+    if (err) {
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
+    }
+    
+    if (!module) {
+      return res.status(404).json({ error: 'ไม่พบหลักสูตรที่ต้องการแก้ไข' });
+    }
+
+    // Update module
+    db.run(
+      'UPDATE modules SET title = ?, description = ?, year_level = ?, order_index = ? WHERE module_id = ?',
+      [title.trim(), description ? description.trim() : '', year_level || null, order_index || 0, moduleId],
+      function(err) {
+        if (err) {
+          console.error('Error updating module:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการอัพเดตหลักสูตร' });
+        }
+        
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'ไม่พบหลักสูตรที่ต้องการแก้ไข' });
+        }
+        
+        res.json({ 
+          message: 'บันทึกการแก้ไขหลักสูตรสำเร็จ',
+          module_id: moduleId,
+          success: true
+        });
+      }
+    );
+  });
 });
 
 // Delete module
 router.delete('/modules/:moduleId', authenticateToken, requireAdmin, (req, res) => {
   const { moduleId } = req.params;
 
-  db.run('DELETE FROM modules WHERE module_id = ?', [moduleId], function(err) {
+  // Check if module has videos
+  db.get('SELECT COUNT(*) as count FROM videos WHERE module_id = ?', [moduleId], (err, result) => {
     if (err) {
-      return res.status(500).json({ error: 'Failed to delete module' });
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
     }
-    res.json({ message: 'Module deleted successfully' });
+
+    if (result.count > 0) {
+      return res.status(400).json({ 
+        error: `ไม่สามารถลบหลักสูตรได้ เนื่องจากมีวิดีโอ ${result.count} รายการ กรุณาลบวิดีโอทั้งหมดก่อน` 
+      });
+    }
+
+    // Check if module has quizzes
+    db.get('SELECT COUNT(*) as count FROM quizzes WHERE module_id = ?', [moduleId], (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
+      }
+
+      if (result.count > 0) {
+        return res.status(400).json({ 
+          error: `ไม่สามารถลบหลักสูตรได้ เนื่องจากมีแบบทดสอบ ${result.count} รายการ กรุณาลบแบบทดสอบทั้งหมดก่อน` 
+        });
+      }
+
+      // Delete module
+      db.run('DELETE FROM modules WHERE module_id = ?', [moduleId], function(err) {
+        if (err) {
+          console.error('Error deleting module:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการลบหลักสูตร' });
+        }
+        
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'ไม่พบหลักสูตรที่ต้องการลบ' });
+        }
+        
+        res.json({ 
+          message: 'ลบหลักสูตรสำเร็จ',
+          success: true
+        });
+      });
+    });
   });
 });
 
@@ -98,21 +223,54 @@ router.delete('/modules/:moduleId', authenticateToken, requireAdmin, (req, res) 
 router.post('/videos', authenticateToken, requireAdmin, (req, res) => {
   const { module_id, title, url, duration, order_index } = req.body;
 
-  if (!module_id || !title) {
-    return res.status(400).json({ error: 'Module ID and title required' });
+  // Validation
+  if (!module_id || module_id.trim() === '') {
+    return res.status(400).json({ error: 'กรุณาระบุหลักสูตร' });
   }
 
-  const videoId = uuidv4();
-  db.run(
-    'INSERT INTO videos (video_id, module_id, title, url, duration, order_index) VALUES (?, ?, ?, ?, ?, ?)',
-    [videoId, module_id, title, url || '', duration || 0, order_index || 0],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to create video' });
-      }
-      res.json({ video_id: videoId, message: 'Video created successfully' });
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ error: 'กรุณาระบุชื่อวิดีโอ' });
+  }
+
+  if (title.length > 300) {
+    return res.status(400).json({ error: 'ชื่อวิดีโอต้องไม่เกิน 300 ตัวอักษร' });
+  }
+
+  if (duration !== null && duration !== undefined) {
+    const dur = parseInt(duration);
+    if (isNaN(dur) || dur < 0) {
+      return res.status(400).json({ error: 'ระยะเวลาต้องเป็นตัวเลขที่มากกว่าหรือเท่ากับ 0' });
     }
-  );
+  }
+
+  // Check if module exists
+  db.get('SELECT module_id FROM modules WHERE module_id = ?', [module_id], (err, module) => {
+    if (err) {
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
+    }
+    
+    if (!module) {
+      return res.status(404).json({ error: 'ไม่พบหลักสูตรที่ระบุ' });
+    }
+
+    const videoId = uuidv4();
+    db.run(
+      'INSERT INTO videos (video_id, module_id, title, url, duration, order_index) VALUES (?, ?, ?, ?, ?, ?)',
+      [videoId, module_id, title.trim(), url || '', duration || 0, order_index || 0],
+      function(err) {
+        if (err) {
+          console.error('Error creating video:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการสร้างวิดีโอ' });
+        }
+        
+        res.json({ 
+          video_id: videoId, 
+          message: 'เพิ่มวิดีโอสำเร็จ',
+          success: true
+        });
+      }
+    );
+  });
 });
 
 // Update video
@@ -120,116 +278,293 @@ router.put('/videos/:videoId', authenticateToken, requireAdmin, (req, res) => {
   const { videoId } = req.params;
   const { title, url, duration, order_index } = req.body;
 
-  db.run(
-    'UPDATE videos SET title = ?, url = ?, duration = ?, order_index = ? WHERE video_id = ?',
-    [title, url, duration || 0, order_index || 0, videoId],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to update video' });
-      }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Video not found' });
-      }
-      res.json({ message: 'Video updated successfully' });
+  // Validation
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ error: 'กรุณาระบุชื่อวิดีโอ' });
+  }
+
+  if (title.length > 300) {
+    return res.status(400).json({ error: 'ชื่อวิดีโอต้องไม่เกิน 300 ตัวอักษร' });
+  }
+
+  if (duration !== null && duration !== undefined) {
+    const dur = parseInt(duration);
+    if (isNaN(dur) || dur < 0) {
+      return res.status(400).json({ error: 'ระยะเวลาต้องเป็นตัวเลขที่มากกว่าหรือเท่ากับ 0' });
     }
-  );
+  }
+
+  // Check if video exists
+  db.get('SELECT video_id FROM videos WHERE video_id = ?', [videoId], (err, video) => {
+    if (err) {
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
+    }
+    
+    if (!video) {
+      return res.status(404).json({ error: 'ไม่พบวิดีโอที่ต้องการแก้ไข' });
+    }
+
+    db.run(
+      'UPDATE videos SET title = ?, url = ?, duration = ?, order_index = ? WHERE video_id = ?',
+      [title.trim(), url, duration || 0, order_index || 0, videoId],
+      function(err) {
+        if (err) {
+          console.error('Error updating video:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการอัพเดตวิดีโอ' });
+        }
+        
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'ไม่พบวิดีโอที่ต้องการแก้ไข' });
+        }
+        
+        res.json({ 
+          message: 'บันทึกการแก้ไขวิดีโอสำเร็จ',
+          success: true
+        });
+      }
+    );
+  });
 });
 
 // Delete video
 router.delete('/videos/:videoId', authenticateToken, requireAdmin, (req, res) => {
   const { videoId } = req.params;
 
-  db.run('DELETE FROM videos WHERE video_id = ?', [videoId], function(err) {
+  // Check if video has progress records
+  db.get('SELECT COUNT(*) as count FROM video_progress WHERE video_id = ?', [videoId], (err, result) => {
     if (err) {
-      return res.status(500).json({ error: 'Failed to delete video' });
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
     }
-    if (this.changes === 0) {
-      return res.status(404).json({ error: 'Video not found' });
+
+    // Delete video (cascade delete progress if exists)
+    if (result.count > 0) {
+      // Delete progress records first
+      db.run('DELETE FROM video_progress WHERE video_id = ?', [videoId], (err) => {
+        if (err) {
+          console.error('Error deleting video progress:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการลบข้อมูลความคืบหน้า' });
+        }
+
+        // Then delete video
+        deleteVideo();
+      });
+    } else {
+      deleteVideo();
     }
-    res.json({ message: 'Video deleted successfully' });
+
+    function deleteVideo() {
+      db.run('DELETE FROM videos WHERE video_id = ?', [videoId], function(err) {
+        if (err) {
+          console.error('Error deleting video:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการลบวิดีโอ' });
+        }
+        
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'ไม่พบวิดีโอที่ต้องการลบ' });
+        }
+        
+        res.json({ 
+          message: 'ลบวิดีโอสำเร็จ',
+          success: true
+        });
+      });
+    }
   });
 });
 
 // Create quiz
 router.post('/quizzes', authenticateToken, requireAdmin, (req, res) => {
-  const { module_id, title, time_limit, passing_score, allow_retake, questions } = req.body;
+  const { module_id, title, time_limit, passing_score, allow_retake, order_index, questions } = req.body;
 
-  if (!module_id || !title) {
-    return res.status(400).json({ error: 'Module ID and title required' });
+  // Validation
+  if (!module_id || module_id.trim() === '') {
+    return res.status(400).json({ error: 'กรุณาระบุหลักสูตร' });
   }
 
-  const quizId = uuidv4();
-  db.run(
-    'INSERT INTO quizzes (quiz_id, module_id, title, time_limit, passing_score, allow_retake) VALUES (?, ?, ?, ?, ?, ?)',
-    [quizId, module_id, title, time_limit || 30, passing_score || 70, allow_retake !== undefined ? allow_retake : 1],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to create quiz' });
-      }
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ error: 'กรุณาระบุชื่อแบบทดสอบ' });
+  }
 
-      // Add questions if provided
-      if (questions && Array.isArray(questions)) {
-        questions.forEach((q, index) => {
-          const questionId = uuidv4();
-          db.run(
-            'INSERT INTO quiz_questions (question_id, quiz_id, question, type, options, correct_answer, order_index) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [
-              questionId,
-              quizId,
-              q.question,
-              q.type || 'multiple_choice',
-              JSON.stringify(q.options || []),
-              q.correct_answer,
-              index + 1,
-            ]
-          );
-        });
-      }
+  if (title.length > 300) {
+    return res.status(400).json({ error: 'ชื่อแบบทดสอบต้องไม่เกิน 300 ตัวอักษร' });
+  }
 
-      res.json({ quiz_id: quizId, message: 'Quiz created successfully' });
+  const timeLimit = parseInt(time_limit);
+  if (isNaN(timeLimit) || timeLimit < 1 || timeLimit > 180) {
+    return res.status(400).json({ error: 'เวลาในการทำแบบทดสอบต้องอยู่ระหว่าง 1-180 นาที' });
+  }
+
+  const passingScore = parseInt(passing_score);
+  if (isNaN(passingScore) || passingScore < 0 || passingScore > 100) {
+    return res.status(400).json({ error: 'คะแนนผ่านต้องอยู่ระหว่าง 0-100' });
+  }
+
+  // Check if module exists
+  db.get('SELECT module_id FROM modules WHERE module_id = ?', [module_id], (err, module) => {
+    if (err) {
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
     }
-  );
+    
+    if (!module) {
+      return res.status(404).json({ error: 'ไม่พบหลักสูตรที่ระบุ' });
+    }
+
+    const quizId = uuidv4();
+    db.run(
+      'INSERT INTO quizzes (quiz_id, module_id, title, time_limit, passing_score, allow_retake, order_index) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [quizId, module_id, title.trim(), timeLimit, passingScore, allow_retake !== undefined ? allow_retake : 1, order_index || 1],
+      function(err) {
+        if (err) {
+          console.error('Error creating quiz:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการสร้างแบบทดสอบ' });
+        }
+
+        // Add questions if provided
+        if (questions && Array.isArray(questions) && questions.length > 0) {
+          let questionCount = 0;
+          let questionErrors = 0;
+
+          questions.forEach((q, index) => {
+            if (!q.question || !q.correct_answer) {
+              questionErrors++;
+              return;
+            }
+
+            const questionId = uuidv4();
+            db.run(
+              'INSERT INTO quiz_questions (question_id, quiz_id, question, type, options, correct_answer, order_index) VALUES (?, ?, ?, ?, ?, ?, ?)',
+              [
+                questionId,
+                quizId,
+                q.question,
+                q.type || 'multiple_choice',
+                JSON.stringify(q.options || []),
+                q.correct_answer,
+                index + 1,
+              ],
+              (err) => {
+                if (!err) questionCount++;
+              }
+            );
+          });
+
+          setTimeout(() => {
+            res.json({ 
+              quiz_id: quizId, 
+              message: `สร้างแบบทดสอบสำเร็จ${questionCount > 0 ? ` พร้อมคำถาม ${questionCount} ข้อ` : ''}`,
+              success: true,
+              question_count: questionCount
+            });
+          }, 100);
+        } else {
+          res.json({ 
+            quiz_id: quizId, 
+            message: 'สร้างแบบทดสอบสำเร็จ (ยังไม่มีคำถาม กรุณาเพิ่มคำถามในภายหลัง)',
+            success: true,
+            question_count: 0
+          });
+        }
+      }
+    );
+  });
 });
 
 // Update quiz
 router.put('/quizzes/:quizId', authenticateToken, requireAdmin, (req, res) => {
   const { quizId } = req.params;
-  const { title, time_limit, passing_score, order_index } = req.body;
+  const { title, time_limit, passing_score, allow_retake, order_index } = req.body;
 
-  db.run(
-    'UPDATE quizzes SET title = ?, time_limit = ?, passing_score = ?, order_index = ? WHERE quiz_id = ?',
-    [title, time_limit || 30, passing_score || 70, order_index || 0, quizId],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to update quiz' });
-      }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Quiz not found' });
-      }
-      res.json({ message: 'Quiz updated successfully' });
+  // Validation
+  if (!title || title.trim() === '') {
+    return res.status(400).json({ error: 'กรุณาระบุชื่อแบบทดสอบ' });
+  }
+
+  if (title.length > 300) {
+    return res.status(400).json({ error: 'ชื่อแบบทดสอบต้องไม่เกิน 300 ตัวอักษร' });
+  }
+
+  const timeLimit = parseInt(time_limit);
+  if (isNaN(timeLimit) || timeLimit < 1 || timeLimit > 180) {
+    return res.status(400).json({ error: 'เวลาในการทำแบบทดสอบต้องอยู่ระหว่าง 1-180 นาที' });
+  }
+
+  const passingScore = parseInt(passing_score);
+  if (isNaN(passingScore) || passingScore < 0 || passingScore > 100) {
+    return res.status(400).json({ error: 'คะแนนผ่านต้องอยู่ระหว่าง 0-100' });
+  }
+
+  // Check if quiz exists
+  db.get('SELECT quiz_id FROM quizzes WHERE quiz_id = ?', [quizId], (err, quiz) => {
+    if (err) {
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
     }
-  );
+    
+    if (!quiz) {
+      return res.status(404).json({ error: 'ไม่พบแบบทดสอบที่ต้องการแก้ไข' });
+    }
+
+    db.run(
+      'UPDATE quizzes SET title = ?, time_limit = ?, passing_score = ?, allow_retake = ?, order_index = ? WHERE quiz_id = ?',
+      [title.trim(), timeLimit, passingScore, allow_retake !== undefined ? allow_retake : 1, order_index || 0, quizId],
+      function(err) {
+        if (err) {
+          console.error('Error updating quiz:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการอัพเดตแบบทดสอบ' });
+        }
+        
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'ไม่พบแบบทดสอบที่ต้องการแก้ไข' });
+        }
+        
+        res.json({ 
+          message: 'บันทึกการแก้ไขแบบทดสอบสำเร็จ',
+          success: true
+        });
+      }
+    );
+  });
 });
 
 // Delete quiz
 router.delete('/quizzes/:quizId', authenticateToken, requireAdmin, (req, res) => {
   const { quizId } = req.params;
 
-  // Delete quiz questions first
-  db.run('DELETE FROM quiz_questions WHERE quiz_id = ?', [quizId], (err) => {
+  // Check if quiz has results
+  db.get('SELECT COUNT(*) as count FROM quiz_results WHERE quiz_id = ?', [quizId], (err, result) => {
     if (err) {
-      return res.status(500).json({ error: 'Failed to delete quiz questions' });
+      return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล' });
     }
-    
-    // Then delete quiz
-    db.run('DELETE FROM quizzes WHERE quiz_id = ?', [quizId], function(err) {
+
+    if (result.count > 0) {
+      return res.status(400).json({ 
+        error: `ไม่สามารถลบแบบทดสอบได้ เนื่องจากมีนักศึกษา ${result.count} คนทำแบบทดสอบนี้แล้ว`,
+        hint: 'หากต้องการลบจริงๆ กรุณาลบผลการทดสอบทั้งหมดก่อน'
+      });
+    }
+
+    // Delete quiz questions first
+    db.run('DELETE FROM quiz_questions WHERE quiz_id = ?', [quizId], (err) => {
       if (err) {
-        return res.status(500).json({ error: 'Failed to delete quiz' });
+        console.error('Error deleting quiz questions:', err);
+        return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการลบคำถาม' });
       }
-      if (this.changes === 0) {
-        return res.status(404).json({ error: 'Quiz not found' });
-      }
-      res.json({ message: 'Quiz deleted successfully' });
+      
+      // Then delete quiz
+      db.run('DELETE FROM quizzes WHERE quiz_id = ?', [quizId], function(err) {
+        if (err) {
+          console.error('Error deleting quiz:', err);
+          return res.status(500).json({ error: 'เกิดข้อผิดพลาดในการลบแบบทดสอบ' });
+        }
+        
+        if (this.changes === 0) {
+          return res.status(404).json({ error: 'ไม่พบแบบทดสอบที่ต้องการลบ' });
+        }
+        
+        res.json({ 
+          message: 'ลบแบบทดสอบสำเร็จ',
+          success: true
+        });
+      });
     });
   });
 });
